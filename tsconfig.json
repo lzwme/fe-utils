@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "commonjs",
+    "outDir": "build/module",
+    "moduleResolution": "node",
+    "inlineSourceMap": false,
+    "esModuleInterop": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
+    /* Debugging Options */
+    "traceResolution": false,
+    "listEmittedFiles": false,
+    "listFiles": false,
+    "pretty": true,
+
+    "lib": ["DOM", "esnext"],
+    "typeRoots": ["./node_modules/@types"]
+  },
+  "exclude": ["node_modules/**"],
+  "include": ["**/*.ts"],
+  "compileOnSave": false
+}

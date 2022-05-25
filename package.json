@@ -1,0 +1,86 @@
+{
+  "name": "@lzwme/node-utils",
+  "description": "前端 node、web 项目常用工具函数集合。",
+  "version": "1.7.0",
+  "main": "build/cjs/index.js",
+  "module": "build/esm/index.js",
+  "typings": "build/cjs/index.d.ts",
+  "license": "MIT",
+  "repository": "https://github.com/lzwme/node-utils.git",
+  "author": {
+    "name": "renxia",
+    "email": "lzwy0820@qq.com",
+    "url": "https://lzw.me"
+  },
+  "keywords": [
+    "node",
+    "utils",
+    "function utils",
+    "typescript"
+  ],
+  "scripts": {
+    "prepare": "husky install",
+    "dev": "npm run watch:build",
+    "start": "npm run watch",
+    "build": "run-s clean && run-p build:*",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:esm": "tsc -p tsconfig.module.json",
+    "fix": "run-s fix:*",
+    "fix:lint": "eslint src --ext .ts --fix",
+    "fix:prettier": "prettier \"src/**/*.ts\" --write",
+    "test": "run-s test:*",
+    "test:lint": "eslint src --ext .ts",
+    "test:prettier": "prettier \"src/**/*.ts\" --list-different",
+    "test:unit": "npm run cov",
+    "watch": "run-s clean build:cjs && run-p \"build:cjs -- -w\" \"test:unit -- --watch\"",
+    "watch:build": "tsc -p tsconfig.cjs.json -w",
+    "watch:test": "jest --watch",
+    "cov": "jest --coverage --silent",
+    "cov:html": "jest --coverage --silent --reporter=html",
+    "doc": "run-s doc:html",
+    "doc:html": "typedoc src/ --exclude **/*.spec.ts --out build/docs --tsconfig tsconfig.module.json",
+    "doc:json": "typedoc src/ --exclude **/*.spec.ts --json build/docs/typedoc.json --tsconfig tsconfig.module.json",
+    "version": "standard-version",
+    "dist": "run-s test build doc:html",
+    "release": "run-s dist",
+    "release-version": "run-s dist version",
+    "clean": "flh rm -f ./build"
+  },
+  "engines": {
+    "node": ">=10"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "dependencies": {
+    "console-log-colors": "^0.2.3"
+  },
+  "devDependencies": {
+    "@lzwme/fed-lint-helper": "^1.7.0",
+    "@jest/core": "^27",
+    "@jest/types": "^27",
+    "@swc/core": "^1.2.192",
+    "@swc/jest": "^0.2.20",
+    "@types/eslint": "^8.4.2",
+    "@types/glob": "^7.2.0",
+    "@types/jest": "^27.4.1",
+    "@types/node": "^16",
+    "@typescript-eslint/eslint-plugin": "^5.22.0",
+    "@typescript-eslint/parser": "^5.22.0",
+    "eslint": "^8.15.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-jest": "^26.1.5",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-unicorn": "^42.0.0",
+    "husky": "^8.0.1",
+    "jest": "^27.5.1",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.6.2",
+    "standard-version": "^9.3.2",
+    "ts-node": "^10.7.0",
+    "typedoc": "^0.22.15",
+    "typescript": "^4.7.2"
+  },
+  "packageManager": "pnpm@7.1.0"
+}

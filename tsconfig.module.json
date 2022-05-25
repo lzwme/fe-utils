@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "emitDeclarationOnly": false,
+    "outDir": "build/esm",
+    "target": "es2022",
+    "module": "esnext"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules/**", "__test__", "src/**/*.spec.ts"]
+}
