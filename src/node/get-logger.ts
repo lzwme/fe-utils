@@ -1,7 +1,7 @@
-/* eslint no-console: 0 */
 import { color } from 'console-log-colors';
-import { Logger, LogLevelType } from '../lib';
+import { NLogger } from './lib/NLogger';
+import { type LogLevelType } from '../common/Logger';
 
-export function getLogger(tag = '[flh]', levelType?: LogLevelType): Logger {
-  return Logger.getLogger(tag, { levelType, color });
+export function getLogger(tag = '[general]', levelType?: LogLevelType): NLogger {
+  return NLogger.getLogger(tag, { levelType, color });
 }

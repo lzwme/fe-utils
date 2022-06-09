@@ -1,7 +1,7 @@
 import path from 'path';
 import { color } from 'console-log-colors';
 import { createInterface } from 'readline';
-import { Logger } from './lib/Logger';
+import { getLogger } from './get-logger';
 import { formatTimeCost } from '../common/date';
 
 /** 等待并获取用户输入内容 */
@@ -38,7 +38,7 @@ export function getTimeCost(startTime: number, withTip = true) {
  * @param {number} startTime 开始时间戳
  */
 export function logTimeCost(startTime: number, prefix = '') {
-  Logger.getLogger().log(color.cyan(prefix), getTimeCost(startTime));
+  getLogger().log(color.cyan(prefix), getTimeCost(startTime));
 }
 
 // @see async.ts

@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-01-12 15:10:41
  * @LastEditors: lzw
- * @LastEditTime: 2022-05-25 20:49:49
+ * @LastEditTime: 2022-06-09 22:47:56
  * @Description:
  * @see src\vs\base\common\async.ts
  */
@@ -135,7 +135,7 @@ export class SequencerByKey<TKey> {
   queue<T>(key: TKey, promiseTask: ITask<Promise<T>>): Promise<T> {
     const runningPromise = this.promiseMap.get(key) ?? Promise.resolve();
     const newPromise = runningPromise
-      .catch(() => {})
+      .catch(() => null)
       .then(promiseTask)
       .finally(() => {
         if (this.promiseMap.get(key) === newPromise) {
@@ -147,7 +147,7 @@ export class SequencerByKey<TKey> {
   }
 }
 
-interface IScheduledLater extends IDisposable {
+export interface IScheduledLater extends IDisposable {
   isTriggered(): boolean;
 }
 

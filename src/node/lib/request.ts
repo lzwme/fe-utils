@@ -18,7 +18,7 @@ function toLowcaseKeyObject(info: PlainObject = {}) {
 export function urlFormat(url: string, params: PlainObject, isRepalce = false) {
   if (!url || !params) return url;
 
-  const u = new URL(url);
+  const u = new URL(url.includes(':') ? url : `file://${url}`);
   for (const [key, value] of Object.entries(params)) {
     if (isRepalce) u.searchParams.set(key, value);
     else u.searchParams.append(key, value);

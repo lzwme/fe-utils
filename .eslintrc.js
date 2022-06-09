@@ -44,11 +44,21 @@ module.exports = {
         '**/*.d.ts',
     ],
     rules: {
+        'prefer-const': [
+            'warn',
+            {
+                destructuring: 'all',
+            },
+        ],
         'prettier/prettier': 'warn',
         // 关闭 eslint 的 indent，使用 prettier 格式化格式
         indent: ['off', 2],
         '@typescript-eslint/explicit-module-boundary-types': 'off',
-        '@typescript-eslint/no-unused-vars': ['warn', { varsIgnorePattern: '^_', argsIgnorePattern: '^_', ignoreRestSiblings: true }],
+        '@typescript-eslint/no-unused-vars': ['warn', {
+            varsIgnorePattern: '^_',
+            argsIgnorePattern: '^_',
+            ignoreRestSiblings: true
+        }],
         '@typescript-eslint/ban-ts-comment': 'off',
         'unicorn/prefer-module': 'off',
         'unicorn/prefer-node-protocol': 'off',
@@ -60,11 +70,11 @@ module.exports = {
         'unicorn/no-null': 'off',
         'unicorn/prevent-abbreviations': 'off',
         'unicorn/import-style': ['error', {
-          styles: {
-            path: {
-              named: true,
+            styles: {
+                path: {
+                    named: true,
+                }
             }
-          }
         }]
     },
 };

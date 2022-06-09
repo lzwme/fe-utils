@@ -14,16 +14,13 @@ build/docs
 coverage
 .nyc_output
 *.log
-npm-debug.log
-eslintWhitelist.json
-tsCheckWhiteList.json
+/config/
+/docs/
 
 # manager
 package-lock.json
 yarn.lock
-yarn-error.log
 pnpm-lock.yaml
-.pnpm-debug.log
 
 # config
 .gitattributes

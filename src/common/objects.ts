@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { type PlainObject } from './types';
-import { isObject } from './is';
+import { isObject, isSet, isMap } from './is';
 
 export function safeStringify(obj: any): string {
   const seen = new Set<any>();
@@ -51,6 +51,7 @@ export function mixin<T = any>(destination: any, source: any, overwrite = true):
   }
   return destination;
 }
+
 export function simpleAssign<T = PlainObject>(a: T, b: PlainObject, isIgnoreNull = false): T {
   // 入参不是对象格式则忽略
   if (!a || typeof a !== 'object') return a;
@@ -58,12 +59,14 @@ export function simpleAssign<T = PlainObject>(a: T, b: PlainObject, isIgnoreNull
     return a;
   }
 
+  // todo: Set、Map
   for (const key in b) {
-    // 如果是数组，则只简单的复制一份（不考虑数组内的类型）
-    if (Array.isArray(b[key])) {
-      a[key] = [...b[key]];
-    } else if (null == b[key] || typeof b[key] !== 'object' || b[key] instanceof RegExp) {
+    if (null == b[key] || typeof b[key] !== 'object' || b[key] instanceof RegExp || isSet(b[key] || isMap(b[key]))) {
       if (!isIgnoreNull || null != b[key]) a[key] = b[key];
+    }
+    // 如果是数组，则只简单的复制一份（不考虑数组内的类型）
+    else if (Array.isArray(b[key])) {
+      a[key] = [...b[key]];
     } else {
       if (!a[key]) a[key] = {};
       simpleAssign(a[key], b[key], isIgnoreNull);

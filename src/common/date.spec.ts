@@ -1,4 +1,4 @@
-import * as utilsDate from './utils-date';
+import * as utilsDate from './date';
 
 describe('utils-date', () => {
   it('dateFormat', () => {

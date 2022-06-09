@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-01-12 15:12:40
  * @LastEditors: lzw
- * @LastEditTime: 2022-05-25 20:51:44
+ * @LastEditTime: 2022-06-09 22:46:51
  * @Description:
  * @see src/vs/base/common/uuid.ts
  */
@@ -37,13 +37,16 @@ if (typeof crypto === 'object' && typeof crypto.getRandomValues === 'function') 
   };
 }
 
+/** 生成 uuid */
 export function generateUuid(): string {
   // get data
   _fillRandomValues(_data);
 
   // set version bits
-  _data[6] = (_data[6] & 0x0F) | 0x40;
-  _data[8] = (_data[8] & 0x3F) | 0x80;
+  // eslint-disable-next-line unicorn/number-literal-case
+  _data[6] = (_data[6] & 0x0f) | 0x40;
+  // eslint-disable-next-line unicorn/number-literal-case
+  _data[8] = (_data[8] & 0x3f) | 0x80;
 
   // print as string
   let i = 0;
@@ -71,4 +74,5 @@ export function generateUuid(): string {
   return result;
 }
 
+/** @see generateUuid */
 export const v1 = generateUuid;

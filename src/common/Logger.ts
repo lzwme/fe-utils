@@ -2,12 +2,12 @@
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
  * @LastEditors: lzw
- * @LastEditTime: 2022-05-17 20:41:06
+ * @LastEditTime: 2022-06-09 22:24:36
  * @Description:
  */
 /* eslint no-console: 0 */
-import fs from 'fs';
-import path from 'path';
+
+import { type GeneralFn } from './types';
 
 /** 日志级别 */
 export enum LogLevel {
@@ -34,7 +34,6 @@ export interface LoggerOptions {
 }
 
 export type LogLevelType = keyof typeof LogLevel;
-type LogFn = (...p) => void;
 
 const defaultOptions: LoggerOptions = {
   levelType: 'log',
@@ -44,68 +43,57 @@ const defaultOptions: LoggerOptions = {
   color: null,
 };
 
+let headTipColored = false;
 const LogLevelHeadTip = {
   error: ['[ERROR]', 'redBright'],
-  warn: ['[WARNING]', 'yellowBright'],
+  warn: ['[WARN]', 'yellowBright'],
   info: ['[INFO]', 'blueBright'],
   log: ['[LOG]', 'cyanBright'],
   debug: ['[DEBUG]', 'gray'],
 } as const;
-
-const fsStreamCache: { [logPath: string]: fs.WriteStream } = {};
 
 export class Logger {
   public static map: { [tag: string]: Logger } = {};
   /** 日志记录级别 */
   private level: LogLevel = LogLevel.log;
 
-  public silent: LogFn = this._log.bind(this, 'error');
-  public error: LogFn = this._log.bind(this, 'error');
-  public warn: LogFn = this._log.bind(this, 'warn');
-  public info: LogFn = this._log.bind(this, 'info');
-  public log: LogFn = this._log.bind(this, 'log');
-  public debug: LogFn = this._log.bind(this, 'debug');
+  public silent: GeneralFn = this._log.bind(this, 'error');
+  public error: GeneralFn = this._log.bind(this, 'error');
+  public warn: GeneralFn = this._log.bind(this, 'warn');
+  public info: GeneralFn = this._log.bind(this, 'info');
+  public log: GeneralFn = this._log.bind(this, 'log');
+  public debug: GeneralFn = this._log.bind(this, 'debug');
 
   /** 日志路径 */
-  private logPath: string;
-  private logDir: string;
+  protected logPath: string;
+  protected logDir: string;
   /** 本机与服务器时间的差值 diff = Date.now() - serverTime */
   private static serverTimeDiff = 0;
 
   /** 记录日志的次数 */
   private times = 0;
 
-  constructor(private tag: string, private options: LoggerOptions = {}) {
+  constructor(protected tag: string, protected options: LoggerOptions = {}) {
     const match = /(\w+)/.exec(tag);
     if (!match) throw 'Logger tag expected';
     this.tag = tag;
 
     if (!(options.levelType in LogLevel)) {
-      if (process.env.FLH_LOG_LEVEL) options.levelType = process.env.ET_LOG_LEVEL as LogLevelType;
+      if (process.env.FE_LOG_LEVEL) options.levelType = process.env.FE_LOG_LEVEL as LogLevelType;
       if (options.levelType in LogLevel) this.level = LogLevel[options.levelType];
     }
 
     options = this.updateOptions(options);
-    this.setLogDir(options.logDir);
+    if (this.setLogDir) this.setLogDir(options.logDir);
   }
-  public setLogDir(logDir: string) {
-    if (!logDir || !fs?.createWriteStream) return;
-    if (logDir === this.logDir) return;
-    this.logDir = logDir;
-
-    const logFsStream = fsStreamCache[this.logPath];
-    if (logFsStream) {
-      logFsStream.destroy();
-      delete fsStreamCache[this.logPath];
-    }
-
-    if (logDir.endsWith('.log')) {
-      this.logPath = logDir;
-      this.logDir = path.dirname(logDir);
-    } else {
-      const curTime = new Date().toTimeString().slice(0, 8).replace(/\D/g, '');
-      this.logPath = path.resolve(logDir, `${this.tag.replace(/[^\dA-Za-z]/g, '')}_${curTime}.log`);
-    }
+  public setLogDir(_logDir: string) {
+    // todo: node.js 下可扩展该方法
+  }
+  /**
+   * 写入到日志文件。
+   */
+  protected writeToFile(_msg: string) {
+    // todo: node.js 下可扩展该方法
   }
   /** 更新服务器时间，计算时间差并返回 */
   static setServerTime(serverTime: number) {
@@ -127,10 +115,10 @@ export class Logger {
     if (lvl <= this.level) {
       this.times++;
       const now = this.getSeverTime(true);
-      const curTime = now.toTimeString().slice(0, 8) + '.' + now.getMilliseconds();
+      const curTime = now.toTimeString().slice(0, 8) + '.' + String(now.getMilliseconds()).padStart(3, '0');
       const msg = args.map(s => (typeof s === 'string' ? s : JSON.stringify(s))).join(' ');
 
-      this.writeToFile(`[${curTime}]${this.tag}[${type}] ${msg}\n`);
+      if (this.writeToFile) this.writeToFile(`[${curTime}]${this.tag}[${type}] ${msg}\n`);
       if (this.options.silent) return;
 
       if (console[type]) {
@@ -150,26 +138,14 @@ export class Logger {
       }
     }
   }
-  /**
-   * 写入到日志文件
-   * @todo 增加分包支持
-   */
-  private writeToFile(msg: string) {
-    if (!this.logPath) return;
-    let logFsStream = fsStreamCache[this.logPath];
-    if (!logFsStream || logFsStream.destroyed) {
-      if (!fs.existsSync(this.logDir)) fs.mkdirSync(this.logDir, { recursive: true });
-      logFsStream = fs.createWriteStream(this.logPath, { encoding: 'utf8', flags: 'a' });
-      fsStreamCache[this.logPath] = logFsStream;
-    }
-    // eslint-disable-next-line no-control-regex
-    logFsStream.write(msg.replace(/\u001B\[\d+m/g, ''), 'utf8');
-  }
   public updateOptions(options: LoggerOptions) {
-    if (!this.options.color && options.color) {
+    if (!headTipColored && options.color) {
       for (const key of Object.keys(LogLevelHeadTip)) {
         const [tag, colorType] = LogLevelHeadTip[key];
-        if (options.color[colorType]) LogLevelHeadTip[key][0] = options.color[colorType](tag);
+        if (options.color[colorType]) {
+          LogLevelHeadTip[key][0] = options.color[colorType](tag);
+          headTipColored = true;
+        }
       }
     }
 
@@ -184,13 +160,12 @@ export class Logger {
     }
 
     if (options.levelType in LogLevel) this.level = LogLevel[options.levelType];
-    options = this.options;
 
-    return options;
+    return this.options;
   }
 
   public static getLogger(tag?: string, options?: LoggerOptions): Logger {
-    if (!tag) tag = '[flh]';
+    if (!tag) tag = '[general]';
     if (!Logger.map[tag]) Logger.map[tag] = new Logger(tag, options);
     else if (options) Logger.map[tag].updateOptions(options);
     return Logger.map[tag];

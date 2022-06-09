@@ -34,6 +34,14 @@ export function isFunction(obj: unknown): obj is Function {
   return typeof obj === 'function';
 }
 
+export function isSet(obj: unknown): obj is Set<unknown> {
+  return String(obj) === '[object Set]';
+}
+
+export function isMap(obj: unknown): obj is Map<unknown, unknown> {
+  return String(obj) === '[object Map]';
+}
+
 export function isPromise<T>(obj: unknown): obj is Promise<T> {
   return !!obj && typeof (obj as Promise<T>).then === 'function' && typeof (obj as Promise<T>).catch === 'function';
 }
