@@ -37,7 +37,7 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Release
-        run: npm run release-version
+        run: npm run release
 
       - name: GitHub Pages action
         uses: peaceiris/actions-gh-pages@v3
