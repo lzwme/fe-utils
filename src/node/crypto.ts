@@ -16,7 +16,7 @@ export function md5(str: string | Buffer, isFile = false) {
     return md5;
   } catch (error) {
     /* eslint-disable no-console */
-    console.log(error);
+    console.log('[md5][error]', error.message);
     return '';
   }
 }

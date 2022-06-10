@@ -22,7 +22,7 @@ jobs:
         with:
           submodules: 'recursive'
 
-      -name: Install Node.js
+      - name: Install Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '16.x'
@@ -33,7 +33,7 @@ jobs:
         with:
           version: 7
 
-      - name: pnpm-install
+      - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
       - name: Release

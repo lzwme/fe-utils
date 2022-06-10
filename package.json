@@ -57,7 +57,7 @@
     "console-log-colors": "^0.2.3"
   },
   "devDependencies": {
-    "@lzwme/fed-lint-helper": "^1.7.0",
+    "@lzwme/fed-lint-helper": "^1.8.0",
     "@jest/core": "^28",
     "@jest/types": "^28",
     "@swc/core": "^1.2.197",
