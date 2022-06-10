@@ -41,28 +41,34 @@ describe('utils-date', () => {
     }
   });
 
+  const utcTimestamp = new Date('2022-04-06T10:10:13.915').getTime() + new Date().getTimezoneOffset() * 60_000;
   it('getDateTimeByTimeZone', () => {
     const list = [
-      [8, new Date('2022-04-06T10:10:13.915'), 1_649_211_013_915],
-      [-8, new Date('2022-04-06T10:10:13.915'), 1_649_153_413_915],
-      [0, new Date('2022-04-06T10:10:13.915'), 1_649_182_213_915],
+      [8, new Date('2022-04-06T10:10:13.915'), utcTimestamp + 8 * 3_600_000],
+      [-8, new Date('2022-04-06T10:10:13.915'), utcTimestamp - 8 * 3_600_000],
+      [0, new Date('2022-04-06T10:10:13.915'), utcTimestamp],
     ] as const;
 
     for (const [timeZone, now, r] of list) {
-      expect(utilsDate.getDateTimeByTimeZone(timeZone, now).getTime()).toEqual(r);
+      const result = utilsDate.getDateTimeByTimeZone(timeZone, now).getTime();
+      if (result !== r) console.error('getDateTimeByTimeZone-error:', timeZone, now, r, result);
+      expect(result).toEqual(r);
     }
   });
 
   it('toLocalTime', () => {
+    const timezone = new Date().getTimezoneOffset() / 60;
     const list = [
-      [new Date('2022-04-06T10:10:13.915'), 8, 1_649_211_013_915],
-      [new Date('2022-04-06T10:10:13.915'), 0, 1_649_182_213_915],
-      ['20220406', 8, 1_649_174_400_000],
-      ['20220406', 0, 1_649_145_600_000],
+      [new Date('2022-04-06T10:10:13.915'), 8, utcTimestamp + 8 * 3_600_000],
+      [new Date('2022-04-06T10:10:13.915'), 0, utcTimestamp],
+      ['20220406', 8, 1_649_174_400_000 + (timezone + 8) * 3_600_000],
+      ['20220406', 0, 1_649_174_400_000 + (timezone + 0) * 3_600_000],
     ] as const;
 
     for (const [now, timeZone, r] of list) {
-      expect(utilsDate.toLocalTime(now, timeZone).getTime()).toEqual(r);
+      const result = utilsDate.toLocalTime(now, timeZone).getTime();
+      if (result !== r) console.error('toLocalTime-error:', timeZone, now, r, result);
+      expect(result).toEqual(r);
     }
   });
 

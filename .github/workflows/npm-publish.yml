@@ -26,7 +26,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '16.x'
-          # registry-url: https://registry.npmjs.com
+          registry-url: https://registry.npmjs.com
           # cache: 'pnpm'
 
       - uses: pnpm/action-setup@v2
@@ -47,6 +47,6 @@ jobs:
          publish_dir: ./docs
 
       - name: npm-publish
-        run: npm publish
-          env:
-            NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
