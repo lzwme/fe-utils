@@ -57,12 +57,12 @@ describe('utils-date', () => {
   });
 
   it('toLocalTime', () => {
-    const timezone = new Date().getTimezoneOffset() / 60;
+    const utcTimestamp2 = new Date('2022-04-06T00:00:00').getTime() + new Date().getTimezoneOffset() * 60_000;
     const list = [
       [new Date('2022-04-06T10:10:13.915'), 8, utcTimestamp + 8 * 3_600_000],
       [new Date('2022-04-06T10:10:13.915'), 0, utcTimestamp],
-      ['20220406', 8, 1_649_174_400_000 + (timezone + 8) * 3_600_000],
-      ['20220406', 0, 1_649_174_400_000 + (timezone + 0) * 3_600_000],
+      ['20220406', 8, utcTimestamp2 + 8 * 3_600_000],
+      ['20220406', 0, utcTimestamp2 + 0 * 3_600_000],
     ] as const;
 
     for (const [now, timeZone, r] of list) {
