@@ -39,6 +39,8 @@ module.exports = {
         '**/node_modules/**',
         'dist/**',
         'build/**',
+        '**/esm/**',
+        '**/cjs/**',
         'mock/**',
         '**/*.js',
         '**/*.d.ts',

@@ -4,7 +4,7 @@
 
 [![NPM version][npm-badge]][npm-url]
 [![node version][node-badge]][node-url]
-![license MIT](https://img.shields.io/github/license/lzwme/asmd-calc)
+![license MIT](https://img.shields.io/github/license/lzwme/fe-utils)
 
 [![build status](https://github.com/lzwme/fe-utils/actions/workflows/node-ci.yml/badge.svg)](https://github.com/lzwme/fe-utils/actions/workflows/node-ci.yml)
 [![npm download][download-badge]][download-url]
@@ -75,7 +75,7 @@ npm link
 yarn dev
 ```
 
-或者 [fork]() 本项目进行代码贡献。
+或者 [fork](https://github.com/lzwme/fe-utils/fork) 本项目进行代码贡献。
 
 **欢迎贡献想法与代码。**
 

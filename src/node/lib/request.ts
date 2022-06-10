@@ -2,7 +2,8 @@ import { URL } from 'url';
 import zlib from 'zlib';
 import http from 'http';
 import https from 'https';
-import type { PlainObject } from '../../common';
+import { urlFormat } from '../../common/url';
+import type { PlainObject } from '../../common/types';
 
 function toLowcaseKeyObject(info: PlainObject = {}) {
   for (const key of Object.keys(info)) {
@@ -13,18 +14,6 @@ function toLowcaseKeyObject(info: PlainObject = {}) {
     }
   }
   return info;
-}
-
-export function urlFormat(url: string, params: PlainObject, isRepalce = false) {
-  if (!url || !params) return url;
-
-  const u = new URL(url.includes(':') ? url : `file://${url}`);
-  for (const [key, value] of Object.entries(params)) {
-    if (isRepalce) u.searchParams.set(key, value);
-    else u.searchParams.append(key, value);
-  }
-
-  return u.toString();
 }
 
 export class Request {
@@ -64,8 +53,8 @@ export class Request {
   getCookie(isString = true) {
     return isString ? this.cookies.join('; ') : this.cookies;
   }
-  request<T = PlainObject>(method: string, url: string, parameters: PlainObject, headers?: http.IncomingHttpHeaders) {
-    const urlObject = new URL(url);
+  request<T = PlainObject>(method: string, url: string | URL, parameters: PlainObject, headers?: http.IncomingHttpHeaders) {
+    const urlObject = typeof url === 'string' ? new URL(url) : url;
     const options: https.RequestOptions = {
       hostname: urlObject.host,
       port: urlObject.port,

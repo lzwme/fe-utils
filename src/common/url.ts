@@ -1,22 +1,31 @@
 import { PlainObject } from './types';
 
+/**
+ *
+ * @param url
+ * @param params 参数
+ * @param isRepalce 是否替换已存在于 url 中的参数
+ * @returns
+ */
 export function urlFormat(url: string, params: PlainObject, isRepalce = false) {
-  if (!url || !params) return url;
-
   const u = new URL(url, 'file:');
-  for (let [key, value] of Object.entries(params)) {
-    if (value == null) value = '';
-    else if (typeof value !== 'string') value = JSON.stringify(value);
 
-    if (isRepalce) u.searchParams.set(key, value);
-    else u.searchParams.append(key, value);
+  if (params) {
+    for (let [key, value] of Object.entries(params)) {
+      if (value == null) value = '';
+      else if (typeof value !== 'string') value = JSON.stringify(value);
+
+      if (isRepalce) u.searchParams.set(key, value);
+      else u.searchParams.append(key, value);
+    }
   }
 
-  return u.toString();
+  return u;
 }
 
-export function toFileUri(filePath: string): string {
-  return new URL(filePath, 'file:').toString();
+export function toFileUri(filePath: string, params?: PlainObject): string {
+  // if (!params) return new URL(filePath, 'file:').toString();
+  return urlFormat(filePath, params).toString();
 }
 
 /** 将对象参数转换为 url searchParams 格式 */

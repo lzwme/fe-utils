@@ -3,7 +3,7 @@
  * @Author: lzw
  * @Date: 2021-12-24 13:01:39
  * @LastEditors: lzw
- * @LastEditTime: 2022-05-25 20:53:00
+ * @LastEditTime: 2022-06-10 11:35:02
  * @Description: 企业微信机器人通知
  */
 
@@ -43,15 +43,10 @@ export function wxWorkNotify(params: string | Record<string, any>, webhookUrl: s
     };
   }
 
-  return api
-    .post<WxWorkResult>(webhookUrl, params, {
-      'content-type': 'application/json',
-      type: 'payload',
-    })
-    .then(d => {
-      if (debug) console.log(`[wxWorkNotify][${d.data.errcode}]`, JSON.stringify(d.data));
-      return d.data;
-    });
+  return api.post<WxWorkResult>(webhookUrl, params, { 'content-type': 'application/json' }).then(d => {
+    if (debug) console.log(`[wxWorkNotify][${d.data.errcode}]`, JSON.stringify(d.data));
+    return d.data;
+  });
 }
 
 // wxWorkNotify('hello!');
