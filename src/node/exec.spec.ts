@@ -20,6 +20,6 @@ describe('utils/exec', () => {
   it('execPromisfy', async () => {
     expect((await execPromisfy('test')).stdout).toBe('');
     expect((await execPromisfy('echo test')).stdout).toBe('test');
-    expect((await execPromisfy('echo test', true)).stdout).toBe('test');
+    expect((await execPromisfy('echo test', null, true)).stdout).toBe('test');
   });
 });
