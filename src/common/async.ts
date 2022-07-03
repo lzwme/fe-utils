@@ -393,3 +393,71 @@ export async function retry<T>(task: ITask<Promise<T>>, delay: number, retries: 
 
   throw lastError;
 }
+
+interface ILimitedTaskFactory<T> {
+  factory: ITask<Promise<T>>;
+  c: (value: T | Promise<T>) => void;
+  e: (error?: unknown) => void;
+}
+
+/**
+ * A helper to queue N promises and run them all with a max degree of parallelism. The helper
+ * ensures that at any time no more than M promises are running at the same time.
+ */
+export class Limiter<T> {
+  private _size = 0;
+  private runningPromises = 0;
+  private maxDegreeOfParalellism: number;
+  private outstandingPromises: ILimitedTaskFactory<T>[] = [];
+  private onFinishCallbackFns: ((...args: unknown[]) => unknown)[] = [];
+
+  constructor(maxDegreeOfParalellism: number) {
+    this.maxDegreeOfParalellism = maxDegreeOfParalellism;
+  }
+
+  onFinished(callback: (...args: unknown[]) => unknown) {
+    this.onFinishCallbackFns.push(callback);
+  }
+
+  get size(): number {
+    return this._size;
+  }
+
+  queue(factory: ITask<Promise<T>>): Promise<T> {
+    this._size++;
+
+    return new Promise<T>((c, e) => {
+      this.outstandingPromises.push({ factory, c, e });
+      this.consume();
+    });
+  }
+
+  private consume(): void {
+    while (this.outstandingPromises.length > 0 && this.runningPromises < this.maxDegreeOfParalellism) {
+      const iLimitedTask = this.outstandingPromises.shift();
+      this.runningPromises++;
+
+      const promise = iLimitedTask.factory();
+      promise.then(iLimitedTask.c, iLimitedTask.e);
+      promise.then(
+        () => this.consumed(),
+        () => this.consumed()
+      );
+    }
+  }
+
+  private consumed(): void {
+    this._size--;
+    this.runningPromises--;
+
+    if (this.outstandingPromises.length > 0) {
+      this.consume();
+    } else {
+      for (const d of this.onFinishCallbackFns) d();
+    }
+  }
+
+  dispose(): void {
+    this.onFinishCallbackFns = [];
+  }
+}
