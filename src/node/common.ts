@@ -27,7 +27,19 @@ export function fixToshortPath(filepath = '', rootDir = process.cwd()) {
   return shortPath.startsWith('/') ? shortPath.slice(1) : shortPath;
 }
 
-export function getTimeCost(startTime: number, withTip = true) {
+/** 计算指定函数的执行耗时。返回值单位为 ns */
+export async function calcTimeCost(fn: () => unknown, label?: string) {
+  const startTime = process.hrtime.bigint();
+  await fn();
+  const endTime = process.hrtime.bigint();
+  const timeCost = Number(endTime - startTime);
+
+  if (label) getLogger().log(`[${color.cyanBright(label)}] timeCost:`, color.greenBright(`${timeCost / 1e9}s`));
+
+  return timeCost;
+}
+
+export function getFormatedTimeCost(startTime: number, withTip = true) {
   let timeCost = formatTimeCost(startTime); // (Date.now() - startTime) / 1000 + 's';
   if (withTip) timeCost = `TimeCost: ${color.greenBright(timeCost)}`;
   return timeCost;
@@ -38,7 +50,7 @@ export function getTimeCost(startTime: number, withTip = true) {
  * @param {number} startTime 开始时间戳
  */
 export function logTimeCost(startTime: number, prefix = '') {
-  getLogger().log(color.cyan(prefix), getTimeCost(startTime));
+  getLogger().log(color.cyan(prefix), getFormatedTimeCost(startTime));
 }
 
 // @see async.ts

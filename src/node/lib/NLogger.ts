@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
  * @LastEditors: lzw
- * @LastEditTime: 2022-06-09 22:09:01
+ * @LastEditTime: 2022-06-28 22:02:06
  * @Description:
  */
 /* eslint no-console: 0 */
@@ -19,30 +19,34 @@ export class NLogger extends Logger {
   constructor(tag: string, options: LoggerOptions = {}) {
     super(tag, options);
   }
-  public setLogDir(logDir: string) {
+  public override setLogDir(logDir: string) {
     if (!logDir || !fs?.createWriteStream) return;
-    if (logDir === this.logDir) return;
-    this.logDir = logDir;
+
+    let logPath = logDir;
+
+    if (logDir.endsWith('.log')) {
+      logDir = path.dirname(logDir);
+    } else {
+      const curTime = new Date().toISOString().slice(0, 10).replace(/\D/g, '');
+      logPath = path.resolve(logDir, `${this.tag.replace(/[^\dA-Za-z]/g, '')}_${curTime}.log`);
+    }
+
+    if (logPath === this.logPath) return;
 
     const logFsStream = fsStreamCache[this.logPath];
     if (logFsStream) {
-      logFsStream.destroy();
+      logFsStream.close();
       delete fsStreamCache[this.logPath];
     }
 
-    if (logDir.endsWith('.log')) {
-      this.logPath = logDir;
-      this.logDir = path.dirname(logDir);
-    } else {
-      const curTime = new Date().toTimeString().slice(0, 8).replace(/\D/g, '');
-      this.logPath = path.resolve(logDir, `${this.tag.replace(/[^\dA-Za-z]/g, '')}_${curTime}.log`);
-    }
+    this.logDir = logDir;
+    this.logPath = logPath;
   }
   /**
    * 写入到日志文件
    * @todo 增加分包支持
    */
-  protected writeToFile(msg: string) {
+  protected override writeToFile(msg: string) {
     if (!this.logPath) return;
     let logFsStream = fsStreamCache[this.logPath];
     if (!logFsStream || logFsStream.destroyed) {

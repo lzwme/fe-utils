@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
  * @LastEditors: lzw
- * @LastEditTime: 2022-06-09 22:24:36
+ * @LastEditTime: 2022-06-28 22:43:32
  * @Description:
  */
 /* eslint no-console: 0 */
@@ -88,6 +88,7 @@ export class Logger {
   }
   public setLogDir(_logDir: string) {
     // todo: node.js 下可扩展该方法
+    console.warn('该接口方法未实现', _logDir);
   }
   /**
    * 写入到日志文件。
@@ -149,13 +150,14 @@ export class Logger {
       }
     }
 
-    if (options.logDir) this.setLogDir(options.logDir);
-
     this.options = Object.assign({}, defaultOptions, this.options);
     for (const key of Object.keys(defaultOptions)) {
       if (key in options) {
+        if (key === 'logDir') {
+          if (null == options.logDir) continue;
+          this.setLogDir(options.logDir);
+        }
         this.options[key] = options[key];
-        if (key === 'logDir') this.setLogDir(options.logDir);
       }
     }
 
