@@ -4,3 +4,4 @@ export * from './git';
 export * from './get-logger';
 export * from './fs';
 export * from './exec';
+export * from './find-free-port';

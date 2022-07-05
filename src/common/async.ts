@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-01-12 15:10:41
  * @LastEditors: lzw
- * @LastEditTime: 2022-06-09 22:47:56
+ * @LastEditTime: 2022-07-04 10:21:57
  * @Description:
  * @see src\vs\base\common\async.ts
  */
@@ -392,6 +392,28 @@ export async function retry<T>(task: ITask<Promise<T>>, delay: number, retries: 
   }
 
   throw lastError;
+}
+
+export function concurrency<T>(taskList: ITask<Promise<T>>[], maxDegreeOfParalellism = 5): Promise<T[]> {
+  const total = taskList.length;
+  let idx = 0;
+  const resut: T[] = [];
+  const onFinish = (r: T) => {
+    resut.push(r);
+    return next();
+  };
+  const next = (): Promise<void> => {
+    if (idx >= total) return null;
+    return taskList[idx++]()
+      .then(r => onFinish(r))
+      .catch(error => onFinish(error));
+  };
+  const size = Math.min(maxDegreeOfParalellism, total);
+  // const queue = Array.from<Promise<void>>({ length: size }).fill(next());
+  const queue: Promise<void>[] = [];
+  for (let i = 0; i < size; i++) queue.push(next());
+
+  return Promise.allSettled(queue).then(() => resut);
 }
 
 interface ILimitedTaskFactory<T> {
