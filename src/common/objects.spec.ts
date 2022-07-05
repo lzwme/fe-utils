@@ -23,19 +23,19 @@ describe('objects/assign', () => {
     const a = { a: 1, b: { c: 2, d: 3 } };
 
     const c = deepClone(a);
-    expect(a == c).toBeFalsy();
+    expect(a === c).toBeFalsy();
     expect(c.b.c).toBe(a.b.c);
     expect(c.b.d).toBe(3);
   });
 
   it('mixin', () => {
     const a = { a: 1, b: { c: 2, d: 3 } };
-    const b = { b: { c: null, d: 5 } };
+    const b = { b: { c: null as unknown, d: 5 } };
 
     let c = mixin(a, b, false);
     expect(c.b.c).toBe(2);
     expect(c.b.d).toBe(3);
-    expect(a == c).toBeTruthy();
+    expect(a === c).toBeTruthy();
 
     c = mixin(a, b);
     expect(c.b.c).toBeNull();
@@ -44,18 +44,19 @@ describe('objects/assign', () => {
 
   it('simpleAssgin', () => {
     const a = { a: 1, b: { c: 2, d: 3 } };
-    const b = { b: { c: null, d: 5 } };
+    const b = { b: { c: null as unknown, d: 5 } };
 
     let c = simpleAssign(a, b, value => value != null);
     expect(c.b.c).toBe(2);
 
     c = simpleAssign(a, b);
     expect(c.b.c).toBeNull();
-    expect(a == c).toBeTruthy();
+    expect(a === c).toBeTruthy();
   });
 
   it('assign', () => {
-    const a = { b: 1 };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const a: Record<string, any> = { b: 1 };
     const b = { a: { b: 1 }, b: 2, c: [1, 2] };
 
     expect(assign(a, b)).toEqual(a);
@@ -63,7 +64,7 @@ describe('objects/assign', () => {
     expect(assign(a, [], b).b).toEqual(2);
     expect(Array.isArray(assign(a, b)['c'])).toBeTruthy();
 
-    expect(assign(void 0, b) == void 0).toBeTruthy();
+    expect(assign(void 0, b) === void 0).toBeTruthy();
     expect(assign(a, void 0)).toEqual(a);
 
     // 第一个参数是数组，则原样返回
@@ -82,7 +83,7 @@ describe('objects/assign', () => {
 
   it('assignExceptNil', () => {
     const a = { a: 1, b: { c: 2 } };
-    const b = { b: { c: null } };
+    const b = { b: { c: null as unknown } };
 
     expect(assignExceptNil(a, b).b.c).toBe(2);
 
