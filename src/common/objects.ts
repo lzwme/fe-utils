@@ -62,12 +62,19 @@ export function mixin<T = any>(destination: any, source: any, overwrite = true):
 /**
  * 将 b 合并深度到 a
  */
-export function simpleAssign<T extends Record<string, any>, U>(a: T, b: U, filter?: (value: unknown) => boolean): T & U {
+export function simpleAssign<T extends Record<string, any>, U>(
+  a: T,
+  b: U,
+  filter?: (value: unknown) => boolean,
+  seen = new Set<unknown>()
+): T & U {
   // 入参不是对象格式则忽略
   if (!a || typeof a !== 'object') return a as T & U;
   if (typeof b !== 'object' || b instanceof RegExp || Array.isArray(b)) {
     return a as T & U;
   }
+
+  seen.add(b);
 
   for (const key in b) {
     const value = b[key];
@@ -84,7 +91,12 @@ export function simpleAssign<T extends Record<string, any>, U>(a: T, b: U, filte
     } else {
       // @ts-ignore
       if (!a[key as string]) a[key] = {};
-      simpleAssign(a[key as string], value, filter);
+      if (seen.has(value)) {
+        a[key] = value as never;
+      } else {
+        seen.add(value);
+        simpleAssign(a[key as string], value, filter, seen);
+      }
     }
   }
 

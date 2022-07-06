@@ -35,11 +35,13 @@ export function isFunction(obj: unknown): obj is Function {
 }
 
 export function isSet(obj: unknown): obj is Set<unknown> {
-  return String(obj) === '[object Set]';
+  if (!globalThis.Set) return false;
+  return obj instanceof Set; // String(obj) === '[object Set]';
 }
 
 export function isMap(obj: unknown): obj is Map<unknown, unknown> {
-  return String(obj) === '[object Map]';
+  if (!globalThis.Map) return false;
+  return obj instanceof Map; // String(obj) === '[object Map]';
 }
 
 export function isPromise<T>(obj: unknown): obj is Promise<T> {
