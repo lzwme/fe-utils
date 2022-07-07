@@ -2,14 +2,13 @@
  * @Author: lzw
  * @Date: 2021-08-25 10:12:21
  * @LastEditors: lzw
- * @LastEditTime: 2022-05-25 20:01:27
+ * @LastEditTime: 2022-07-07 17:31:08
  * @Description: 在 fork 子进程中执行 Check 任务
  */
 
 import { fork } from 'child_process';
-import { type PlainObject } from '../common/types';
 
-export interface CreateThreadOptions<T = PlainObject> {
+export interface CreateThreadOptions<T = Record<string, unknown>> {
   workerFile: string;
   type: string;
   debug?: boolean;

@@ -2,12 +2,12 @@
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
  * @LastEditors: lzw
- * @LastEditTime: 2022-06-28 22:43:32
+ * @LastEditTime: 2022-07-07 17:34:19
  * @Description:
  */
 /* eslint no-console: 0 */
 
-import { type GeneralFn } from './types';
+import { type GeneralFn } from '../types';
 
 /** 日志级别 */
 export enum LogLevel {

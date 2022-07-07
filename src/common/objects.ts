@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { type PlainObject } from './types';
 import { isObject, isSet, isMap } from './is';
 
 export function safeStringify(obj: any): string {
@@ -115,7 +114,7 @@ export function assignExceptNil<T extends object, U>(a: T, b: U, isOnlyExceptNul
 }
 
 /** 简易的对象深复制 */
-export function assign<T extends object>(a: T, ...args: PlainObject[]): T {
+export function assign<T extends object>(a: T, ...args: Record<any, any>[]): T {
   if (a && typeof a === 'object') {
     for (const arg of args) simpleAssign(a, arg);
   }

@@ -3,9 +3,8 @@ import zlib from 'zlib';
 import http from 'http';
 import https from 'https';
 import { urlFormat } from '../../common/url';
-import type { PlainObject } from '../../common/types';
 
-function toLowcaseKeyObject(info: PlainObject = {}) {
+function toLowcaseKeyObject(info: Record<string, unknown> = {}) {
   for (const key of Object.keys(info)) {
     const lowCaseKey = key.toLocaleLowerCase();
     if (key !== lowCaseKey) {
@@ -53,7 +52,12 @@ export class Request {
   getCookie(isString = true) {
     return isString ? this.cookies.join('; ') : this.cookies;
   }
-  request<T = PlainObject>(method: string, url: string | URL, parameters: PlainObject, headers?: http.IncomingHttpHeaders) {
+  request<T = Record<string, unknown>>(
+    method: string,
+    url: string | URL,
+    parameters: Record<string, unknown>,
+    headers?: http.IncomingHttpHeaders
+  ) {
     const urlObject = typeof url === 'string' ? new URL(url) : url;
     const options: https.RequestOptions = {
       hostname: urlObject.host.split(':')[0],
@@ -67,7 +71,7 @@ export class Request {
     if (parameters) {
       postBody = String(options.headers['content-type']).includes('application/json')
         ? JSON.stringify(parameters)
-        : new URLSearchParams(parameters).toString();
+        : new URLSearchParams(parameters as Record<string, string>).toString();
       options.headers['content-length'] = Buffer.byteLength(postBody).toString();
     }
 
@@ -104,10 +108,10 @@ export class Request {
       request.end();
     }) as Promise<{ data: T; headers: http.IncomingHttpHeaders }>;
   }
-  get<T = PlainObject>(url: string, parameters?: PlainObject, headers?: http.IncomingHttpHeaders) {
+  get<T = Record<string, unknown>>(url: string, parameters?: Record<string, unknown>, headers?: http.IncomingHttpHeaders) {
     return this.request<T>('GET', urlFormat(url, parameters), void 0, headers);
   }
-  post<T = PlainObject>(url: string, parameters: PlainObject, headers?: http.IncomingHttpHeaders) {
+  post<T = Record<string, unknown>>(url: string, parameters: Record<string, unknown>, headers?: http.IncomingHttpHeaders) {
     return this.request<T>('POST', url, parameters, headers);
   }
 }
