@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-01-12 15:10:41
  * @LastEditors: lzw
- * @LastEditTime: 2022-07-04 10:21:57
+ * @LastEditTime: 2022-07-07 17:57:41
  * @Description:
  * @see src\vs\base\common\async.ts
  */
@@ -84,7 +84,7 @@ export class Throttler {
       }
 
       return new Promise((resolve, reject) => {
-        this.queuedPromise.then(resolve, reject);
+        this.queuedPromise.then(resolve as never, reject);
       });
     }
 
@@ -385,7 +385,7 @@ export async function retry<T>(task: ITask<Promise<T>>, delay: number, retries: 
       const result = await task();
       if (!validator || validator(result)) return result;
     } catch (error) {
-      lastError = error;
+      lastError = error as Error;
 
       await sleep(delay);
     }

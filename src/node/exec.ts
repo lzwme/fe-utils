@@ -29,9 +29,10 @@ export function execSync(cmd: string, stdio?: StdioOptions, cwd = process.cwd(),
     const res = cpExecSync(cmd, { stdio, encoding: 'utf8', cwd });
     result.stdout = res ? res.toString().trim() : '';
   } catch (error) {
-    if (debug) getLogger().error(color.redBright(error.message));
-    result.stderr = error.message;
-    result.error = error;
+    const e = error as Error;
+    if (debug) getLogger().error(color.redBright(e.message));
+    result.stderr = e.message;
+    result.error = e;
   }
   return result;
 }

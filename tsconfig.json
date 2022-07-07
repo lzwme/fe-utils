@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    "strict": true,
+    "strictNullChecks": false,
+    "skipLibCheck": true,
     "target": "ESNext",
     "module": "commonjs",
     "outDir": "cjs",

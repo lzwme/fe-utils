@@ -53,6 +53,7 @@ export function dateFormat(fmt: string, date: Date | string = new Date()): strin
   }
   for (const k in o) {
     if (new RegExp(`(${k})`).test(fmt)) {
+      // @ts-ignore
       fmt = fmt.replace(RegExp.$1, RegExp.$1.length === 1 ? o[k] : ('00' + o[k]).slice(('' + o[k]).length));
     }
   }

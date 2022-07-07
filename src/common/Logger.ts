@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
  * @LastEditors: lzw
- * @LastEditTime: 2022-07-07 17:34:19
+ * @LastEditTime: 2022-07-07 17:39:03
  * @Description:
  */
 /* eslint no-console: 0 */
@@ -110,7 +110,7 @@ export class Logger {
     return now;
   }
 
-  private _log(type: LogLevelType, ...args) {
+  private _log(type: LogLevelType, ...args: unknown[]) {
     const lvl = LogLevel[type];
 
     if (lvl <= this.level) {
@@ -120,7 +120,7 @@ export class Logger {
       const msg = args.map(s => (typeof s === 'string' ? s : JSON.stringify(s))).join(' ');
 
       if (this.writeToFile) this.writeToFile(`[${curTime}]${this.tag}[${type}] ${msg}\n`);
-      if (this.options.silent) return;
+      if (this.options.silent || type === 'silent') return;
 
       if (console[type]) {
         let header = `[${curTime}]${this.tag}`;
@@ -141,10 +141,11 @@ export class Logger {
   }
   public updateOptions(options: LoggerOptions) {
     if (!headTipColored && options.color) {
-      for (const key of Object.keys(LogLevelHeadTip)) {
-        const [tag, colorType] = LogLevelHeadTip[key];
+      for (const value of Object.values(LogLevelHeadTip)) {
+        const [tag, colorType] = value;
         if (options.color[colorType]) {
-          LogLevelHeadTip[key][0] = options.color[colorType](tag);
+          // @ts-ignore
+          value[0] = options.color[colorType](tag);
           headTipColored = true;
         }
       }
@@ -157,6 +158,7 @@ export class Logger {
           if (null == options.logDir) continue;
           this.setLogDir(options.logDir);
         }
+        // @ts-ignore
         this.options[key] = options[key];
       }
     }

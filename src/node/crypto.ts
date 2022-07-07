@@ -16,7 +16,7 @@ export function md5(str: string | Buffer, isFile = false) {
     return md5;
   } catch (error) {
     /* eslint-disable no-console */
-    console.log('[md5][error]', error.message);
+    console.log('[md5][error]', (error as Error).message);
     return '';
   }
 }
@@ -26,7 +26,7 @@ export function md5(str: string | Buffer, isFile = false) {
  * @param params
  * @param filterKeyList 要过滤的通用字段
  */
-export function getMd5ByPlainObject(params: Record<string | number, unknown>, filterKeyList = []) {
+export function getMd5ByPlainObject(params: Record<string | number, unknown>, filterKeyList: string[] = []) {
   if (!params) return '';
   // const filterKeyList = ['current_page', 'page_size', 'uid', 'pageSize', 'currentPage'];
 

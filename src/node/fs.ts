@@ -19,7 +19,7 @@ export function rmrf(filepath: string) {
 }
 
 /** 【异步】删除指定的文件或目录 */
-export async function rmrfAsync(filepath: string) {
+export async function rmrfAsync(filepath: string): Promise<void> {
   try {
     return promises.rm(filepath, { recursive: true, maxRetries: 3 });
   } catch {

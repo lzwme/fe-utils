@@ -11,4 +11,4 @@ export type ThenArgs<T> = T extends PromiseLike<infer U> ? U : T;
 
 export type ArrayLikeArgs<T> = T extends ArrayLike<infer U> ? U : T;
 
-export type GeneralFn<T = void> = (...p) => T;
+export type GeneralFn<T = void> = (...p: unknown[]) => T;
