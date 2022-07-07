@@ -22,12 +22,12 @@ export function getObjectKeysUnsafe<T extends object>(value: T): (keyof T)[] {
   return Object.keys(value) as (keyof T)[];
 }
 
-export function deepClone<T>(obj: T): T {
+export function deepClone<T extends object>(obj: T): T {
   if (!obj || typeof obj !== 'object' || obj instanceof RegExp) return obj;
 
   const result: any = Array.isArray(obj) ? [] : {};
   // eslint-disable-next-line unicorn/no-array-for-each
-  getObjectKeysUnsafe(<any>obj).forEach((key: string) => {
+  getObjectKeysUnsafe(obj).forEach(key => {
     if ((<any>obj)[key] && typeof (<any>obj)[key] === 'object') {
       result[key] = deepClone((<any>obj)[key]);
     } else {
