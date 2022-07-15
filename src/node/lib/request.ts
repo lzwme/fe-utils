@@ -1,8 +1,11 @@
 import { URL } from 'url';
 import zlib from 'zlib';
-import http from 'http';
+import http, { type IncomingMessage, type IncomingHttpHeaders } from 'http';
 import https from 'https';
 import { urlFormat } from '../../common/url';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyObject = Record<string, any>;
 
 function toLowcaseKeyObject(info: Record<string, unknown> = {}) {
   for (const key of Object.keys(info)) {
@@ -16,8 +19,13 @@ function toLowcaseKeyObject(info: Record<string, unknown> = {}) {
 }
 
 export class Request {
+  static instance: Request;
+  static getInstance() {
+    if (!this.instance) this.instance = new Request();
+    return this.instance;
+  }
   private cookies: string[] = [];
-  private headers: http.IncomingHttpHeaders = {
+  private headers: IncomingHttpHeaders = {
     pragma: 'no-cache',
     connection: 'keep-alive',
     'cache-control': 'no-cache',
@@ -27,11 +35,11 @@ export class Request {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36',
   };
 
-  constructor(cookie?: string, headers?: http.IncomingHttpHeaders) {
+  constructor(cookie?: string, headers?: IncomingHttpHeaders) {
     if (cookie) this.setCookie(cookie);
     if (headers) this.headers = Object.assign(this.headers, toLowcaseKeyObject(headers));
   }
-  private getHeaders(urlObject: URL, headers?: http.IncomingHttpHeaders) {
+  private getHeaders(urlObject: URL, headers?: IncomingHttpHeaders) {
     headers = {
       ...this.headers,
       host: urlObject.host,
@@ -52,13 +60,7 @@ export class Request {
   getCookie(isString = true) {
     return isString ? this.cookies.join('; ') : this.cookies;
   }
-  request<T = Record<string, unknown>>(
-    method: string,
-    url: string | URL,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    parameters: Record<string, any>,
-    headers?: http.IncomingHttpHeaders
-  ) {
+  request<T = Record<string, unknown>>(method: string, url: string | URL, parameters: AnyObject, headers?: IncomingHttpHeaders) {
     const urlObject = typeof url === 'string' ? new URL(url) : url;
     const options: https.RequestOptions = {
       hostname: urlObject.host.split(':')[0],
@@ -76,28 +78,31 @@ export class Request {
       options.headers['content-length'] = Buffer.byteLength(postBody).toString();
     }
 
-    return new Promise((resolve, reject) => {
-      const request = (urlObject.protocol == 'http:' ? http : https).request(options, response => {
+    return new Promise<{ data: T; buffer: Buffer; headers: IncomingHttpHeaders; response: IncomingMessage }>((resolve, reject) => {
+      const request = (urlObject.protocol === 'http:' ? http : https).request(options, response => {
         const chunks: Buffer[] = [];
         response.on('data', data => chunks.push(data));
         request.on('error', error => reject(error));
         response.on('end', () => {
           const buffer = Buffer.concat(chunks);
           const encoding = response.headers['content-encoding'];
-          const resolveData = (body: string) => {
-            const result = { data: body as never as T, headers: response.headers };
+          const contentType = response.headers['content-type'];
+          const resolveData = (body: string | Buffer) => {
+            const result = { data: body as never as T, buffer, headers: response.headers, response };
             try {
-              result.data = JSON.parse(body);
+              if (typeof body === 'string' && (!contentType || contentType.includes('json'))) {
+                result.data = JSON.parse(body);
+              }
               resolve(result);
             } catch (error) {
-              console.error((error as Error).message, result);
+              console.warn((error as Error).message, url);
               resolve(result);
             }
           };
 
-          if (encoding == 'gzip') {
+          if (encoding === 'gzip') {
             zlib.gunzip(buffer, (_error, decoded) => resolveData(decoded.toString()));
-          } else if (encoding == 'deflate') {
+          } else if (encoding === 'deflate') {
             zlib.inflate(buffer, (_error, decoded) => resolveData(decoded.toString()));
           } else {
             resolveData(buffer.toString());
@@ -107,14 +112,12 @@ export class Request {
 
       if (postBody) request.write(postBody);
       request.end();
-    }) as Promise<{ data: T; headers: http.IncomingHttpHeaders }>;
+    });
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  get<T = Record<string, unknown>>(url: string, parameters?: Record<string, any>, headers?: http.IncomingHttpHeaders) {
+  get<T = Record<string, unknown>>(url: string, parameters?: AnyObject, headers?: IncomingHttpHeaders) {
     return this.request<T>('GET', urlFormat(url, parameters), void 0, headers);
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  post<T = Record<string, unknown>>(url: string, parameters: Record<string, any>, headers?: http.IncomingHttpHeaders) {
+  post<T = Record<string, unknown>>(url: string, parameters: AnyObject, headers?: IncomingHttpHeaders) {
     return this.request<T>('POST', url, parameters, headers);
   }
 }

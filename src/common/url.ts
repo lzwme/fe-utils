@@ -5,7 +5,7 @@
  * @param isRepalce 是否替换已存在于 url 中的参数
  * @returns
  */
-export function urlFormat(url: string, params: Record<string, unknown>, isRepalce = false) {
+export function urlFormat<T = unknown>(url: string, params: Record<string, T>, isRepalce = false) {
   const u = new URL(url, 'file:');
 
   if (params) {
@@ -20,9 +20,9 @@ export function urlFormat(url: string, params: Record<string, unknown>, isRepalc
   return u;
 }
 
-export function toFileUri(filePath: string, params?: Record<string, unknown>): string {
+export function toFileUri<T = unknown>(filePath: string, params?: Record<string, T>): string {
   // if (!params) return new URL(filePath, 'file:').toString();
-  return urlFormat(filePath, params).toString();
+  return urlFormat<T>(filePath, params).toString();
 }
 
 /** 将对象参数转换为 url searchParams 格式 */

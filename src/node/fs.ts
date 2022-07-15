@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, rmdirSync, rmSync, statSync, unlinkSync, promises, mkdirSync } from 'fs';
-import { normalize, resolve, sep } from 'path';
+import { resolve, sep } from 'path';
 
 /** 【同步】删除指定的文件或目录 */
 export function rmrf(filepath: string) {
@@ -31,17 +31,21 @@ export async function rmrfAsync(filepath: string): Promise<void> {
  * 创建一个深度的目录
  */
 export function mkdirp(dirpath: string) {
-  dirpath = normalize(dirpath);
-  if (existsSync(dirpath) && statSync(dirpath).isDirectory()) return;
+  if (existsSync(dirpath)) return true;
 
-  const segs = dirpath.split(sep);
-  for (let i = 0; i < segs.length; i++) {
-    const p = segs.slice(0, i + 1).join(sep);
-    if (p === '') continue;
-    if (existsSync(p)) {
-      if (statSync(p).isDirectory()) continue;
-      rmrf(p);
+  try {
+    mkdirSync(dirpath, { recursive: true });
+  } catch {
+    const list = dirpath.replace(sep, '/').split('/');
+    for (let i = 0; i < list.length; i++) {
+      const p = list.slice(0, i + 1).join(sep);
+      if (p === '') continue;
+      if (existsSync(p)) {
+        if (!statSync(p).isDirectory()) return false;
+        continue;
+      }
+      mkdirSync(p);
     }
-    mkdirSync(p);
   }
+  return true;
 }
