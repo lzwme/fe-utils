@@ -82,5 +82,8 @@
     "typedoc": "^0.22.17",
     "typescript": "^4.7.3"
   },
+  "optionalDependencies": {
+    "windows-process-tree": "^0.3.2"
+  },
   "packageManager": "pnpm@7.1.0"
 }

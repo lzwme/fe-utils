@@ -71,6 +71,8 @@ module.exports = {
         'unicorn/filename-case': 'off',
         'unicorn/no-null': 'off',
         'unicorn/prevent-abbreviations': 'off',
+        'unicorn/no-lonely-if': 'off',
+        '@typescript-eslint/no-non-null-assertion': 'off',
         'unicorn/import-style': ['error', {
             styles: {
                 path: {

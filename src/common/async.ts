@@ -394,19 +394,19 @@ export async function retry<T>(task: ITask<Promise<T>>, delay: number, retries: 
   throw lastError;
 }
 
-export function concurrency<T>(taskList: ITask<Promise<T>>[], maxDegreeOfParalellism = 5): Promise<T[]> {
+export function concurrency<T, E = Error>(taskList: ITask<Promise<T>>[], maxDegreeOfParalellism = 5) {
   const total = taskList.length;
   let idx = 0;
-  const resut: T[] = [];
-  const onFinish = (r: T) => {
-    resut.push(r);
+  const resut: { result: T; error: E }[] = [];
+  const onFinish = (result: T, error?: E) => {
+    resut.push({ result, error });
     return next();
   };
   const next = (): Promise<void> => {
     if (idx >= total) return null;
     return taskList[idx++]()
       .then(r => onFinish(r))
-      .catch(error => onFinish(error));
+      .catch(error => onFinish(null, error));
   };
   const size = Math.min(maxDegreeOfParalellism, total);
   // const queue = Array.from<Promise<void>>({ length: size }).fill(next());
