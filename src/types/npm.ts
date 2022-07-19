@@ -1,5 +1,5 @@
 /** 通用 package.json 类型定义 */
-export interface PackageInfo extends Record<string, unknown> {
+export interface PackageJson extends Record<string, unknown> {
   name: string;
   version: string;
   author?: Record<string, string>;
@@ -13,8 +13,10 @@ export interface PackageInfo extends Record<string, unknown> {
   main?: string;
   scripts?: Record<string, string>;
   publishConfig?: {
-    access: string;
+    [key: string]: unknown;
+    access: 'public' | 'restricted';
     registry: string;
+    tags?: string;
   };
   typings?: string;
   type?: string;
@@ -55,7 +57,7 @@ export interface NpmRegistryInfo {
   } & Record<string, string>;
   versions: Record<
     string,
-    PackageInfo & {
+    PackageJson & {
       _id?: string;
       _npmOperationalInternal?: Record<string, string>;
       _hasShrinkwrap?: boolean;
@@ -78,9 +80,9 @@ export interface NpmRegistryInfo {
   };
   users?: Record<string, string>;
   keywords?: string[];
-  maintainers?: PackageInfo['maintainers'];
+  maintainers?: PackageJson['maintainers'];
   license?: string;
-  repository?: PackageInfo['repository'];
+  repository?: PackageJson['repository'];
   homepage?: string;
   author?: {
     name: string;

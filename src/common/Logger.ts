@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
  * @LastEditors: lzw
- * @LastEditTime: 2022-07-07 17:39:03
+ * @LastEditTime: 2022-07-18 09:40:59
  * @Description:
  */
 /* eslint no-console: 0 */
@@ -130,8 +130,7 @@ export class Logger {
 
         if (lvl === LogLevel.debug) header += `[${this.times}]`;
         if (LogLevelHeadTip[type]) {
-          const tip = LogLevelHeadTip[type][0];
-          header = tip + header;
+          header = LogLevelHeadTip[type][0] + header;
         }
 
         if (!this.options.debug && type !== 'debug') console[type](header, msg);
