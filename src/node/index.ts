@@ -8,3 +8,4 @@ export * from './fs';
 export * from './get-logger';
 export * from './git';
 export * from './ps';
+export * from './windows';
