@@ -3,7 +3,7 @@ import { resolve, sep } from 'path';
 
 /** 【同步】删除指定的文件或目录 */
 export function rmrf(filepath: string) {
-  if (!existsSync(filepath)) return;
+  if (!filepath || !existsSync(filepath)) return;
 
   const stats = statSync(filepath);
 
@@ -21,9 +21,11 @@ export function rmrf(filepath: string) {
 /** 【异步】删除指定的文件或目录 */
 export async function rmrfAsync(filepath: string): Promise<void> {
   try {
+    if (!filepath || !existsSync(filepath)) return;
+
     return promises.rm(filepath, { recursive: true, maxRetries: 3 });
   } catch {
-    return rmrfAsync(filepath);
+    return rmrf(filepath);
   }
 }
 

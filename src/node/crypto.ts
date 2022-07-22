@@ -4,8 +4,8 @@ import { basename } from 'path';
 
 /**
  * 生成指定字符串或指定文件路径的md5值
- * @param str {string} 指定的字符串，或者指定的文件路径
- * @param isFile {boolean} str 是否为一个文件路径
+ * @param str 指定的字符串，或者指定的文件路径
+ * @param isFile str 是否为一个文件路径
  */
 export function md5(str: string | Buffer, isFile = false) {
   try {

@@ -29,12 +29,4 @@ describe('utils/common', () => {
     comm.logTimeCost(Date.now());
     expect(1).toBeTruthy();
   });
-
-  it('formatWxWorkKeys', () => {
-    expect(comm.formatWxWorkKeys(null).length).toBe(0);
-    expect(comm.formatWxWorkKeys('').length).toBe(0);
-    expect(comm.formatWxWorkKeys('abc').length).toBe(0);
-    expect(comm.formatWxWorkKeys('d5aeb3d88dd64ffcbbe289982ca00000')[0].length).toBe(36);
-    expect(comm.formatWxWorkKeys('d5aeb3d8-8dd6-4ffc-bbe2-89982ca00000')[0].length).toBe(36);
-  });
 });

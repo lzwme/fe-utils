@@ -52,19 +52,3 @@ export function getFormatedTimeCost(startTime: number, withTip = true) {
 export function logTimeCost(startTime: number, prefix = '') {
   getLogger().log(color.cyan(prefix), getFormatedTimeCost(startTime));
 }
-
-// @see async.ts
-// export const sleep = (delay = 100) => new Promise(rs => setTimeout(() => rs(true), delay));
-
-export function formatWxWorkKeys(keys: string | string[]) {
-  if (!keys) return [];
-  if (!Array.isArray(keys)) keys = [keys];
-  return keys
-    .filter(d => /[\da-z]{8}(-?[\da-z]{4}){3}-?[\da-z]{12}/i.test(d))
-    .map(d => {
-      if (/^[\da-z]{32}$/i.test(d)) {
-        d = [...d].map((s, index) => ([7, 11, 15, 19].includes(index) ? `${s}-` : s)).join('');
-      }
-      return d;
-    });
-}

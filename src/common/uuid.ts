@@ -76,3 +76,16 @@ export function generateUuid(): string {
 
 /** @see generateUuid */
 export const v1 = generateUuid;
+
+export function formatToUuid(keys: string | string[]) {
+  if (!keys) return [];
+  if (!Array.isArray(keys)) keys = [keys];
+  return keys
+    .filter(d => /[\da-z]{8}(-?[\da-z]{4}){3}-?[\da-z]{12}/i.test(d))
+    .map(d => {
+      if (/^[\da-z]{32}$/i.test(d)) {
+        d = [...d].map((s, index) => ([7, 11, 15, 19].includes(index) ? `${s}-` : s)).join('');
+      }
+      return d;
+    });
+}

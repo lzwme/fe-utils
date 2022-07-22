@@ -13,8 +13,7 @@ export function setQuickEdit(enable = false) {
     if (isEnabled === enable) return true;
 
     cmd = `reg add HKEY_CURRENT_USER\\Console /v QuickEdit /t REG_DWORD /d 0000000${enable ? '1' : '0'} /f`;
-    execSync(cmd);
-    return true;
+    return execSync(cmd).stderr === '';
   } catch (error) {
     getLogger().error('[setQuickEdit][error]\n', error);
     return false;

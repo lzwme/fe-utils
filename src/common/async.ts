@@ -38,20 +38,21 @@ export function raceTimeout<T>(promise: Promise<T>, timeout: number, onTimeout?:
  *
  * The throttler implements this via the queue() method, by providing it a task
  * factory. Following the example:
+ * ```ts
+ * const throttler = new Throttler();
+ * const letters = [];
  *
- * 		const throttler = new Throttler();
- * 		const letters = [];
+ * function deliver() {
+ *   const lettersToDeliver = letters;
+ *   letters = [];
+ *   return makeTheTrip(lettersToDeliver);
+ * }
  *
- * 		function deliver() {
- * 			const lettersToDeliver = letters;
- * 			letters = [];
- * 			return makeTheTrip(lettersToDeliver);
- * 		}
- *
- * 		function onLetterReceived(l) {
- * 			letters.push(l);
- * 			throttler.queue(deliver);
- * 		}
+ * function onLetterReceived(l) {
+ *   letters.push(l);
+ *   throttler.queue(deliver);
+ * }
+ * ```
  */
 export class Throttler {
   private activePromise: Promise<unknown> | null;
@@ -90,20 +91,20 @@ export class Throttler {
 
     this.activePromise = promiseFactory();
 
-    return (this.activePromise as Promise<T>).finally(() => (this.activePromise = null));
+    // return (this.activePromise as Promise<T>).finally(() => (this.activePromise = null));
 
-    // return new Promise((resolve, reject) => {
-    //     this.activePromise!.then(
-    //         (result: T) => {
-    //             this.activePromise = null;
-    //             resolve(result);
-    //         },
-    //         (err: unknown) => {
-    //             this.activePromise = null;
-    //             reject(err);
-    //         }
-    //     );
-    // });
+    return new Promise((resolve, reject) => {
+      (this.activePromise! as Promise<T>).then(
+        (result: T) => {
+          this.activePromise = null;
+          resolve(result);
+        },
+        (error: unknown) => {
+          this.activePromise = null;
+          reject(error);
+        }
+      );
+    });
   }
 }
 
@@ -211,14 +212,15 @@ export function canceled(): Error {
  * The delayer offers this behavior via the trigger() method, into which both the task
  * to be executed and the waiting period (delay) must be passed in as arguments. Following
  * the example:
+ * ```ts
+ * const delayer = new Delayer(WAITING_PERIOD);
+ * const letters = [];
  *
- * 		const delayer = new Delayer(WAITING_PERIOD);
- * 		const letters = [];
- *
- * 		function letterReceived(l) {
- * 			letters.push(l);
- * 			delayer.trigger(() => { return makeTheTrip(); });
- * 		}
+ * function letterReceived(l) {
+ *   letters.push(l);
+ *   delayer.trigger(() => { return makeTheTrip(); });
+ * }
+ * ```
  */
 export class Delayer<T> implements IDisposable {
   private deferred: IScheduledLater | null;

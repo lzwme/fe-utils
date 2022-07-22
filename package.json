@@ -57,9 +57,9 @@
     "console-log-colors": "^0.2.3"
   },
   "devDependencies": {
-    "@lzwme/fed-lint-helper": "^1.11.1",
     "@jest/core": "^28",
     "@jest/types": "^28",
+    "@lzwme/fed-lint-helper": "^1.11.1",
     "@swc/core": "^1.2.218",
     "@swc/jest": "^0.2.22",
     "@types/eslint": "^8.4.5",
@@ -68,7 +68,6 @@
     "@types/node": "^18",
     "@typescript-eslint/eslint-plugin": "^5.30.7",
     "@typescript-eslint/parser": "^5.30.7",
-    "compressing": "^1.6.2",
     "eslint": "^8.20.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-jest": "^26.6.0",
@@ -81,8 +80,16 @@
     "standard-version": "^9.5.0",
     "ts-node": "^10.9.1",
     "typedoc": "^0.23.8",
-    "typescript": "^4.7.4",
+    "typescript": "^4.7.4"
+  },
+  "optionalDependencies": {
+    "compressing": "^1.6.2",
     "windows-process-tree": "^0.3.3"
+  },
+  "peerDependenciesMeta": {
+    "windows-process-tree": {
+      "optional": true
+    }
   },
   "packageManager": "pnpm@7.5.0"
 }

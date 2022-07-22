@@ -4,8 +4,8 @@
 
 /**
  * 将给定时间日期按照指定格式格式化输出 -- 建议使用 moment().format 替代
- * @param fmt {string} 格式
- * @param date {Date|string} 指定的日期。为 Date 类型，或 20180131 格式字符串、或可 new Date() 格式化的字符串
+ * @param fmt 格式
+ * @param date 指定的日期。为 Date 类型，或 20180131 格式字符串、或可 new Date() 格式化的字符串
  * @example
  * dateFormat('yyyy-MM-dd hh:mm:ss.S', new Date(1526895082375)); // 2018-05-21 17:31:22.375
  */
