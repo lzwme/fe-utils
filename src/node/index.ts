@@ -1,4 +1,5 @@
 export * from './lib';
+export * from './clearRequireCache';
 export * from './common';
 export * from './crypto';
 export * from './exec';
