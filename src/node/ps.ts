@@ -1,7 +1,11 @@
 /* eslint-disable unicorn/no-array-for-each */
 /* eslint-disable unicorn/no-for-loop */
 
-import { exec } from 'child_process';
+import { ChildProcess, exec } from 'child_process';
+import { color } from 'console-log-colors';
+import { execPromisfy, execSync } from './exec';
+import { getLogger } from './get-logger';
+
 export interface ProcessItem {
   name: string;
   cmd: string;
@@ -13,6 +17,7 @@ export interface ProcessItem {
   mem: number;
   children?: ProcessItem[];
 }
+
 export function listProcesses(rootPid: number, formatName?: (cmd: string) => string): Promise<ProcessItem> {
   return new Promise((resolve, reject) => {
     let rootItem: ProcessItem | undefined;
@@ -228,6 +233,40 @@ function parsePsOutput(stdout: string, addToTree: (pid: number, ppid: number, cm
         Number.parseFloat(matches[4])
       );
     }
+  }
+}
+
+/** 按进程实例或程序进程名称杀死进程 */
+export async function tryKillProcess(params: { proc?: ChildProcess; name?: string }) {
+  const logger = getLogger();
+
+  try {
+    if (params.proc) {
+      logger.log(`try kill by pid: ${params.proc.pid}`);
+      params.proc.removeAllListeners();
+      process.kill(params.proc.pid);
+      if (!params.proc.killed) params.proc.kill('SIGKILL');
+    }
+
+    if (params.name) {
+      logger.log(`kill by program name: ${color.green(params.name)}`);
+
+      if (process.platform === 'win32') {
+        const taskList = execSync('tasklist').stdout;
+        if (taskList.includes(params.name)) await execPromisfy(`taskkill /F /T /IM ${params.name}`, true);
+      } else {
+        const pidList = execSync(`ps -ef | pgrep -f "${params.name.replace('.exe', '')}"`)
+          .stdout.split('\n')
+          .map(d => String(d).trim())
+          .filter(Boolean);
+        if (pidList.length > 0) {
+          const killTaskList = pidList.map(pid => execPromisfy(`kill -9 ${pid}`, true));
+          await Promise.all(killTaskList);
+        }
+      }
+    }
+  } catch (error) {
+    logger.error('[tryKillProcess][error]\n', error);
   }
 }
 
