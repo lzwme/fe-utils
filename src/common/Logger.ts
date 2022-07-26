@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
  * @LastEditors: lzw
- * @LastEditTime: 2022-07-18 09:40:59
+ * @LastEditTime: 2022-07-26 16:20:02
  * @Description:
  */
 /* eslint no-console: 0 */
@@ -84,7 +84,7 @@ export class Logger {
     }
 
     options = this.updateOptions(options);
-    if (this.setLogDir) this.setLogDir(options.logDir);
+    if (options.logDir && this.setLogDir) this.setLogDir(options.logDir);
   }
   public setLogDir(_logDir: string) {
     // todo: node.js 下可扩展该方法
