@@ -3,6 +3,7 @@
   "compilerOptions": {
     "outDir": "cjs",
     "target": "es2018",
+    "importHelpers": true,
     "module": "commonjs"
   }
 }
