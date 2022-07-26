@@ -43,7 +43,7 @@ jobs:
           version: 7
 
       - name: Install dependencies
-        run: pnpm install # --ignore-scripts
+        run: pnpm install --ignore-scripts
 
       - name: Test
         run: pnpm test
