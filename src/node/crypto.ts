@@ -10,14 +10,14 @@ import { basename } from 'path';
 export function md5(str: string | Buffer, isFile = false) {
   try {
     if (isFile) {
-      if (!existsSync(str)) return '';
+      if (!str || !existsSync(str)) return '';
       str = readFileSync(str);
     }
     const md5 = createHash('md5').update(str).digest('hex');
     return md5;
   } catch (error) {
     /* eslint-disable no-console */
-    console.log(error);
+    console.log((error as Error).message);
     return '';
   }
 }

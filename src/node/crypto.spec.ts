@@ -8,6 +8,6 @@ describe('common/crypto', () => {
     expect(md5(void 0)).toEqual('');
 
     // catch error
-    expect(md5(null, true)).toEqual('');
+    expect(md5({} as never, true)).toEqual('');
   });
 });
