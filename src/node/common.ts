@@ -1,4 +1,3 @@
-import path from 'path';
 import { color } from 'console-log-colors';
 import { createInterface } from 'readline';
 import { getLogger } from './get-logger';
@@ -17,14 +16,6 @@ export function readSyncByRl(tips = '> ') {
       rl.close();
     });
   });
-}
-
-/**
- * 将给定的文件路径规整为 a/b/c.js 格式
- */
-export function fixToshortPath(filepath = '', rootDir = process.cwd()) {
-  const shortPath = path.resolve(rootDir, filepath).replace(rootDir, '').replace(/\\/g, '/');
-  return shortPath.startsWith('/') ? shortPath.slice(1) : shortPath;
 }
 
 /** 计算指定函数的执行耗时。返回值单位为 ns */
