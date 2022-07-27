@@ -8,5 +8,6 @@ export * from './find-free-port';
 export * from './fs';
 export * from './get-logger';
 export * from './git';
+export * from './path';
 export * from './ps';
 export * from './windows';

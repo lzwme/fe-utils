@@ -62,7 +62,7 @@ const logger = Logger.getLogger();
 logger.log(dateFormat('yyyy-MM-dd', new Date()));
 ```
 
-更多细节可参考 [API 文档](https://lzw.me/doc/fe-utils)。
+更多细节可参考 [API 文档](https://lzwme.github.io/fe-utils/)。
 
 ## 开发
 
