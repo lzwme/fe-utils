@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.5](https://github.com/lzwme/fe-utils/compare/v0.0.4...v0.0.5) (2022-07-28)
+
+
+### Bug Fixes
+
+* 修复 formatTimeCost 逻辑异常问题 ([6e7eebc](https://github.com/lzwme/fe-utils/commit/6e7eebc8bb7d0466f8b125717d7d937daa2b0b3e))
+
 ### [0.0.4](https://github.com/lzwme/fe-utils/compare/v0.0.3...v0.0.4) (2022-07-26)
 
 ### [0.0.3](https://github.com/lzwme/fe-utils/compare/v0.0.2...v0.0.3) (2022-07-26)
