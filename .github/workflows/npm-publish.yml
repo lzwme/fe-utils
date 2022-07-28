@@ -3,9 +3,9 @@
 name: Publish Package to npmjs for GPA
 
 on:
-  # push:
-  #   tags:
-  #     - 'v*'
+  push:
+    tags:
+      - 'v*'
   release:
     types: [created]
 
