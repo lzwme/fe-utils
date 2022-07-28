@@ -30,6 +30,16 @@ describe('utils-date', () => {
     expect(utilsDate.arriveTimerFormat(86_400, '天')).toEqual([1, 0, 0, 0, '1天00:00:00']);
   });
 
+  it('formatTimeCost', () => {
+    expect(+utilsDate.formatTimeCost(0).split('days')[0] > 19_200).toBeTruthy();
+    expect(utilsDate.formatTimeCost(Date.now()).length <= 1).toBeTruthy();
+    expect(utilsDate.formatTimeCost(Date.now() - 1000) === '1s').toBeTruthy();
+    expect(utilsDate.formatTimeCost(Date.now() - 1001).includes('1s')).toBeTruthy();
+    expect(utilsDate.formatTimeCost(Date.now() - 1001, ['日', '小时', '分钟', '秒', '毫秒']).includes('毫秒')).toBeTruthy();
+    // suffix 对应位置为 null 则不显示
+    expect(utilsDate.formatTimeCost(Date.now() - 1011, ['日', '小时', '分钟', '秒', null]) === '1秒').toBeTruthy();
+  });
+
   it('yyyyMMddFormat', () => {
     const list = [
       ['20180101', '2018年01月01日'],
