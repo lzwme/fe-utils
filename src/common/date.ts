@@ -93,7 +93,7 @@ export function arriveTimerFormat(second: number | string, dayDesc = 'day ') {
   return [day, hour, min, sec, t.join(':')] as const;
 }
 
-export function formatTimeCost(startTime: number, suffix = ['days', 'hours', 'min', 's', '']) {
+export function formatTimeCost(startTime: number, suffix = ['days', 'hours', 'min', 's', 'ms']) {
   const s = Date.now() - startTime;
   // let hour = Math.floor(s / 3600 / 1000);
   // const day = Math.floor(hour / 24);
