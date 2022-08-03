@@ -43,13 +43,13 @@ export function getMd5ByPlainObject(params: Record<string | number, unknown>, fi
 /**
  * tar.gz 压缩。需添加依赖库 `compressing`
  * @param srcDir 要压缩的目录路径
- * @param dest 解压输出目录路径
+ * @param tgzFilePath 压缩文件输出路径。若省略则默认使用 srcDir 压缩目录名
  */
-export async function tgzip(srcDir: string, dest?: string) {
-  if (!dest) dest = srcDir.replace(/\/$/, '');
-  if (!dest.endsWith('.tar.gz')) dest += '.tar.gz';
+export async function tgzip(srcDir: string, tgzFilePath?: string) {
+  if (!tgzFilePath) tgzFilePath = srcDir.replace(/\/$/, '');
+  if (!tgzFilePath.endsWith('.tar.gz')) tgzFilePath += '.tar.gz';
 
-  return import('compressing').then(({ tgz }) => tgz.compressDir(srcDir, dest));
+  return import('compressing').then(({ tgz }) => tgz.compressDir(srcDir, tgzFilePath));
 }
 
 /**
