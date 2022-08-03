@@ -32,15 +32,14 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
     return this.options.filepath;
   }
   private cache: LSCache<T>;
-  private options: LSOptions;
+  private options: Required<LSOptions>;
   constructor(options?: LSOptions) {
-    options = {
+    this.options = {
       version: '0.0.0',
       uuid: 'defaults',
       filepath: resolve(existsSync('./node_modules') ? './node_modules/' : homedir(), '.liteStoreage/ls.json'),
       ...options,
     };
-    this.options = options;
 
     this.init();
     this.reload();

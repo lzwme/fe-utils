@@ -9,6 +9,8 @@
     "moduleResolution": "node",
     "inlineSourceMap": false,
     "esModuleInterop": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
