@@ -116,7 +116,9 @@ export function assignExceptNil<T extends object, U>(a: T, b: U, isOnlyExceptNul
 /** 简易的对象深复制 */
 export function assign<T extends object>(a: T, ...args: Record<any, any>[]): T {
   if (a && typeof a === 'object') {
-    for (const arg of args) simpleAssign(a, arg);
+    const tmp = {};
+    for (const arg of args) simpleAssign(tmp, arg);
+    simpleAssign(a, tmp);
   }
   return a;
 }

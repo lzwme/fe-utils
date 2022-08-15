@@ -73,6 +73,9 @@ describe('objects/assign', () => {
 
     // 顺序优先级
     expect(assign(a, b, { b: 3 }).b).toEqual(3);
+
+    // 循环顺序正确性
+    expect(assign(a, b, a).b).toEqual(3);
   });
 
   it('assignMuti', () => {
