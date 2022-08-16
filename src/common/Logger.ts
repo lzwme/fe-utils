@@ -2,12 +2,13 @@
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
  * @LastEditors: lzw
- * @LastEditTime: 2022-07-26 16:20:02
+ * @LastEditTime: 2022-08-16 15:41:30
  * @Description:
  */
 /* eslint no-console: 0 */
 
 import { type GeneralFn } from '../types';
+import { safeStringify } from './objects';
 
 /** 日志级别 */
 export enum LogLevel {
@@ -117,7 +118,7 @@ export class Logger {
       this.times++;
       const now = this.getSeverTime(true);
       const curTime = now.toTimeString().slice(0, 8) + '.' + String(now.getMilliseconds()).padStart(3, '0');
-      const msg = args.map(s => (typeof s === 'string' ? s : JSON.stringify(s))).join(' ');
+      const msg = args.map(s => (typeof s === 'string' ? s : safeStringify(s))).join(' ');
 
       if (this.writeToFile) this.writeToFile(`[${curTime}]${this.tag}[${type}] ${msg}\n`);
       if (this.options.silent || type === 'silent') return;
