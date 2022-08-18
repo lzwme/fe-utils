@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { exec } from 'node:child_process';
 
 /** 写入文本至剪切板 */
 export function writeToClipBoard(text: string) {

@@ -1,4 +1,4 @@
-import { type StdioOptions, execSync as cpExecSync, exec } from 'child_process';
+import { type StdioOptions, execSync as cpExecSync, exec } from 'node:child_process';
 import { color } from 'console-log-colors';
 import { getLogger } from './get-logger';
 

@@ -1,6 +1,6 @@
-import { homedir } from 'os';
-import { dirname, resolve } from 'path';
-import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'fs';
+import { homedir } from 'node:os';
+import { dirname, resolve } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { assign } from '../common/objects';
 
 interface LSCache<T> {

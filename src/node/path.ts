@@ -1,4 +1,4 @@
-import { resolve } from 'path';
+import { resolve } from 'node:path';
 
 /**
  * 将给定的文件路径规整为 a/b/c.js 格式

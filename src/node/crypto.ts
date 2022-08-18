@@ -1,6 +1,6 @@
-import { createHash } from 'crypto';
-import { existsSync, readFileSync } from 'fs';
-import { basename } from 'path';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync } from 'node:fs';
+import { basename } from 'node:path';
 
 /**
  * 生成指定字符串或指定文件路径的md5值

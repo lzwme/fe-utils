@@ -6,8 +6,8 @@
  * @Description:
  */
 /* eslint no-console: 0 */
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import { clearScreenDown, cursorTo } from 'readline';
 import { Logger, type LoggerOptions } from '../../common/Logger';
 

@@ -6,8 +6,8 @@
  * @Description: gh u 相关的命令。主要为常用的快捷工具方法
  */
 
-import path from 'path';
-import fs from 'fs';
+import path from 'node:path';
+import fs from 'node:fs';
 import { execSync } from './exec';
 
 /** 获取当前的本地分支名 */

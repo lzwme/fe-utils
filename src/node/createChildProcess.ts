@@ -6,7 +6,7 @@
  * @Description: 在 fork 子进程中执行 Check 任务
  */
 
-import { fork } from 'child_process';
+import { fork } from 'node:child_process';
 
 export interface CreateThreadOptions<T = Record<string, unknown>> {
   workerFile: string;

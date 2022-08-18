@@ -1,5 +1,5 @@
-import { existsSync, readdirSync, rmdirSync, rmSync, statSync, unlinkSync, promises, mkdirSync } from 'fs';
-import { resolve, sep } from 'path';
+import { existsSync, readdirSync, rmdirSync, rmSync, statSync, unlinkSync, promises, mkdirSync } from 'node:fs';
+import { resolve, sep } from 'node:path';
 
 /** 【同步】删除指定的文件或目录 */
 export function rmrf(filepath: string) {

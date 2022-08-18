@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/no-array-for-each */
 /* eslint-disable unicorn/no-for-loop */
 
-import { ChildProcess, exec } from 'child_process';
+import { ChildProcess, exec } from 'node:child_process';
 import { color } from 'console-log-colors';
 import { execPromisfy, execSync } from './exec';
 import { getLogger } from './get-logger';
