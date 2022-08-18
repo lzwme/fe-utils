@@ -57,27 +57,35 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
       },
     };
   }
-  private save() {
+  /** 主动保存 */
+  public save(value?: T) {
+    if (value) return this.set(value);
+
     const cacheDir = dirname(this.cachePath);
     if (!existsSync(cacheDir)) mkdirSync(cacheDir, { recursive: true });
     this.reload();
     writeFileSync(this.cachePath, JSON.stringify(this.cache, null, 4), 'utf8');
+    return this;
   }
   /** 从文件中重载数据至内存。在多进程、多线程模式下，需读取最新数据时，可手动调用 */
   public reload() {
     if (existsSync(this.cachePath)) {
       const localCache = JSON.parse(readFileSync(this.cachePath, 'utf8')) as LSCache<T>;
-      if (localCache.version === this.options.version) assign(this.cache, localCache);
-      else rmSync(this.cachePath, { force: true });
+      if (localCache.version === this.options.version) {
+        assign(this.cache, assign({}, localCache, this.cache));
+      } else rmSync(this.cachePath, { force: true });
     }
     return this;
   }
   public set(value: T) {
     const uuid = this.options.uuid;
-    if (value && uuid) {
+
+    if (value != null && uuid) {
       if (!this.cache.data[uuid]) this.cache.data[uuid] = {} as T;
-      assign(this.cache.data[uuid], value);
+      if (value !== this.cache.data[uuid]) assign(this.cache.data[uuid], value);
       this.save();
+    } else {
+      console.warn('[LiteStorage][set]error', uuid, value);
     }
     return this;
   }
