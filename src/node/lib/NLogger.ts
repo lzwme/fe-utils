@@ -2,13 +2,13 @@
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
  * @LastEditors: lzw
- * @LastEditTime: 2022-07-07 17:39:31
+ * @LastEditTime: 2022-08-31 18:05:54
  * @Description:
  */
 /* eslint no-console: 0 */
 import fs from 'node:fs';
 import path from 'node:path';
-import { clearScreenDown, cursorTo } from 'readline';
+import { clearScreenDown, cursorTo } from 'node:readline';
 import { Logger, type LoggerOptions } from '../../common/Logger';
 
 const fsStreamCache: { [logPath: string]: fs.WriteStream } = {};

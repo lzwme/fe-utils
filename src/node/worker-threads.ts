@@ -2,14 +2,14 @@
  * @Author: lzw
  * @Date: 2021-08-25 10:12:21
  * @LastEditors: lzw
- * @LastEditTime: 2022-05-25 20:55:06
+ * @LastEditTime: 2022-08-31 18:05:08
  * @Description: worker_threads 实现在 worker 线程中执行
  *
  * - worker_threads 比 child_process 和 cluster 更为轻量级的并行性，而且 worker_threads 可有效地共享内存
  * - eslint-plugins 也使用了 worker_threads，会有一些异常现象
  */
 
-import { Worker, isMainThread, workerData } from 'worker_threads'; // parentPort
+import { Worker, isMainThread, workerData } from 'node:worker_threads'; // parentPort
 import { getLogger } from './get-logger';
 interface CreateThreadOptions {
   debug?: boolean;

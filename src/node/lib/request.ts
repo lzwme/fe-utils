@@ -1,7 +1,7 @@
-import { URL } from 'url';
-import zlib from 'zlib';
-import http, { type IncomingMessage, type IncomingHttpHeaders } from 'http';
-import https from 'https';
+import { URL } from 'node:url';
+import zlib from 'node:zlib';
+import http, { type IncomingMessage, type IncomingHttpHeaders } from 'node:http';
+import https from 'node:https';
 import { urlFormat } from '../../common/url';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

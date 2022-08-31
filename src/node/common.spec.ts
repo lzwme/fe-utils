@@ -1,6 +1,6 @@
 // import test from 'ava';
 import * as comm from './common';
-jest.mock('readline', () => ({
+jest.mock('node:readline', () => ({
   createInterface() {
     return {
       question(tip: string, callback: (answer: string) => void) {

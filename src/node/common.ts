@@ -1,11 +1,11 @@
 import { color } from 'console-log-colors';
-import { createInterface } from 'readline';
 import { getLogger } from './get-logger';
 import { formatTimeCost } from '../common/date';
 
 /** 等待并获取用户输入内容 */
-export function readSyncByRl(tips = '> ') {
-  return new Promise(resolve => {
+export async function readSyncByRl(tips = '> ') {
+  const { createInterface } = await import('node:readline');
+  return new Promise<string>(resolve => {
     const rl = createInterface({
       input: process.stdin,
       output: process.stdout,
