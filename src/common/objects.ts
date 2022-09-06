@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { isObject, isSet, isMap } from './is';
+import { isObject, isSet, isMap, isArray } from './is';
 
 export function safeStringify(obj: any): string {
   const seen = new Set<any>();
@@ -121,4 +121,10 @@ export function assign<T extends object>(a: T, ...args: Record<any, any>[]): T {
     simpleAssign(a, tmp);
   }
   return a;
+}
+
+export function ensureArray<T>(input: readonly T[] | T | undefined | null): readonly T[] {
+  if (isArray(input)) return input as T[];
+  if (input == null) return [];
+  return [input as T];
 }

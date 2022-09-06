@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2021-04-23 10:44:32
  * @LastEditors: lzw
- * @LastEditTime: 2022-07-07 17:35:35
+ * @LastEditTime: 2022-09-06 12:08:17
  * @Description: gh u 相关的命令。主要为常用的快捷工具方法
  */
 
@@ -48,4 +48,9 @@ export function getHeadDiffFileList(headIndex = 0, cwd?: string, debug = false) 
 /** 获取 git user eamil 地址 */
 export function getUserEmail() {
   return execSync('git config --get user.email', 'pipe').stdout;
+}
+
+/** 给文件增加或撤销可执行权限 */
+export function setChmod(filepath: string, type: 'add' | 'del' = 'add') {
+  return execSync(`git update-index --add --chmod=${type === 'del' ? '-' : '+'}x ${filepath}`);
 }

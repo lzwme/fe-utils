@@ -21,7 +21,8 @@ export function isNumber(obj: unknown): obj is number {
   return typeof obj === 'number' && !Number.isNaN(obj);
 }
 
-export function isArray(array: unknown): array is unknown[] {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function isArray(array: any): array is any[] {
   return Array.isArray(array);
 }
 

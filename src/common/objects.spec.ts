@@ -1,4 +1,4 @@
-import { assign, simpleAssign, assignExceptNil, mixin, deepClone, safeStringify } from './objects';
+import { assign, simpleAssign, assignExceptNil, mixin, deepClone, safeStringify, ensureArray } from './objects';
 
 describe('objects/assign', () => {
   it('safeStringify', () => {
@@ -95,5 +95,13 @@ describe('objects/assign', () => {
     expect(assignExceptNil(a, b).b.c).toBe('');
     b.b.c = 0;
     expect(assignExceptNil(a, b, true).b.c).toBe(0);
+  });
+
+  it('ensureArray', () => {
+    const a = { a: 1, b: { c: 2 } };
+
+    expect(ensureArray(a)[0]).toBe(a);
+    expect(ensureArray(null).length).toBe(0);
+    expect(ensureArray([1])[0]).toBe(1);
   });
 });
