@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2021-08-25 10:12:21
  * @LastEditors: lzw
- * @LastEditTime: 2022-07-07 17:31:08
+ * @LastEditTime: 2022-09-07 15:33:08
  * @Description: 在 fork 子进程中执行 Check 任务
  */
 
@@ -74,7 +74,7 @@ export function createChildProcess<T>(options: CreateThreadOptions, onMessage?: 
 
 let loaded = false;
 const exit = (data: unknown) => {
-  process.send({ data, end: true } as WorkerMessageBody);
+  process.send!({ data, end: true } as WorkerMessageBody);
   process.exit(0);
 };
 
@@ -88,7 +88,7 @@ export function childProcessInit(onmessage: (msg: CreateThreadOptions) => void) 
 
     // heartbeat
     if (config.type === 'ping') {
-      process.send({ type: 'pong' });
+      process.send!({ type: 'pong' });
       return;
     }
 
@@ -96,7 +96,7 @@ export function childProcessInit(onmessage: (msg: CreateThreadOptions) => void) 
   });
 
   // 立即发送一次心跳
-  process.send({ type: 'pong' });
+  process.send!({ type: 'pong' });
 
   return { exit };
 }

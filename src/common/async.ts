@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-01-12 15:10:41
  * @LastEditors: lzw
- * @LastEditTime: 2022-07-07 17:57:41
+ * @LastEditTime: 2022-09-07 15:32:46
  * @Description:
  * @see src\vs\base\common\async.ts
  */
@@ -73,19 +73,19 @@ export class Throttler {
         const onComplete = () => {
           this.queuedPromise = null;
 
-          const result = this.queue(this.queuedPromiseFactory);
+          const result = this.queue(this.queuedPromiseFactory!);
           this.queuedPromiseFactory = null;
 
           return result;
         };
 
         this.queuedPromise = new Promise(resolve => {
-          this.activePromise.then(onComplete, onComplete).then(resolve);
+          this.activePromise!.then(onComplete, onComplete).then(resolve);
         });
       }
 
       return new Promise((resolve, reject) => {
-        this.queuedPromise.then(resolve as never, reject);
+        this.queuedPromise!.then(resolve as never, reject);
       });
     }
 
@@ -396,19 +396,19 @@ export async function retry<T>(task: ITask<Promise<T>>, delay: number, retries: 
   throw lastError;
 }
 
-export function concurrency<T, E = Error>(taskList: ITask<Promise<T>>[], maxDegreeOfParalellism = 5) {
+export function concurrency<T, E = Error | undefined>(taskList: ITask<Promise<T>>[], maxDegreeOfParalellism = 5) {
   const total = taskList.length;
   let idx = 0;
   const resut: { result: T; error: E }[] = [];
   const onFinish = (result: T, error?: E) => {
-    resut.push({ result, error });
+    resut.push({ result, error: error as never });
     return next();
   };
   const next = (): Promise<void> => {
-    if (idx >= total) return null;
+    if (idx >= total) return Promise.resolve();
     return taskList[idx++]()
       .then(r => onFinish(r))
-      .catch(error => onFinish(null, error));
+      .catch(error => onFinish(null as never as T, error));
   };
   const size = Math.min(maxDegreeOfParalellism, total);
   // const queue = Array.from<Promise<void>>({ length: size }).fill(next());
@@ -461,12 +461,14 @@ export class Limiter<T> {
       const iLimitedTask = this.outstandingPromises.shift();
       this.runningPromises++;
 
-      const promise = iLimitedTask.factory();
-      promise.then(iLimitedTask.c, iLimitedTask.e);
-      promise.then(
-        () => this.consumed(),
-        () => this.consumed()
-      );
+      if (iLimitedTask) {
+        const promise = iLimitedTask.factory();
+        promise.then(iLimitedTask.c, iLimitedTask.e);
+        promise.then(
+          () => this.consumed(),
+          () => this.consumed()
+        );
+      }
     }
   }
 
