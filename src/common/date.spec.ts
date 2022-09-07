@@ -2,11 +2,14 @@ import * as utilsDate from './date';
 
 describe('utils-date', () => {
   it('dateFormat', () => {
+    expect(utilsDate.dateFormat('yyyy', '' as never)).toBe('');
     expect(utilsDate.dateFormat('yyyy').length).toEqual(4);
 
     const list = [
       ['', '1649211013915', '1649211013915'],
       ['yyyy-MM-dd', '1649211013915', '2022-04-06'],
+      ['yyyy-MM-dd', '20220406', '2022-04-06'],
+      ['yyyy-MM-dd hh:mm:ss.S', '2022-04-06T10:10:13.915', '2022-04-06 10:10:13.915'],
       ['yyyy-MM-dd hh:mm:ss.S', new Date('2022-04-06T10:10:13.915'), '2022-04-06 10:10:13.915'],
     ] as const;
 
@@ -37,7 +40,7 @@ describe('utils-date', () => {
     expect(utilsDate.formatTimeCost(Date.now() - 1001).includes('1s')).toBeTruthy();
     expect(utilsDate.formatTimeCost(Date.now() - 1001, ['日', '小时', '分钟', '秒', '毫秒']).includes('毫秒')).toBeTruthy();
     // suffix 对应位置为 null 则不显示
-    expect(utilsDate.formatTimeCost(Date.now() - 1011, ['日', '小时', '分钟', '秒', null]) === '1秒').toBeTruthy();
+    expect(utilsDate.formatTimeCost(Date.now() - 1011, ['日', '小时', '分钟', '秒']) === '1秒').toBeTruthy();
   });
 
   it('yyyyMMddFormat', () => {
@@ -76,7 +79,7 @@ describe('utils-date', () => {
     ] as const;
 
     for (const [now, timeZone, r] of list) {
-      const result = utilsDate.toLocalTime(now, timeZone).getTime();
+      const result = utilsDate.toLocalTime(now, timeZone)!.getTime();
       if (result !== r) console.error('toLocalTime-error:', timeZone, now, r, result);
       expect(result).toEqual(r);
     }

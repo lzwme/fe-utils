@@ -38,7 +38,7 @@ export function deepClone<T extends object>(obj: T): T {
 }
 
 export function mixin<T = any>(destination: any, source: any, overwrite = true): T {
-  if (!isObject(destination)) source;
+  if (!isObject(destination)) return source;
 
   if (isObject(source)) {
     for (const key of Object.keys(source)) {

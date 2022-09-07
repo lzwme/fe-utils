@@ -17,7 +17,7 @@ describe('utils/common', () => {
   });
 
   it('formatToUuid', () => {
-    expect(comm.formatToUuid(null).length).toBe(0);
+    expect(comm.formatToUuid(null as never).length).toBe(0);
     expect(comm.formatToUuid('').length).toBe(0);
     expect(comm.formatToUuid('abc').length).toBe(0);
     expect(comm.formatToUuid('d5aeb3d88dd64ffcbbe289982ca00000')[0].length).toBe(36);

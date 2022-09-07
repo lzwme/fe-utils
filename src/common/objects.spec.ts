@@ -26,11 +26,18 @@ describe('objects/assign', () => {
     expect(a === c).toBeFalsy();
     expect(c.b.c).toBe(a.b.c);
     expect(c.b.d).toBe(3);
+
+    expect(deepClone(null as never)).toBeNull();
+
+    const regex1 = /abc/g;
+    expect(deepClone(regex1)).toEqual(regex1);
+
+    expect(deepClone([a]).length === 1).toBeTruthy();
   });
 
   it('mixin', () => {
     const a = { a: 1, b: { c: 2, d: 3 } };
-    const b = { b: { c: null as unknown, d: 5 } };
+    const b = { b: { c: null as unknown, d: 5 }, m: 1 };
 
     let c = mixin(a, b, false);
     expect(c.b.c).toBe(2);
@@ -40,6 +47,8 @@ describe('objects/assign', () => {
     c = mixin(a, b);
     expect(c.b.c).toBeNull();
     expect(c.b.d).toBe(5);
+
+    expect(mixin(null, a)).toEqual(a);
   });
 
   it('simpleAssgin', () => {
@@ -52,6 +61,8 @@ describe('objects/assign', () => {
     c = simpleAssign(a, b);
     expect(c.b.c).toBeNull();
     expect(a === c).toBeTruthy();
+
+    expect(simpleAssign(null as never, b)).toBeNull();
   });
 
   it('assign', () => {
@@ -64,7 +75,9 @@ describe('objects/assign', () => {
     expect(assign(a, [], b).b).toEqual(2);
     expect(Array.isArray(assign(a, b)['c'])).toBeTruthy();
 
+    // @ts-ignore
     expect(assign(void 0, b) === void 0).toBeTruthy();
+    // @ts-ignore
     expect(assign(a, void 0)).toEqual(a);
 
     // 第一个参数是数组，则原样返回

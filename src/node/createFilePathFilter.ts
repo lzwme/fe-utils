@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-09-07 09:04:38
  * @LastEditors: lzw
- * @LastEditTime: 2022-09-07 13:52:38
+ * @LastEditTime: 2022-09-07 14:58:26
  * @Description: create filter
  * @see https://github.com/rollup/plugins/blob/master/packages/pluginutils/src/createFilter.ts
  */
@@ -62,22 +62,20 @@ export interface FilePathFilterOptions {
 
 export function createFilePathFilter(options: FilePathFilterOptions = {}) {
   let { extensions = [] } = options;
-  const getMatcher = (id: string | RegExp) =>
-    id instanceof RegExp
-      ? id
-      : {
-          test: (what: string) => {
-            if (what.includes(id)) return true;
+  const getMatcher = (id: string | RegExp) => {
+    if (id instanceof RegExp) return id;
 
-            if (options.globMatcher) {
-              // this refactor is a tad overly verbose but makes for easy debugging
-              const pattern = getMatcherString(id, options.resolve);
-              return options.globMatcher(what, pattern, id);
-            }
+    const pattern = getMatcherString(id, options.resolve);
 
-            return false;
-          },
-        };
+    return {
+      test: (what: string) => {
+        if (what.includes(id)) return true;
+        if (options.globMatcher) return options.globMatcher(what, pattern, id);
+
+        return false;
+      },
+    };
+  };
 
   const includeMatchers = ensureArray(options.include).map(d => getMatcher(d));
   const excludeMatchers = ensureArray(options.exclude).map(d => getMatcher(d));
@@ -94,7 +92,7 @@ export function createFilePathFilter(options: FilePathFilterOptions = {}) {
 
     if (extensions.length > 0) {
       const ext = extname(id);
-      if (ext && !extensions.includes(ext)) return false;
+      if (!ext || !extensions.includes(ext)) return false;
     }
 
     for (const matcher of excludeMatchers) {

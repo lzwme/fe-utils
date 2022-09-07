@@ -13,8 +13,8 @@ describe('utils/exec', () => {
     expect(execSync('echo test', 'inherit', process.cwd(), true).stdout).toBe('');
 
     // stdio = debug ? 'inherit' : 'pipe'
-    expect(execSync('echo test', null, process.cwd(), true).stdout).toBe('');
-    expect(execSync('echo test', null, process.cwd(), false).stdout).toBe('test');
+    expect(execSync('echo test', void 0, process.cwd(), true).stdout).toBe('');
+    expect(execSync('echo test', void 0, process.cwd(), false).stdout).toBe('test');
   });
 
   it('execPromisfy', async () => {
