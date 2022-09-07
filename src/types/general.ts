@@ -12,3 +12,9 @@ export type ThenArgs<T> = T extends PromiseLike<infer U> ? U : T;
 export type ArrayLikeArgs<T> = T extends ArrayLike<infer U> ? U : T;
 
 export type GeneralFn<T = void> = (...p: unknown[]) => T;
+
+/**
+ * @deprecated This type should be avoided as far as possible
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnyObject = Record<string, any>;

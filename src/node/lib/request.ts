@@ -3,9 +3,7 @@ import zlib from 'node:zlib';
 import http, { type IncomingMessage, type IncomingHttpHeaders } from 'node:http';
 import https from 'node:https';
 import { urlFormat } from '../../common/url';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyObject = Record<string, any>;
+import type { AnyObject } from '../../types';
 
 function toLowcaseKeyObject(info: Record<string, unknown> = {}) {
   for (const key of Object.keys(info)) {

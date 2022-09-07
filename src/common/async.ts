@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-01-12 15:10:41
  * @LastEditors: lzw
- * @LastEditTime: 2022-09-07 15:32:46
+ * @LastEditTime: 2022-09-07 17:44:46
  * @Description:
  * @see src\vs\base\common\async.ts
  */
@@ -418,7 +418,7 @@ export function concurrency<T, E = Error | undefined>(taskList: ITask<Promise<T>
   return Promise.allSettled(queue).then(() => resut);
 }
 
-interface ILimitedTaskFactory<T> {
+export interface ILimitedTaskFactory<T> {
   factory: ITask<Promise<T>>;
   c: (value: T | Promise<T>) => void;
   e: (error?: unknown) => void;
