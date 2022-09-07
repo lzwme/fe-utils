@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0](https://github.com/lzwme/fe-utils/compare/v0.0.5...v1.0.0) (2022-09-07)
+
+
+### Features
+
+* 新增 LiteStorage 轻量级持久化存储类 ([b9165a8](https://github.com/lzwme/fe-utils/commit/b9165a8abe72b52ee46130ee1ab32a4916b3650f))
+* add createFilter; enable tsconfig.strictNullChecks ([f8ce75b](https://github.com/lzwme/fe-utils/commit/f8ce75b7faea38df483ae37dc0c40bb8783013ac))
+* add some util methods ([da33bfd](https://github.com/lzwme/fe-utils/commit/da33bfdb8946b295e09860da19a4423638447368))
+
+
+### Bug Fixes
+
+* 优化 assign 方法执行逻辑 ([e8928c9](https://github.com/lzwme/fe-utils/commit/e8928c994b77ef873ab2b1737911bab445fd1e5a))
+* update for Logger ([c894c94](https://github.com/lzwme/fe-utils/commit/c894c9416bb10dab9c0765a47f1dfabfb3a02463))
+
 ### [0.0.5](https://github.com/lzwme/fe-utils/compare/v0.0.4...v0.0.5) (2022-07-28)
 
 
