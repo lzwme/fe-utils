@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-09-07 09:04:38
  * @LastEditors: lzw
- * @LastEditTime: 2022-09-07 11:51:36
+ * @LastEditTime: 2022-09-07 13:52:38
  * @Description: create filter
  * @see https://github.com/rollup/plugins/blob/master/packages/pluginutils/src/createFilter.ts
  */
@@ -12,9 +12,7 @@ import { ensureArray } from '../common/objects';
 import { normalizePath } from './path';
 
 function getMatcherString(id: string, resolutionBase: string | false | null | undefined) {
-  if (resolutionBase === false || isAbsolute(id) || id.startsWith('*')) {
-    return normalizePath(id);
-  }
+  if (resolutionBase === false || isAbsolute(id) || id.startsWith('*')) return normalizePath(id);
 
   // resolve('') is valid and will default to process.cwd()
   const basePath = normalizePath(resolve(resolutionBase || ''))
@@ -28,20 +26,41 @@ function getMatcherString(id: string, resolutionBase: string | false | null | un
 }
 
 /**
- * A valid `picomatch` glob pattern, or array of patterns.
+ * A valid glob pattern, or array of patterns.
  */
 export type FilterPattern = ReadonlyArray<string | RegExp> | string | RegExp | null;
 
-export function createFilter(
-  options: {
-    include?: FilterPattern;
-    exclude?: FilterPattern;
-    extensions?: string[];
-    globMatcher?: (pathId: string, ruleId: string, ruleIdNormalized: string) => boolean;
-    /** resolve with base path for options.include and options.exclude */
-    resolve?: string | false | null;
-  } = {}
-) {
+export interface FilePathFilterOptions {
+  /** A pattern, or array of patterns, which specify the files should operate on. */
+  include?: FilterPattern;
+  /** A pattern, or array of patterns, which specify the files should ignore. */
+  exclude?: FilterPattern;
+  extensions?: string[];
+  /**
+   * custom glob matcher. For example:
+   * ### use picomatch
+   * ```ts
+   * import picomatch from 'picomatch';
+   *
+   * const globMatcher = (pathId, ruleIdNormalized, _ruleId) => {
+   *    return picomatch(ruleIdNormalized, { dot: true })(pathId);
+   * };
+   * ```
+   * ### use micromatch
+   * ```ts
+   * import { isMatch } from 'micromatch';
+   *
+   * const globMatcher = (pathId, ruleIdNormalized, _ruleId) => {
+   *    return isMatch(pathId, ruleIdNormalized, { dot: true });
+   * };
+   * ```
+   */
+  globMatcher?: (pathId: string, ruleIdNormalized: string, ruleId: string) => boolean;
+  /** resolve with base path for options.include and options.exclude */
+  resolve?: string | false | null;
+}
+
+export function createFilePathFilter(options: FilePathFilterOptions = {}) {
   let { extensions = [] } = options;
   const getMatcher = (id: string | RegExp) =>
     id instanceof RegExp
@@ -54,11 +73,6 @@ export function createFilter(
               // this refactor is a tad overly verbose but makes for easy debugging
               const pattern = getMatcherString(id, options.resolve);
               return options.globMatcher(what, pattern, id);
-
-              // const pm = require('picomatch');
-              // const fn = pm(pattern, { dot: true });
-              // const result = fn(what);
-              // return result;
             }
 
             return false;
