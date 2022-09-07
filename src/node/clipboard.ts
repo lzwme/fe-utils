@@ -8,10 +8,12 @@ export function writeToClipBoard(text: string) {
     const proc = exec(cmd);
 
     proc.on('error', error => reject(error));
-    proc.stdin.on('error', error => reject(error));
-    proc.stdin.end(text, () => {
-      resolve(true);
-      proc.kill();
-    });
+    if (proc.stdin) {
+      proc.stdin.on('error', error => reject(error));
+      proc.stdin.end(text, () => {
+        resolve(true);
+        proc.kill();
+      });
+    }
   });
 }

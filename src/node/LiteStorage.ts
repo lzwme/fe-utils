@@ -31,6 +31,7 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
   private get cachePath() {
     return this.options.filepath;
   }
+  // @ts-ignore
   private cache: LSCache<T>;
   private options: Required<LSOptions>;
   constructor(options?: LSOptions) {

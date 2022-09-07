@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
  * @LastEditors: lzw
- * @LastEditTime: 2022-08-16 15:41:30
+ * @LastEditTime: 2022-09-07 11:57:29
  * @Description:
  */
 /* eslint no-console: 0 */
@@ -41,7 +41,7 @@ const defaultOptions: LoggerOptions = {
   debug: false,
   silent: false,
   logDir: '',
-  color: null,
+  color: void 0,
 };
 
 let headTipColored = false;
@@ -66,8 +66,8 @@ export class Logger {
   public debug: GeneralFn = this._log.bind(this, 'debug');
 
   /** 日志路径 */
-  protected logPath: string;
-  protected logDir: string;
+  protected logPath = '';
+  protected logDir = '';
   /** 本机与服务器时间的差值 diff = Date.now() - serverTime */
   private static serverTimeDiff = 0;
 
@@ -79,9 +79,9 @@ export class Logger {
     if (!match) throw 'Logger tag expected';
     this.tag = tag;
 
-    if (!(options.levelType in LogLevel)) {
+    if (!options.levelType || !(options.levelType in LogLevel)) {
       if (process.env.FE_LOG_LEVEL) options.levelType = process.env.FE_LOG_LEVEL as LogLevelType;
-      if (options.levelType in LogLevel) this.level = LogLevel[options.levelType];
+      if (options.levelType && options.levelType in LogLevel) this.level = LogLevel[options.levelType];
     }
 
     options = this.updateOptions(options);
@@ -163,7 +163,7 @@ export class Logger {
       }
     }
 
-    if (options.levelType in LogLevel) this.level = LogLevel[options.levelType];
+    if (options.levelType && options.levelType in LogLevel) this.level = LogLevel[options.levelType];
 
     return this.options;
   }

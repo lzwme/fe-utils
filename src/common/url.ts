@@ -5,7 +5,7 @@
  * @param isRepalce 是否替换已存在于 url 中的参数
  * @returns
  */
-export function urlFormat<T = unknown>(url: string, params: Record<string, T>, isRepalce = false) {
+export function urlFormat<T = unknown>(url: string, params?: Record<string, T>, isRepalce = false) {
   const u = new URL(url, 'file:');
 
   if (params) {
@@ -22,7 +22,7 @@ export function urlFormat<T = unknown>(url: string, params: Record<string, T>, i
 
 export function toFileUri<T = unknown>(filePath: string, params?: Record<string, T>): string {
   // if (!params) return new URL(filePath, 'file:').toString();
-  return urlFormat<T>(filePath, params).toString();
+  return urlFormat<T>(filePath, params || {}).toString();
 }
 
 /** 将对象参数转换为 url searchParams 格式 */
@@ -48,7 +48,7 @@ export function getUrlParams(query = location.search) {
     const parts = query.slice(1).split('&');
     for (const line of parts) {
       const kv = line.split('=').map(d => decodeURIComponent(d));
-      ret[kv[0]] = kv[1] || null;
+      ret[kv[0]] = kv[1] || '';
     }
   }
   return ret;

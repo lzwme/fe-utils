@@ -60,7 +60,7 @@ export class Request {
   getCookie(isString = true) {
     return isString ? this.cookies.join('; ') : this.cookies;
   }
-  request<T = Record<string, unknown>>(method: string, url: string | URL, parameters: AnyObject, headers?: IncomingHttpHeaders) {
+  request<T = Record<string, unknown>>(method: string, url: string | URL, parameters?: AnyObject, headers?: IncomingHttpHeaders) {
     const urlObject = typeof url === 'string' ? new URL(url) : url;
     const options: https.RequestOptions = {
       hostname: urlObject.host.split(':')[0],
@@ -72,10 +72,10 @@ export class Request {
     let postBody = '';
 
     if (parameters) {
-      postBody = String(options.headers['content-type']).includes('application/json')
+      postBody = String(options.headers!['content-type']).includes('application/json')
         ? JSON.stringify(parameters)
         : new URLSearchParams(parameters as Record<string, string>).toString();
-      options.headers['content-length'] = Buffer.byteLength(postBody).toString();
+      options.headers!['content-length'] = Buffer.byteLength(postBody).toString();
     }
 
     return new Promise<{ data: T; buffer: Buffer; headers: IncomingHttpHeaders; response: IncomingMessage }>((resolve, reject) => {

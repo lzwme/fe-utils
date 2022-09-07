@@ -90,6 +90,7 @@ export function arriveTimerFormat(second: number | string, dayDesc = 'day ') {
     t.push(String(min).padStart(2, '0'), String(sec).padStart(2, '0'));
   }
 
+  // @ts-ignore
   return [day, hour, min, sec, t.join(':')] as const;
 }
 
@@ -142,7 +143,7 @@ export function yyyyMMddFormat(dateStr: string) {
     second,
     millisecond,
     str: dateStr ? `${year}年${month}月${day}日` : '',
-    date: dateStr ? new Date(+year, +month - 1, +day, +hour, +minute, +second, +millisecond) : new Date(void 0),
+    date: dateStr ? new Date(+year, +month - 1, +day, +hour, +minute, +second, +millisecond) : new Date(),
     dateStr() {
       return this.str;
     },

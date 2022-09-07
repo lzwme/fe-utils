@@ -76,8 +76,7 @@ export interface NpmRegistryInfo {
   time: {
     created: string;
     modified?: string;
-    [version: string]: string;
-  };
+  } & Record<string, string>;
   users?: Record<string, string>;
   keywords?: string[];
   maintainers?: PackageJson['maintainers'];

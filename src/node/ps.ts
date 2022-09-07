@@ -146,7 +146,7 @@ export function listProcesses(rootPid: number, formatName?: (cmd: string) => str
         windowsProcessTree.getProcessList(
           rootPid,
           processList => {
-            windowsProcessTree.getProcessCpuUsage(processList, completeProcessList => {
+            windowsProcessTree.getProcessCpuUsage(processList || [], completeProcessList => {
               const processItems: Map<number, ProcessItem> = new Map();
               completeProcessList.forEach(process => {
                 const commandLine = cleanUNCPrefix(process.commandLine || '');
@@ -244,7 +244,7 @@ export async function tryKillProcess(params: { proc?: ChildProcess; name?: strin
     if (params.proc) {
       logger.log(`try kill by pid: ${params.proc.pid}`);
       params.proc.removeAllListeners();
-      process.kill(params.proc.pid);
+      if (params.proc.pid) process.kill(params.proc.pid);
       if (!params.proc.killed) params.proc.kill('SIGKILL');
     }
 

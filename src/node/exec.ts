@@ -11,17 +11,17 @@ export function execPromisfy(cmd: string, debug = process.env.DEBUG != null) {
 
     const proc = exec(cmd, { maxBuffer: 100 * 1024 * 1024 }, (error, stdout, stderr) => {
       if (debug && error) getLogger().error(`\n[exec]命令执行失败：${cmd}\n`, color.redBright(error.message), '\n', error);
-      resolve({ error, stdout: stdout.trim(), stderr });
+      resolve({ error: error as never, stdout: stdout.trim(), stderr });
     });
 
-    proc.stderr.pipe(process.stderr);
-    if (debug) proc.stdout.pipe(process.stdout);
+    if (proc.stderr) proc.stderr.pipe(process.stderr);
+    if (debug && proc.stdout) proc.stdout.pipe(process.stdout);
   });
 }
 
 export function execSync(cmd: string, stdio?: StdioOptions, cwd = process.cwd(), debug = false) {
   if (debug) getLogger().debug(color.cyanBright('exec cmd:'), color.cyan(cwd));
-  const result = { stdout: '', stderr: '', error: null as Error };
+  const result = { stdout: '', stderr: '', error: null as unknown as Error };
 
   try {
     // 为 pipe 才会返回输出结果给 res；为 inherit 则打印至 stdout 中，res 为空

@@ -2,6 +2,7 @@ export * from './lib';
 export * from './clearRequireCache';
 export * from './clipboard';
 export * from './common';
+export * from './createFilter';
 export * from './crypto';
 export * from './exec';
 export * from './find-free-port';

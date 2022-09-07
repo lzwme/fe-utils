@@ -49,7 +49,7 @@ export async function tgzip(srcDir: string, tgzFilePath?: string) {
   if (!tgzFilePath) tgzFilePath = srcDir.replace(/\/$/, '');
   if (!tgzFilePath.endsWith('.tar.gz')) tgzFilePath += '.tar.gz';
 
-  return import('compressing').then(({ tgz }) => tgz.compressDir(srcDir, tgzFilePath));
+  return import('compressing').then(({ tgz }) => tgz.compressDir(srcDir, tgzFilePath!));
 }
 
 /**
@@ -70,7 +70,7 @@ export async function zip(srcDir: string, dest?: string) {
   if (!dest) dest = srcDir.replace(/\/$/, '');
   if (!dest.endsWith('.zip')) dest += '.zip';
 
-  return import('compressing').then(({ zip }) => zip.compressDir(srcDir, dest));
+  return import('compressing').then(({ zip }) => zip.compressDir(srcDir, dest!));
 }
 
 /**
