@@ -2,12 +2,12 @@
  * @Author: lzw
  * @Date: 2021-04-23 10:44:32
  * @LastEditors: lzw
- * @LastEditTime: 2022-09-06 12:08:17
+ * @LastEditTime: 2022-09-08 10:52:39
  * @Description: gh u 相关的命令。主要为常用的快捷工具方法
  */
 
-import path from 'node:path';
-import fs from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { execSync } from './exec';
 
 /** 获取当前的本地分支名 */
@@ -16,10 +16,10 @@ export function getHeadBranch(baseDirectory = process.cwd()) {
   let branch = process.env.CI_COMMIT_REF_NAME;
 
   if (!branch) {
-    const headPath = path.resolve(baseDirectory, './.git/HEAD');
+    const headPath = resolve(baseDirectory, './.git/HEAD');
 
-    if (fs.existsSync(headPath)) {
-      const head = fs.readFileSync(headPath, { encoding: 'utf8' });
+    if (existsSync(headPath)) {
+      const head = readFileSync(headPath, { encoding: 'utf8' });
       branch = head.split('refs/heads/')[1];
     }
   }
@@ -53,4 +53,16 @@ export function getUserEmail() {
 /** 给文件增加或撤销可执行权限 */
 export function setChmod(filepath: string, type: 'add' | 'del' = 'add') {
   return execSync(`git update-index --add --chmod=${type === 'del' ? '-' : '+'}x ${filepath}`);
+}
+
+/** 判断给定的目录是否为一个 git 仓库 */
+export function isGitRepo(rootDir = process.cwd(), useCache = true): boolean {
+  // @ts-ignore
+  if (isGitRepo[rootDir] == null || !useCache) {
+    // @ts-ignore
+    isGitRepo[rootDir] =
+      existsSync(resolve(rootDir, '.git/config')) || execSync('git branch --show-current', 'pipe', rootDir).error == null;
+  }
+  // @ts-ignore
+  return isGitRepo[rootDir];
 }
