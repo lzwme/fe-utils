@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-09-13 10:59:47
  * @LastEditors: lzw
- * @LastEditTime: 2022-09-13 11:13:29
+ * @LastEditTime: 2022-09-13 13:28:43
  * @Description: Semantic Versioning
  */
 
@@ -12,14 +12,15 @@
  */
 export function semverCompare(a: string, b: string, strict = true) {
   if (!strict) {
-    a = a.replace(/[^\d.]/g, '');
-    b = b.replace(/[^\d.]/g, '');
+    a = a.replace('-', '.').replace(/[^\d.]/g, '');
+    b = b.replace('-', '.').replace(/[^\d.]/g, '');
   }
 
   const pa = a.split('.');
   const pb = b.split('.');
+  const count = strict ? 3 : Math.max(pa.length, pb.length, 3);
 
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < count; i++) {
     const na = Number(pa[i]);
     const nb = Number(pb[i]);
 
