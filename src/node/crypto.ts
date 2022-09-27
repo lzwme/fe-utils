@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
-import { basename } from 'node:path';
+import { createWriteStream, existsSync, readdirSync, readFileSync } from 'node:fs';
+import { basename, resolve } from 'node:path';
 
 /**
  * 生成指定字符串或指定文件路径的md5值
@@ -41,43 +41,72 @@ export function getMd5ByPlainObject(params: Record<string | number, unknown>, fi
 }
 
 /**
+ * 基于 compressing 库的目录压缩
+ * @param srcDir 要压缩的目录路径
+ * @param dest 压缩文件输出路径。若省略则默认使用 srcDir 压缩目录名
+ * @param type 压缩类型
+ * @param includeDirName 是否包含 srcDir 目录名称。默认为 false
+ */
+export async function compressing(srcDir: string, dest?: string, type?: 'zip' | 'gz' | 'tar', includeDirName = false) {
+  if (!dest) dest = srcDir.replace(/\/$/, '');
+  const c = await import('compressing');
+  const cType = type === 'tar' ? c.tar : type === 'gz' ? c.tgz : c.zip;
+  const ext = type === 'tar' ? '.tar' : type === 'gz' ? '.tar.gz' : '.zip';
+  if (!dest.endsWith(ext)) dest += ext;
+
+  if (includeDirName) {
+    return cType.compressDir(srcDir, dest!);
+  } else {
+    const zipStream = new cType.Stream();
+
+    for (const fielname of readdirSync(srcDir)) {
+      zipStream.addEntry(resolve(srcDir, fielname));
+    }
+
+    await new Promise<void>((rs, rj) => {
+      const handleError = (e: unknown) => rj(e);
+
+      zipStream
+        .on('error', handleError)
+        .pipe(createWriteStream(dest!))
+        .on('error', handleError)
+        .on('finish', () => rs());
+    });
+  }
+}
+
+/**
  * tar.gz 压缩。需添加依赖库 `compressing`
  * @param srcDir 要压缩的目录路径
- * @param tgzFilePath 压缩文件输出路径。若省略则默认使用 srcDir 压缩目录名
+ * @param dest 压缩文件输出路径。若省略则默认使用 srcDir 压缩目录名
  */
-export async function tgzip(srcDir: string, tgzFilePath?: string) {
-  if (!tgzFilePath) tgzFilePath = srcDir.replace(/\/$/, '');
-  if (!tgzFilePath.endsWith('.tar.gz')) tgzFilePath += '.tar.gz';
-
-  return import('compressing').then(({ tgz }) => tgz.compressDir(srcDir, tgzFilePath!));
+export function tgzip(srcDir: string, dest?: string, includeDirName = false) {
+  return compressing(srcDir, dest, 'gz', includeDirName);
 }
 
 /**
  * tar.gz 文件解压。需添加依赖库 `compressing`
- * @param tgzFilePath 要解压的 tar.gz 文件路径
+ * @param srcFilePath 要解压的 tar.gz 文件路径
  * @param dest 解压输出目录路径
  */
-export async function untgzip(tgzFilePath: string, dest?: string) {
-  return import('compressing').then(({ tgz }) => tgz.uncompress(tgzFilePath, dest || basename(tgzFilePath)));
+export async function untgzip(srcFilePath: string, dest?: string) {
+  return import('compressing').then(({ tgz }) => tgz.uncompress(srcFilePath, dest || basename(srcFilePath)));
 }
 
 /**
  * zip 压缩。需添加依赖库 `compressing`
  * @param srcDir 要压缩的目录路径
- * @param dest 解压输出目录路径
+ * @param dest zip 文件输出目录路径
  */
-export async function zip(srcDir: string, dest?: string) {
-  if (!dest) dest = srcDir.replace(/\/$/, '');
-  if (!dest.endsWith('.zip')) dest += '.zip';
-
-  return import('compressing').then(({ zip }) => zip.compressDir(srcDir, dest!));
+export function zip(srcDir: string, dest?: string, includeDirName = false) {
+  return compressing(srcDir, dest, 'zip', includeDirName);
 }
 
 /**
  * zip 文件解压。需添加依赖库 `compressing`
- * @param tgzFilePath 要解压的 tar.gz 文件路径
+ * @param srcFilePath 要解压的 tar.gz 文件路径
  * @param dest 解压输出目录路径
  */
-export async function unzip(tgzFilePath: string, dest?: string) {
-  return import('compressing').then(({ zip }) => zip.uncompress(tgzFilePath, dest || basename(tgzFilePath)));
+export async function unzip(srcFilePath: string, dest?: string) {
+  return import('compressing').then(({ zip }) => zip.uncompress(srcFilePath, dest || basename(srcFilePath)));
 }
