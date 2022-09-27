@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/lzwme/fe-utils/compare/v1.0.0...v1.1.0) (2022-09-27)
+
+
+### Features
+
+* add method isGitRepo ([184259e](https://github.com/lzwme/fe-utils/commit/184259e166b53c805befd1a4c0f697e45e8b5260))
+* add semver.ts ([4ae2fe1](https://github.com/lzwme/fe-utils/commit/4ae2fe1d0ca5b4d7018fbb5ac189a447c350d4b2))
+
 ## [1.0.0](https://github.com/lzwme/fe-utils/compare/v0.0.5...v1.0.0) (2022-09-07)
 
 
