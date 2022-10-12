@@ -10,7 +10,10 @@ import { basename, resolve } from 'node:path';
 export function md5(str: string | Buffer, isFile = false) {
   try {
     if (isFile) {
-      if (!str || !existsSync(str)) return '';
+      if (!str || !existsSync(str)) {
+        console.error('File does not exist:', str);
+        return '';
+      }
       str = readFileSync(str);
     }
     const md5 = createHash('md5').update(str).digest('hex');
