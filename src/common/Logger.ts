@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
  * @LastEditors: lzw
- * @LastEditTime: 2022-10-12 09:24:05
+ * @LastEditTime: 2022-10-12 09:34:40
  * @Description:
  */
 /* eslint no-console: 0 */
@@ -81,7 +81,6 @@ export class Logger {
 
     if (!options.levelType || !(options.levelType in LogLevel)) {
       if (process.env.FE_LOG_LEVEL) options.levelType = process.env.FE_LOG_LEVEL as LogLevelType;
-      if (options.levelType && options.levelType in LogLevel) this.level = LogLevel[options.levelType];
     }
 
     this.updateOptions(options);
@@ -151,8 +150,9 @@ export class Logger {
     }
 
     this.options = Object.assign({}, defaultOptions, this.options);
-    for (const key of Object.keys(defaultOptions)) {
-      if (key in options) {
+
+    for (const key in options) {
+      if (key in defaultOptions) {
         if (key === 'logDir') {
           if (null == options.logDir) continue;
           this.setLogDir(options.logDir);
@@ -163,7 +163,6 @@ export class Logger {
     }
 
     if (options.levelType && options.levelType in LogLevel) this.level = LogLevel[options.levelType];
-    if (options.logDir && this.setLogDir) this.setLogDir(options.logDir);
 
     return this;
   }
