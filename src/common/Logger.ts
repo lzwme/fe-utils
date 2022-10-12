@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
  * @LastEditors: lzw
- * @LastEditTime: 2022-09-07 11:57:29
+ * @LastEditTime: 2022-10-12 09:24:05
  * @Description:
  */
 /* eslint no-console: 0 */
@@ -84,8 +84,7 @@ export class Logger {
       if (options.levelType && options.levelType in LogLevel) this.level = LogLevel[options.levelType];
     }
 
-    options = this.updateOptions(options);
-    if (options.logDir && this.setLogDir) this.setLogDir(options.logDir);
+    this.updateOptions(options);
   }
   public setLogDir(_logDir: string) {
     // todo: node.js 下可扩展该方法
@@ -164,8 +163,9 @@ export class Logger {
     }
 
     if (options.levelType && options.levelType in LogLevel) this.level = LogLevel[options.levelType];
+    if (options.logDir && this.setLogDir) this.setLogDir(options.logDir);
 
-    return this.options;
+    return this;
   }
 
   public static getLogger(tag?: string, options?: LoggerOptions): Logger {
