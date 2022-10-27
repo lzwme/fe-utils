@@ -14,6 +14,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { resolve, sep, dirname } from 'node:path';
+import { readFileSync } from 'node:fs';
 
 /** 【同步】删除指定的文件或目录 */
 export function rmrf(filepath: string) {
@@ -81,6 +82,14 @@ export function outputFileSync(filepath: string, data: string | NodeJS.ArrayBuff
   const dir = dirname(filepath);
   if (!existsSync(dir)) mkdirp(dir);
   writeFileSync(filepath, data, options);
+}
+
+export function readJsonFile<T = object>(filepath: string, encoding: BufferEncoding = 'utf8'): Promise<T> {
+  return promises.readFile(filepath, encoding).then(str => JSON.parse(str));
+}
+
+export function readJsonFileSync<T = object>(filepath: string, encoding: BufferEncoding = 'utf8'): T {
+  return JSON.parse(readFileSync(filepath, encoding));
 }
 
 /** 复制一个目录 */
