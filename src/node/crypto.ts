@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { createWriteStream, existsSync, readdirSync, readFileSync } from 'node:fs';
+import { createReadStream, createWriteStream, existsSync, readdirSync } from 'node:fs';
 import { basename, resolve } from 'node:path';
 
 /**
@@ -14,10 +14,9 @@ export function md5(str: string | Buffer, isFile = false) {
         console.error('File does not exist:', str);
         return '';
       }
-      str = readFileSync(str);
+      return createReadStream(str).pipe(createHash('md5')).digest('hex');
     }
-    const md5 = createHash('md5').update(str).digest('hex');
-    return md5;
+    return createHash('md5').update(str).digest('hex');
   } catch (error) {
     /* eslint-disable no-console */
     console.log((error as Error).message);
