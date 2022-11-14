@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/lzwme/fe-utils/compare/v1.1.0...v1.2.0) (2022-11-14)
+
+
+### Features
+
+* 新增 readJsonFile 和 readJsonFileSync 方法 ([bdf9b79](https://github.com/lzwme/fe-utils/commit/bdf9b7957179df499480f1098156ebdb18c48f0e))
+
 ## [1.1.0](https://github.com/lzwme/fe-utils/compare/v1.0.0...v1.1.0) (2022-09-27)
 
 
