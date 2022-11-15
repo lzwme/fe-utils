@@ -14,7 +14,10 @@ export function md5(str: string | Buffer, isFile = false) {
         console.error('File does not exist:', str);
         return '';
       }
-      return createReadStream(str).pipe(createHash('md5')).digest('hex');
+      const stream = createReadStream(str);
+      const r = stream.pipe(createHash('md5')).digest('hex');
+      stream.close();
+      return r;
     }
     return createHash('md5').update(str).digest('hex');
   } catch (error) {
