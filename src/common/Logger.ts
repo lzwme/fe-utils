@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
  * @LastEditors: lzw
- * @LastEditTime: 2022-10-12 09:34:40
+ * @LastEditTime: 2022-11-15 16:16:45
  * @Description:
  */
 /* eslint no-console: 0 */
@@ -23,6 +23,8 @@ export enum LogLevel {
 export interface LoggerOptions {
   /** 日志保存的目录位置。默认为空，则不保存至文件 */
   logDir?: string;
+  /** 历史日志文件有效天数。默认为 7 天。设置为 0 则不自动清理 */
+  validityDays?: number;
   /** 是否为静默模式。为 true 则不打印至控制台 */
   silent?: boolean;
   /** 是否为调试模式。为 true 控制台打印为对象格式的日志 */

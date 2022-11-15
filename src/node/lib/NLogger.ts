@@ -2,15 +2,16 @@
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
  * @LastEditors: lzw
- * @LastEditTime: 2022-11-15 15:33:52
+ * @LastEditTime: 2022-11-15 16:21:29
  * @Description:
  */
 /* eslint no-console: 0 */
-import path from 'node:path';
+import path, { resolve } from 'node:path';
 import type { WriteStream } from 'node:fs';
 import { clearScreenDown, cursorTo } from 'node:readline';
 import { fs } from '../fs-system';
 import { Logger, type LoggerOptions } from '../../common/Logger';
+import { dirname } from 'node:path';
 
 const fsStreamCache: { [logPath: string]: WriteStream } = {};
 
@@ -20,6 +21,7 @@ export class NLogger extends Logger {
 
   constructor(tag: string, options: LoggerOptions = {}) {
     super(tag, options);
+    if (!this.options.validityDays) this.options.validityDays = 7;
   }
   public override setLogDir(logDir: string) {
     if (!logDir || !fs?.createWriteStream) return;
@@ -39,11 +41,41 @@ export class NLogger extends Logger {
     if (logFsStream) {
       logFsStream.close();
       delete fsStreamCache[this.logPath];
+    } else {
+      this.cleanup(this.options.validityDays).then(count => {
+        if (count) this.log(`log cleanup:`, count);
+      });
     }
 
     this.logDir = logDir;
     this.logPath = logPath;
   }
+
+  /** 历史日志清理 */
+  async cleanup(validityDays = 7, logDir?: string): Promise<number> {
+    let count = 0;
+
+    if (!logDir && this.options.logDir) logDir = this.options.logDir;
+    if (logDir && logDir.endsWith('.log')) logDir = dirname(logDir);
+    if (+validityDays < 1 || !logDir || !fs.existsSync(logDir)) return count;
+
+    const list = await fs.promises.readdir(logDir);
+    const shelfLifeMs = validityDays * 86_400_000; // 24 * 60 * 60 * 1000;
+    const now = Date.now();
+
+    for (let filepath of list) {
+      filepath = resolve(logDir, filepath);
+      const stats = await fs.promises.stat(filepath);
+      if (stats.isDirectory()) count += await this.cleanup(validityDays, filepath);
+      else if (stats.isFile() && now - stats.mtimeMs > shelfLifeMs) {
+        fs.promises.unlink(filepath);
+        count++;
+      }
+    }
+
+    return count;
+  }
+
   /**
    * 写入到日志文件
    * @todo 增加分包支持
@@ -64,9 +96,6 @@ export class NLogger extends Logger {
     cursorTo(process.stdout as never, start);
     clearScreenDown(process.stdout as never);
     process.stdout.write(msg, 'utf8');
-    // readline.clearLine(process.stdout, 0);
-    // readline.moveCursor(process.stdout, -curLineLen, 0);
-    // curLineLen = Buffer.byteLength(msg, 'utf8');
   }
 
   public static getLogger(tag?: string, options?: LoggerOptions): NLogger {
