@@ -2,12 +2,12 @@
  * @Author: lzw
  * @Date: 2021-04-23 10:44:32
  * @LastEditors: lzw
- * @LastEditTime: 2022-09-08 10:52:39
+ * @LastEditTime: 2022-11-15 15:35:03
  * @Description: gh u 相关的命令。主要为常用的快捷工具方法
  */
 
-import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { fs } from './fs-system';
 import { execSync } from './exec';
 
 /** 获取当前的本地分支名 */
@@ -18,8 +18,8 @@ export function getHeadBranch(baseDirectory = process.cwd()) {
   if (!branch) {
     const headPath = resolve(baseDirectory, './.git/HEAD');
 
-    if (existsSync(headPath)) {
-      const head = readFileSync(headPath, { encoding: 'utf8' });
+    if (fs.existsSync(headPath)) {
+      const head = fs.readFileSync(headPath, { encoding: 'utf8' });
       branch = head.split('refs/heads/')[1];
     }
   }
@@ -61,7 +61,7 @@ export function isGitRepo(rootDir = process.cwd(), useCache = true): boolean {
   if (isGitRepo[rootDir] == null || !useCache) {
     // @ts-ignore
     isGitRepo[rootDir] =
-      existsSync(resolve(rootDir, '.git/config')) || execSync('git branch --show-current', 'pipe', rootDir).error == null;
+      fs.existsSync(resolve(rootDir, '.git/config')) || execSync('git branch --show-current', 'pipe', rootDir).error == null;
   }
   // @ts-ignore
   return isGitRepo[rootDir];

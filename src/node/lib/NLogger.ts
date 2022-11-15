@@ -2,16 +2,17 @@
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
  * @LastEditors: lzw
- * @LastEditTime: 2022-08-31 18:05:54
+ * @LastEditTime: 2022-11-15 15:33:52
  * @Description:
  */
 /* eslint no-console: 0 */
-import fs from 'node:fs';
 import path from 'node:path';
+import type { WriteStream } from 'node:fs';
 import { clearScreenDown, cursorTo } from 'node:readline';
+import { fs } from '../fs-system';
 import { Logger, type LoggerOptions } from '../../common/Logger';
 
-const fsStreamCache: { [logPath: string]: fs.WriteStream } = {};
+const fsStreamCache: { [logPath: string]: WriteStream } = {};
 
 /** 用于 Node.js 中的 logger 模块 */
 export class NLogger extends Logger {

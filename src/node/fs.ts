@@ -1,44 +1,30 @@
-import {
-  type Stats,
-  type WriteFileOptions,
-  createReadStream,
-  createWriteStream,
-  existsSync,
-  mkdirSync,
-  promises,
-  readdirSync,
-  rmdirSync,
-  rmSync,
-  statSync,
-  unlinkSync,
-  writeFileSync,
-} from 'node:fs';
+import type { Stats, WriteFileOptions } from 'node:fs';
 import { resolve, sep, dirname } from 'node:path';
-import { readFileSync } from 'node:fs';
+import { fs } from './fs-system';
 
 /** 【同步】删除指定的文件或目录 */
 export function rmrf(filepath: string) {
-  if (!filepath || !existsSync(filepath)) return;
+  if (!filepath || !fs.existsSync(filepath)) return;
 
-  const stats = statSync(filepath);
+  const stats = fs.statSync(filepath);
 
-  if (!stats.isDirectory()) return unlinkSync(filepath);
+  if (!stats.isDirectory()) return fs.unlinkSync(filepath);
 
   try {
-    rmSync(filepath, { recursive: true });
+    fs.rmSync(filepath, { recursive: true });
   } catch {
-    const fileList = readdirSync(filepath);
+    const fileList = fs.readdirSync(filepath);
     for (const filename of fileList) rmrf(resolve(filepath, filename));
-    rmdirSync(filepath);
+    fs.rmdirSync(filepath);
   }
 }
 
 /** 【异步】删除指定的文件或目录 */
 export async function rmrfAsync(filepath: string): Promise<void> {
   try {
-    if (!filepath || !existsSync(filepath)) return;
+    if (!filepath || !fs.existsSync(filepath)) return;
 
-    return promises.rm(filepath, { recursive: true, maxRetries: 3 });
+    return fs.promises.rm(filepath, { recursive: true, maxRetries: 3 });
   } catch {
     return rmrf(filepath);
   }
@@ -48,56 +34,56 @@ export async function rmrfAsync(filepath: string): Promise<void> {
  * 创建一个深度的目录
  */
 export function mkdirp(dirpath: string) {
-  if (existsSync(dirpath)) return true;
+  if (fs.existsSync(dirpath)) return true;
 
   try {
-    mkdirSync(dirpath, { recursive: true });
+    fs.mkdirSync(dirpath, { recursive: true });
   } catch {
     const list = dirpath.replace(sep, '/').split('/');
     for (let i = 0; i < list.length; i++) {
       const p = list.slice(0, i + 1).join(sep);
       if (p === '') continue;
-      if (existsSync(p)) {
-        if (!statSync(p).isDirectory()) return false;
+      if (fs.existsSync(p)) {
+        if (!fs.statSync(p).isDirectory()) return false;
         continue;
       }
-      mkdirSync(p);
+      fs.mkdirSync(p);
     }
   }
   return true;
 }
 
 /** 异步写文件。所在目录不存在则递归创建 */
-export const outputFile: typeof promises.writeFile = (filepath, data, options) => {
+export const outputFile: typeof fs.promises.writeFile = (filepath, data, options) => {
   if (typeof filepath === 'string') {
     const dir = dirname(filepath);
-    if (!existsSync(dir)) mkdirp(dir);
+    if (!fs.existsSync(dir)) mkdirp(dir);
   }
 
-  return promises.writeFile(filepath, data, options);
+  return fs.promises.writeFile(filepath, data, options);
 };
 
 /** 同步写文件。所在目录不存在则递归创建 */
 export function outputFileSync(filepath: string, data: string | NodeJS.ArrayBufferView, options?: WriteFileOptions) {
   const dir = dirname(filepath);
-  if (!existsSync(dir)) mkdirp(dir);
-  writeFileSync(filepath, data, options);
+  if (!fs.existsSync(dir)) mkdirp(dir);
+  fs.writeFileSync(filepath, data, options);
 }
 
 export function readJsonFile<T = object>(filepath: string, encoding: BufferEncoding = 'utf8'): Promise<T> {
-  return promises.readFile(filepath, encoding).then(str => JSON.parse(str));
+  return fs.promises.readFile(filepath, encoding).then(str => JSON.parse(str));
 }
 
 export function readJsonFileSync<T = object>(filepath: string, encoding: BufferEncoding = 'utf8'): T {
-  return JSON.parse(readFileSync(filepath, encoding));
+  return JSON.parse(fs.readFileSync(filepath, encoding));
 }
 
 /** 复制一个目录 */
 export function copyDir(src: string, dest: string, filter: (filepath: string, stats: Stats) => boolean = () => true) {
-  for (const filename of readdirSync(src)) {
+  for (const filename of fs.readdirSync(src)) {
     const filepath = resolve(src, filename);
     const outpath = resolve(dest, filename);
-    const stats = statSync(filepath);
+    const stats = fs.statSync(filepath);
 
     if (filter(filepath, stats) === false) continue;
     if (stats.isDirectory()) {
@@ -107,9 +93,9 @@ export function copyDir(src: string, dest: string, filter: (filepath: string, st
     }
 
     try {
-      promises.copyFile(filepath, outpath);
+      fs.promises.copyFile(filepath, outpath);
     } catch {
-      createReadStream(filepath).pipe(createWriteStream(outpath));
+      fs.createReadStream(filepath).pipe(fs.createWriteStream(outpath));
     }
   }
 }

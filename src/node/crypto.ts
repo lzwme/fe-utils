@@ -1,6 +1,8 @@
 import { createHash } from 'node:crypto';
-import { createReadStream, createWriteStream, existsSync, readdirSync } from 'node:fs';
 import { basename, resolve } from 'node:path';
+import { fs } from './fs-system';
+
+const { createReadStream, createWriteStream, existsSync, readdirSync, readFileSync } = fs;
 
 /**
  * 生成指定字符串或指定文件路径的md5值
@@ -14,10 +16,7 @@ export function md5(str: string | Buffer, isFile = false) {
         console.error('File does not exist:', str);
         return '';
       }
-      const stream = createReadStream(str);
-      const r = stream.pipe(createHash('md5')).digest('hex');
-      stream.close();
-      return r;
+      str = readFileSync(str);
     }
     return createHash('md5').update(str).digest('hex');
   } catch (error) {
@@ -25,6 +24,20 @@ export function md5(str: string | Buffer, isFile = false) {
     console.log((error as Error).message);
     return '';
   }
+}
+
+export function md5ByFileStream(filepath: string) {
+  return new Promise<string>((resolve, reject) => {
+    if (!filepath || !existsSync(filepath)) {
+      console.error('File does not exist:', filepath);
+      return resolve('');
+    }
+
+    const stream = createReadStream(filepath);
+    const fsHash = stream.pipe(createHash('md5'));
+    stream.on('end', () => resolve(fsHash.digest('hex')));
+    stream.on('error', error => reject(error));
+  });
 }
 
 /**

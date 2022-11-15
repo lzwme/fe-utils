@@ -1,7 +1,9 @@
 import { homedir } from 'node:os';
 import { dirname, resolve } from 'node:path';
-import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
+import { fs } from './fs-system';
 import { assign } from '../common/objects';
+
+const { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } = fs;
 
 interface LSCache<T> {
   version: string;
