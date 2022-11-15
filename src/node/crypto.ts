@@ -2,8 +2,6 @@ import { createHash } from 'node:crypto';
 import { basename, resolve } from 'node:path';
 import { fs } from './fs-system';
 
-const { createReadStream, createWriteStream, existsSync, readdirSync, readFileSync } = fs;
-
 /**
  * 生成指定字符串或指定文件路径的md5值
  * @param str 指定的字符串，或者指定的文件路径
@@ -12,11 +10,11 @@ const { createReadStream, createWriteStream, existsSync, readdirSync, readFileSy
 export function md5(str: string | Buffer, isFile = false) {
   try {
     if (isFile) {
-      if (!str || !existsSync(str)) {
+      if (!str || !fs.existsSync(str)) {
         console.error('File does not exist:', str);
         return '';
       }
-      str = readFileSync(str);
+      str = fs.readFileSync(str);
     }
     return createHash('md5').update(str).digest('hex');
   } catch (error) {
@@ -28,12 +26,12 @@ export function md5(str: string | Buffer, isFile = false) {
 
 export function md5ByFileStream(filepath: string) {
   return new Promise<string>((resolve, reject) => {
-    if (!filepath || !existsSync(filepath)) {
+    if (!filepath || !fs.existsSync(filepath)) {
       console.error('File does not exist:', filepath);
       return resolve('');
     }
 
-    const stream = createReadStream(filepath);
+    const stream = fs.createReadStream(filepath);
     const fsHash = stream.pipe(createHash('md5'));
     stream.on('end', () => resolve(fsHash.digest('hex')));
     stream.on('error', error => reject(error));
@@ -77,7 +75,7 @@ export async function compressing(srcDir: string, dest?: string, type?: 'zip' | 
   } else {
     const zipStream = new cType.Stream();
 
-    for (const fielname of readdirSync(srcDir)) {
+    for (const fielname of fs.readdirSync(srcDir)) {
       zipStream.addEntry(resolve(srcDir, fielname));
     }
 
@@ -86,7 +84,7 @@ export async function compressing(srcDir: string, dest?: string, type?: 'zip' | 
 
       zipStream
         .on('error', handleError)
-        .pipe(createWriteStream(dest!))
+        .pipe(fs.createWriteStream(dest!))
         .on('error', handleError)
         .on('finish', () => rs());
     });

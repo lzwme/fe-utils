@@ -3,8 +3,6 @@ import { dirname, resolve } from 'node:path';
 import { fs } from './fs-system';
 import { assign } from '../common/objects';
 
-const { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } = fs;
-
 interface LSCache<T> {
   version: string;
   data: {
@@ -40,7 +38,7 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
     this.options = {
       version: '0.0.0',
       uuid: 'defaults',
-      filepath: resolve(existsSync('./node_modules') ? './node_modules/' : homedir(), '.liteStoreage/ls.json'),
+      filepath: resolve(fs.existsSync('./node_modules') ? './node_modules/' : homedir(), '.liteStoreage/ls.json'),
       ...options,
     };
 
@@ -65,18 +63,18 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
     if (value) return this.set(value);
 
     const cacheDir = dirname(this.cachePath);
-    if (!existsSync(cacheDir)) mkdirSync(cacheDir, { recursive: true });
+    if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
     this.reload();
-    writeFileSync(this.cachePath, JSON.stringify(this.cache, null, 4), 'utf8');
+    fs.writeFileSync(this.cachePath, JSON.stringify(this.cache, null, 4), 'utf8');
     return this;
   }
   /** 从文件中重载数据至内存。在多进程、多线程模式下，需读取最新数据时，可手动调用 */
   public reload() {
-    if (existsSync(this.cachePath)) {
-      const localCache = JSON.parse(readFileSync(this.cachePath, 'utf8')) as LSCache<T>;
+    if (fs.existsSync(this.cachePath)) {
+      const localCache = JSON.parse(fs.readFileSync(this.cachePath, 'utf8')) as LSCache<T>;
       if (localCache.version === this.options.version) {
         assign(this.cache, assign({}, localCache, this.cache));
-      } else rmSync(this.cachePath, { force: true });
+      } else fs.rmSync(this.cachePath, { force: true });
     }
     return this;
   }
@@ -113,7 +111,7 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
       if (this.cache.data[uuid]) delete this.cache.data[uuid];
       this.save();
     } else {
-      if (existsSync(this.cachePath)) rmSync(this.cachePath, { force: true });
+      if (fs.existsSync(this.cachePath)) fs.rmSync(this.cachePath, { force: true });
       this.init();
     }
   }

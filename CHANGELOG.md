@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.1](https://github.com/lzwme/fe-utils/compare/v1.2.0...v1.2.1) (2022-11-15)
+
+
+### Bug Fixes
+
+* 更新 md5 方法实现，计算完成后应主动释放创建的 stream 流 ([f5d99da](https://github.com/lzwme/fe-utils/commit/f5d99da200b45c6d19dcc9d25037cef812cb3b6a))
+
 ## [1.2.0](https://github.com/lzwme/fe-utils/compare/v1.1.0...v1.2.0) (2022-11-14)
 
 
