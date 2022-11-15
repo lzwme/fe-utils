@@ -21,7 +21,11 @@ export class NLogger extends Logger {
 
   constructor(tag: string, options: LoggerOptions = {}) {
     super(tag, options);
-    if (this.logPath) this.cleanup(this.options.validityDays);
+    try {
+      if (this.logPath) this.cleanup(this.options.validityDays);
+    } catch (error) {
+      this.log((error as Error).message);
+    }
   }
   public override setLogDir(logDir: string) {
     if (!logDir || !fs?.createWriteStream) return;
