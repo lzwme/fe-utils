@@ -21,7 +21,7 @@ export class NLogger extends Logger {
 
   constructor(tag: string, options: LoggerOptions = {}) {
     super(tag, options);
-    if (!this.options.validityDays) this.options.validityDays = 7;
+    if (this.logPath) this.cleanup(this.options.validityDays);
   }
   public override setLogDir(logDir: string) {
     if (!logDir || !fs?.createWriteStream) return;
@@ -41,10 +41,6 @@ export class NLogger extends Logger {
     if (logFsStream) {
       logFsStream.close();
       delete fsStreamCache[this.logPath];
-    } else {
-      this.cleanup(this.options.validityDays).then(count => {
-        if (count) this.log(`log cleanup:`, count);
-      });
     }
 
     this.logDir = logDir;
@@ -52,26 +48,31 @@ export class NLogger extends Logger {
   }
 
   /** 历史日志清理 */
-  async cleanup(validityDays = 7, logDir?: string): Promise<number> {
+  cleanup(validityDays?: number, logDir?: string): number {
     let count = 0;
-
     if (!logDir && this.options.logDir) logDir = this.options.logDir;
     if (logDir && logDir.endsWith('.log')) logDir = dirname(logDir);
-    if (+validityDays < 1 || !logDir || !fs.existsSync(logDir)) return count;
+    if (validityDays == null) validityDays = 7;
+    if (validityDays < 1 || !logDir || !fs.existsSync(logDir)) return count;
 
-    const list = await fs.promises.readdir(logDir);
     const shelfLifeMs = validityDays * 86_400_000; // 24 * 60 * 60 * 1000;
     const now = Date.now();
+    const cleanDir = (dir: string) => {
+      const list = fs.readdirSync(dir);
 
-    for (let filepath of list) {
-      filepath = resolve(logDir, filepath);
-      const stats = await fs.promises.stat(filepath);
-      if (stats.isDirectory()) count += await this.cleanup(validityDays, filepath);
-      else if (stats.isFile() && now - stats.mtimeMs > shelfLifeMs) {
-        fs.promises.unlink(filepath);
-        count++;
+      for (let filepath of list) {
+        filepath = resolve(dir, filepath);
+        const stats = fs.statSync(filepath);
+        if (stats.isDirectory()) cleanDir(filepath);
+        else if (filepath.endsWith('.log') && stats.isFile() && now > stats.mtimeMs + shelfLifeMs) {
+          fs.unlinkSync(filepath);
+          count++;
+        }
       }
-    }
+    };
+    cleanDir(logDir);
+
+    if (count > 0) this.log(`log cleanup:`, count);
 
     return count;
   }
