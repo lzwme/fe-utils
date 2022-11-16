@@ -2,16 +2,15 @@
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
  * @LastEditors: lzw
- * @LastEditTime: 2022-11-15 16:21:29
+ * @LastEditTime: 2022-11-16 10:47:44
  * @Description:
  */
 /* eslint no-console: 0 */
-import path, { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import type { WriteStream } from 'node:fs';
 import { clearScreenDown, cursorTo } from 'node:readline';
 import { fs } from '../fs-system';
 import { Logger, type LoggerOptions } from '../../common/Logger';
-import { dirname } from 'node:path';
 
 const fsStreamCache: { [logPath: string]: WriteStream } = {};
 
@@ -21,11 +20,6 @@ export class NLogger extends Logger {
 
   constructor(tag: string, options: LoggerOptions = {}) {
     super(tag, options);
-    try {
-      if (this.logPath) this.cleanup(this.options.validityDays);
-    } catch (error) {
-      this.log((error as Error).message);
-    }
   }
   public override setLogDir(logDir: string) {
     if (!logDir || !fs?.createWriteStream) return;
@@ -33,10 +27,10 @@ export class NLogger extends Logger {
     let logPath = logDir;
 
     if (logDir.endsWith('.log')) {
-      logDir = path.dirname(logDir);
+      logDir = dirname(logDir);
     } else {
       const curTime = new Date().toISOString().slice(0, 10).replace(/\D/g, '');
-      logPath = path.resolve(logDir, `${this.tag.replace(/[^\dA-Za-z]/g, '')}_${curTime}.log`);
+      logPath = resolve(logDir, `${this.tag.replace(/[^\dA-Za-z]/g, '')}_${curTime}.log`);
     }
 
     if (logPath === this.logPath) return;
@@ -49,6 +43,12 @@ export class NLogger extends Logger {
 
     this.logDir = logDir;
     this.logPath = logPath;
+
+    try {
+      if (this.logPath && !fs.existsSync(logPath)) this.cleanup(this.options.validityDays);
+    } catch (error) {
+      this.log((error as Error).message);
+    }
   }
 
   /** 历史日志清理 */
