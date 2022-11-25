@@ -28,11 +28,7 @@ export function deepClone<T extends object>(obj: T): T {
   const result: any = Array.isArray(obj) ? [] : {};
   // eslint-disable-next-line unicorn/no-array-for-each
   getObjectKeysUnsafe(obj).forEach(key => {
-    if ((<any>obj)[key] && typeof (<any>obj)[key] === 'object') {
-      result[key] = deepClone((<any>obj)[key]);
-    } else {
-      result[key] = (<any>obj)[key];
-    }
+    result[key] = (<any>obj)[key] && typeof (<any>obj)[key] === 'object' ? deepClone((<any>obj)[key]) : (<any>obj)[key];
   });
   return result;
 }

@@ -205,12 +205,7 @@ export function listProcesses(rootPid: number, formatName?: (cmd: string) => str
               reject(err || new Error(stderr.toString()));
             } else {
               parsePsOutput(stdout, addToTree);
-
-              if (!rootItem) {
-                reject(new Error(`Root process ${rootPid} not found`));
-              } else {
-                resolve(rootItem);
-              }
+              rootItem ? resolve(rootItem) : reject(new Error(`Root process ${rootPid} not found`));
             }
           });
         }

@@ -106,13 +106,13 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
     return this;
   }
   public clear(isAll = false) {
-    if (!isAll) {
+    if (isAll) {
+      if (fs.existsSync(this.cachePath)) fs.rmSync(this.cachePath, { force: true });
+      this.init();
+    } else {
       const uuid = this.options.uuid;
       if (this.cache.data[uuid]) delete this.cache.data[uuid];
       this.save();
-    } else {
-      if (fs.existsSync(this.cachePath)) fs.rmSync(this.cachePath, { force: true });
-      this.init();
     }
   }
 }
