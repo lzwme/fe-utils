@@ -53,6 +53,7 @@
     "access": "public",
     "registry": "https://registry.npmjs.com"
   },
+  "files": ["esm", "cjs"],
   "dependencies": {
     "console-log-colors": "^0.3.3",
     "tslib": "^2.4.1"
