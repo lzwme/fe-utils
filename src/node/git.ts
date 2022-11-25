@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2021-04-23 10:44:32
  * @LastEditors: lzw
- * @LastEditTime: 2022-11-22 15:21:15
+ * @LastEditTime: 2022-11-25 11:57:18
  * @Description: gh u 相关的命令。主要为常用的快捷工具方法
  */
 
@@ -11,7 +11,7 @@ import { fs } from './fs-system';
 import { execSync } from './exec';
 
 /** getGitLog 返回项的格式 */
-interface GitLogItem {
+export interface GitLogItem {
   /** hash 提交对象（commit）的完整哈希字串 */
   H?: string;
   /** abbrevHash 提交对象的简短哈希字串 */
@@ -54,7 +54,8 @@ export function getGitLog(num = 1, cwd?: string) {
   const cmd = `git log -${num} --pretty="tformat:%${prettyFormat.join(' _-_ %')}" --date=iso`;
   const logResult = execSync(cmd, 'pipe', cwd);
   if (logResult.stderr) console.error('[getGitLog][error]', logResult.stderr);
-  const list = logResult.stdout.trim().split('\n');
+
+  const list = logResult.stdout ? logResult.stdout.split('\n') : [];
   const result: GitLogItem[] = list.map(line => {
     const valList = line.split(' _-_ ');
     // eslint-disable-next-line unicorn/no-array-reduce
