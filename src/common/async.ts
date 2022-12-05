@@ -395,8 +395,28 @@ export async function retry<T>(task: ITask<Promise<T>>, delay: number, retries: 
 
   throw lastError;
 }
-
-export function concurrency<T, E = Error | undefined>(taskList: ITask<Promise<T>>[], maxDegreeOfParalellism = 5) {
+/**
+ * 并发执行多任务
+ * @eample
+ * ```ts
+ * async function concurrencyTest(paralelism = 5, total = 100) {
+ *     const startTime = Date.now();
+ *     const taskList = Array.from({ length: total })
+ *         .fill(1)
+ *         .map((_v, idx) => () => sleep(50, idx));
+ *
+ *     console.log(tasklist);
+ *     const result = await concurrency(taskList, paralelism);
+ *     console.log('TimeCost:', Date.now() - startTime);
+ *
+ *     return result;
+ * }
+ *
+ * await concurrencyTest(10);
+ * await concurrencyTest(100);
+ * ```
+ */
+export function concurrency<T, E = T | undefined>(taskList: ITask<Promise<T>>[], maxDegreeOfParalellism = 5) {
   const total = taskList.length;
   let idx = 0;
   const resut: { result: T; error: E }[] = [];
@@ -411,7 +431,6 @@ export function concurrency<T, E = Error | undefined>(taskList: ITask<Promise<T>
       .catch(error => onFinish(null as never as T, error));
   };
   const size = Math.min(maxDegreeOfParalellism, total);
-  // const queue = Array.from<Promise<void>>({ length: size }).fill(next());
   const queue: Promise<void>[] = [];
   for (let i = 0; i < size; i++) queue.push(next());
 

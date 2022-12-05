@@ -22,6 +22,10 @@ describe('helper.ts', () => {
 
     expect(formatByteSize(8888, 0)).toBe('8.6796875KB');
     expect(formatByteSize(8888, 4)).toBe('8.6797KB');
+
+    // tofixed
+    expect(formatByteSize(1536, 2, false)).toBe('1.5KB');
+    expect(formatByteSize(1536, 2, true)).toBe('1.50KB');
   });
 
   it('formatQty', () => {

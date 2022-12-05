@@ -1,4 +1,4 @@
-export function formatByteSize(byteSize: number | string, decimal = 2) {
+export function formatByteSize(byteSize: number | string, decimal = 2, toFixed = false) {
   let formated = +byteSize;
   if (byteSize === '' || byteSize == null || Number.isNaN(formated)) {
     return typeof byteSize === 'string' ? byteSize : '';
@@ -13,7 +13,7 @@ export function formatByteSize(byteSize: number | string, decimal = 2) {
     idx++;
   }
 
-  return (decimal > 0 ? +formated.toFixed(decimal) : formated) + sizeName[idx];
+  return (decimal > 0 ? (toFixed ? formated.toFixed(decimal) : +formated.toFixed(decimal)) : formated) + sizeName[idx];
   //   if (byteSize > 1 << 30) return (byteSize / (1 << 30)).toFixed(2) + 'GB';
   //   if (byteSize > 1 << 20) return (byteSize / (1 << 20)).toFixed(2) + 'MB';
   //   if (byteSize > 1 << 10) return (byteSize / (1 << 10)).toFixed(2) + 'KB';
