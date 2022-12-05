@@ -1,13 +1,24 @@
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function isObject(obj: unknown): obj is Object {
-  return typeof obj === 'object' && obj !== null && !Array.isArray(obj) && !(obj instanceof RegExp) && !(obj instanceof Date);
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    !Array.isArray(obj) &&
+    !(obj instanceof RegExp) &&
+    !(obj instanceof Date) &&
+    !isSet(obj) &&
+    !isMap(obj)
+  );
 }
 
 export function isEmpty(obj: unknown): boolean {
-  return !obj || (Array.isArray(obj) && obj.length === 0) || isEmptyObject(obj);
+  if (!obj) return true;
+  if (isSet(obj) || isMap(obj)) return obj.size === 0;
+  if (Array.isArray(obj)) return obj.length === 0;
+  return isEmptyObject(obj);
 }
 
-export function isEmptyObject(obj: unknown): obj is object {
+export function isEmptyObject(obj: unknown): boolean {
   if (!isObject(obj)) return false;
 
   for (const key in obj) {
@@ -42,7 +53,7 @@ export function isSet(obj: unknown): obj is Set<unknown> {
 
 export function isMap(obj: unknown): obj is Map<unknown, unknown> {
   if (!globalThis.Map) return false;
-  return obj instanceof Map; // String(obj) === '[object Map]';
+  return !!obj && obj instanceof Map; // String(obj) === '[object Map]';
 }
 
 export function isPromise<T>(obj: unknown): obj is Promise<T> {
@@ -50,5 +61,6 @@ export function isPromise<T>(obj: unknown): obj is Promise<T> {
 }
 
 export function isIterable<T>(obj: unknown): obj is Iterable<T> {
+  if (typeof obj === 'string') return true;
   return !!obj && typeof (obj as never)[Symbol.iterator] === 'function';
 }

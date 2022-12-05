@@ -20,7 +20,7 @@ export interface LSOptions {
 }
 
 /**
- * 轻量的本地文件持久性数据存储。主要用于建安的配置参数等的持久化
+ * 轻量的本地文件持久性数据存储。主要用于简单的配置信息持久化
  */
 export class LiteStorage<T extends object = Record<string, unknown>> {
   private static instance: LiteStorage<object>;
