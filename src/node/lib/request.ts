@@ -84,11 +84,11 @@ export class Request {
         response.on('end', () => {
           const buffer = Buffer.concat(chunks);
           const encoding = response.headers['content-encoding'];
-          const contentType = response.headers['content-type'];
+          const contentType = response.headers['content-type'] || options.headers!['content-type'];
           const resolveData = (body: string | Buffer) => {
             const result = { data: body as never as T, buffer, headers: response.headers, response };
             try {
-              if (typeof body === 'string' && (!contentType || contentType.includes('json'))) {
+              if (typeof body === 'string' && typeof contentType === 'string' && contentType.includes('json')) {
                 result.data = JSON.parse(body);
               }
               resolve(result);
