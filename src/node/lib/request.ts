@@ -35,7 +35,7 @@ export class Request {
 
   constructor(cookie?: string, headers?: IncomingHttpHeaders) {
     if (cookie) this.setCookie(cookie);
-    if (headers) this.headers = Object.assign(this.headers, toLowcaseKeyObject(headers));
+    if (headers) this.setHeaders(headers);
   }
   private getHeaders(urlObject: URL, headers?: IncomingHttpHeaders) {
     headers = {
@@ -54,6 +54,9 @@ export class Request {
     const cookies = cookie.split(';').map(d => d.trim());
     for (const c of cookies) !this.cookies.includes(c) && this.cookies.push(c);
     return this;
+  }
+  setHeaders(headers: IncomingHttpHeaders) {
+    if (headers) this.headers = Object.assign(this.headers, toLowcaseKeyObject(headers));
   }
   getCookie(isString = true) {
     return isString ? this.cookies.join('; ') : this.cookies;
