@@ -15,7 +15,7 @@ export function copyToClipboard2(msg: unknown) {
   const oInput = document.createElement('input');
   oInput.style.display = 'none';
   oInput.value = typeof msg === 'string' ? msg : JSON.stringify(msg);
-  document.body.appendChild(oInput);
+  document.body.append(oInput);
   oInput.select();
   document.execCommand('copy');
   oInput.remove();
