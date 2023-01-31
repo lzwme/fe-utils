@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-01-12 15:12:40
  * @LastEditors: lzw
- * @LastEditTime: 2022-06-09 22:46:51
+ * @LastEditTime: 2023-01-31 13:47:55
  * @Description:
  * @see src/vs/base/common/uuid.ts
  */
@@ -22,7 +22,7 @@ for (let i = 0; i < 256; i++) {
 
 let _fillRandomValues: (bucket: Uint8Array) => Uint8Array;
 
-declare const crypto: undefined | { getRandomValues(data: Uint8Array): Uint8Array };
+declare const crypto: undefined | { getRandomValues(data: Uint8Array): Uint8Array; randomUUID?(): string };
 
 // eslint-disable-next-line unicorn/prefer-ternary
 if (typeof crypto === 'object' && typeof crypto.getRandomValues === 'function') {
@@ -39,6 +39,8 @@ if (typeof crypto === 'object' && typeof crypto.getRandomValues === 'function') 
 
 /** 生成 uuid */
 export function generateUuid(): string {
+  if (typeof crypto === 'object' && crypto.randomUUID) return crypto.randomUUID();
+
   // get data
   _fillRandomValues(_data);
 
@@ -74,7 +76,7 @@ export function generateUuid(): string {
   return result;
 }
 
-/** @see generateUuid */
+/** {@link generateUuid} */
 export const v1 = generateUuid;
 
 export function formatToUuid(keys: string | string[]) {

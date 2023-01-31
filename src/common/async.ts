@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-01-12 15:10:41
  * @LastEditors: lzw
- * @LastEditTime: 2022-09-07 17:44:46
+ * @LastEditTime: 2023-01-31 09:42:10
  * @Description:
  * @see src\vs\base\common\async.ts
  */
@@ -375,9 +375,8 @@ export class AutoOpenBarrier extends Barrier {
   }
 }
 
-export const sleep = <T>(milliseconds = 0, value?: T | (() => T | Promise<T>)): Promise<T> =>
-  // @ts-ignore
-  new Promise(resolve => setTimeout(() => resolve(), milliseconds)).then(() => (typeof value === 'function' ? value() : value));
+export const sleep = <T>(milliseconds = 0, value?: T | (() => T | Promise<T>)): Promise<T | undefined> =>
+  new Promise(resolve => setTimeout(() => resolve(value instanceof Function ? value() : value), milliseconds));
 
 export async function retry<T>(task: ITask<Promise<T>>, delay: number, retries: number, validator?: (r: T) => boolean): Promise<T> {
   let lastError: Error | undefined;
