@@ -3,7 +3,7 @@ import { dirname, resolve } from 'node:path';
 import { fs } from './fs-system';
 import { assign } from '../common/objects';
 
-interface LSCache<T> {
+export interface LSCache<T> {
   version: string;
   data: {
     [uuid: string]: T;

@@ -44,7 +44,7 @@ export interface PackageJson extends Record<string, unknown> {
 
 /**
  * npm registry 返回结果类型定义
- * {@see https://registry.npmjs.com/@lzwme/fed-lint-helper}
+ * {@link https://registry.npmjs.com/@lzwme/fed-lint-helper}
  */
 export interface NpmRegistryInfo {
   _id: string;

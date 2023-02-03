@@ -4,20 +4,20 @@ export function formatByteSize(byteSize: number | string, decimal = 2, toFixed =
     return typeof byteSize === 'string' ? byteSize : '';
   }
 
+  const neg = formated < 0 ? '-' : '';
+  if (neg) formated = -formated;
+  if (formated < 1) return neg + formated + 'B';
+
   const base = 1024;
-  const sizeName = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+  const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
   let idx = 0;
 
-  while (idx < sizeName.length && formated > base) {
+  while (idx < units.length && formated > base) {
     formated /= base;
     idx++;
   }
 
-  return (decimal > 0 ? (toFixed ? formated.toFixed(decimal) : +formated.toFixed(decimal)) : formated) + sizeName[idx];
-  //   if (byteSize > 1 << 30) return (byteSize / (1 << 30)).toFixed(2) + 'GB';
-  //   if (byteSize > 1 << 20) return (byteSize / (1 << 20)).toFixed(2) + 'MB';
-  //   if (byteSize > 1 << 10) return (byteSize / (1 << 10)).toFixed(2) + 'KB';
-  //   return byteSize + 'B';
+  return neg + (decimal > 0 ? (toFixed ? formated.toFixed(decimal) : +formated.toFixed(decimal)) : formated) + units[idx];
 }
 
 export function formatQty(number: number | string) {

@@ -111,7 +111,7 @@ export interface WxWorkReqParams {
   };
 }
 
-interface WxWorkResult {
+export interface WxWorkResult {
   errcode: number;
   errmsg: string;
 }
