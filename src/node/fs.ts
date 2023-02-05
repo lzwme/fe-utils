@@ -15,8 +15,9 @@ export function rmrf(filepath: string) {
   } catch {
     const fileList = fs.readdirSync(filepath);
     for (const filename of fileList) rmrf(resolve(filepath, filename));
-    fs.rmdirSync(filepath);
   }
+
+  if (fs.existsSync(filepath)) fs.rmdirSync(filepath, { recursive: true });
 }
 
 /** 【异步】删除指定的文件或目录 */
