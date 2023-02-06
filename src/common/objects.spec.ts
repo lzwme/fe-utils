@@ -1,4 +1,4 @@
-import { assign, simpleAssign, assignExceptNil, mixin, deepClone, safeStringify, ensureArray } from './objects';
+import { assign, mergeArrayLike, simpleAssign, assignExceptNil, mixin, deepClone, safeStringify, ensureArray } from './objects';
 
 describe('objects/assign', () => {
   it('safeStringify', () => {
@@ -51,11 +51,26 @@ describe('objects/assign', () => {
     expect(mixin(null, a)).toEqual(a);
   });
 
-  it('simpleAssgin', () => {
+  it('mergeArrayLike', () => {
     const a = { a: 1, b: { c: 2, d: 3 } };
     const b = { b: { c: null as unknown, d: 5 } };
 
-    let c = simpleAssign(a, b, value => value != null);
+    expect(mergeArrayLike(a, b)).toBe(a);
+
+    expect(mergeArrayLike([1, 2, 3], [4]).at(-1) === 4).toBeTruthy();
+    expect(mergeArrayLike(new Set([1, 2, 3]), new Set([4])).size === 4).toBeTruthy();
+
+    const amap = new Map([['b', { a: 2 }]]);
+    const bmap = new Map<string, unknown>();
+    bmap.set('b', { a: 1 });
+    expect(mergeArrayLike(amap, bmap).get('b')!.a === 1).toBeTruthy();
+  });
+
+  it('simpleAssgin', () => {
+    const a = { a: 1, b: { c: 2, d: 3, n: [1, 2] } };
+    const b = { b: { c: null as unknown, d: 5, n: [2, 3] } };
+
+    let c = simpleAssign(a, b, { filter: value => value != null });
     expect(c.b.c).toBe(2);
 
     c = simpleAssign(a, b);
@@ -63,6 +78,12 @@ describe('objects/assign', () => {
     expect(a === c).toBeTruthy();
 
     expect(simpleAssign(null as never, b)).toBeNull();
+
+    // 支持数组合并(去重)
+    a.b.n = [1, 2];
+    b.b.n = [2, 3];
+    expect(simpleAssign(a, b, { mergeArrayLike: true }).b.n.length === 3).toBeTruthy();
+    expect(simpleAssign(a, b).b.n === b.b.n).toBeTruthy();
   });
 
   it('assign', () => {

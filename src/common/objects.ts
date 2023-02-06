@@ -54,48 +54,75 @@ export function mixin<T = any>(destination: any, source: any, overwrite = true):
   return destination;
 }
 
+/** 合并类数组对象。若执行了合并，会去除重复的值 */
+export function mergeArrayLike<T>(a: T, b: unknown) {
+  let result: unknown = a;
+
+  if (Array.isArray(b)) {
+    const shouldMerge = Array.isArray(a);
+    result = shouldMerge ? [...new Set([...(a as Array<unknown>), ...b])] : [...b];
+  } else if (isSet(b)) {
+    result = isSet(a) ? new Set([...(a as Set<unknown>), ...b]) : b;
+  } else if (isMap(b)) {
+    if (isMap(a)) {
+      const source = a as Map<string, unknown>;
+      for (const [k, v] of b as Map<string, unknown>) {
+        if (source.has(k)) source.set(k, simpleAssign(source.get(k) as never, v, { mergeArrayLike: true }));
+        else source.set(k, v);
+      }
+    } else {
+      result = b;
+    }
+  }
+
+  return result as T;
+}
+
+export interface SimpleAssignOptions {
+  filter?: (value: unknown, key: string) => boolean;
+  /** 是否对类数组(Array、Set、Map) 作合并并去重。为 false 则简单替换。默认为 false */
+  mergeArrayLike?: boolean;
+}
 /**
  * 将 b 合并深度到 a
  */
 export function simpleAssign<T extends Record<string, any>, U>(
   a: T,
   b: U,
-  filter?: (value: unknown) => boolean,
+  options: SimpleAssignOptions = {},
   seen = new Set<unknown>()
 ): T & U {
+  const result: Record<string, unknown> = a;
+
   // 入参不是对象格式则忽略
-  if (!a || typeof a !== 'object') return a as T & U;
+  if (!a || typeof a !== 'object') return result as T & U;
   if (typeof b !== 'object' || b instanceof RegExp || Array.isArray(b)) {
-    return a as T & U;
+    return result as T & U;
   }
 
   seen.add(b);
 
-  for (const key in b) {
-    const value = b[key];
-    if (typeof filter === 'function' && !filter(value)) continue;
+  for (const [key, value] of Object.entries(b as Record<string, unknown>)) {
+    // eslint bug
+    // eslint-disable-next-line unicorn/no-array-callback-reference, unicorn/no-array-method-this-argument
+    if (typeof options.filter === 'function' && !options.filter(value, key)) continue;
 
-    if (null == value || typeof value !== 'object' || value instanceof RegExp || isSet(value) || isMap(value)) {
-      // @ts-ignore
-      a[key] = value;
-    }
-    // 如果是数组，则只简单的复制一份（不考虑数组内的类型）
-    else if (Array.isArray(value)) {
-      // @ts-ignore
-      a[key] = [...value];
+    if (null == value || typeof value !== 'object' || value instanceof RegExp) {
+      result[key] = value;
+    } else if (Array.isArray(value) || isSet(value) || isMap(value)) {
+      result[key] = options.mergeArrayLike ? mergeArrayLike(result[key], value) : value;
     } else {
-      // @ts-ignore
-      if (!a[key as string]) a[key] = {};
+      if (!result[key]) result[key] = {};
       if (seen.has(value)) {
-        a[key] = value as never;
+        result[key] = value as never;
       } else {
         seen.add(value);
-        simpleAssign(a[key as string], value, filter, seen);
+        simpleAssign(result[key] as object, value, options, seen);
       }
     }
   }
 
-  return a as T & U;
+  return result as T & U;
 }
 
 /**
@@ -103,9 +130,8 @@ export function simpleAssign<T extends Record<string, any>, U>(
  * @param {boolean} [isOnlyNil=true] 是否仅忽略 null 和 undefined。为 false 则忽略所有空值(![key] === true)
  */
 export function assignExceptNil<T extends object, U>(a: T, b: U, isOnlyExceptNull = true) {
-  return simpleAssign(a, b, value => {
-    if (null == value) return false;
-    return !!value || isOnlyExceptNull;
+  return simpleAssign(a, b, {
+    filter: value => (null == value ? false : !!value || isOnlyExceptNull),
   });
 }
 
