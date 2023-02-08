@@ -57,7 +57,7 @@ describe('objects/assign', () => {
 
     expect(mergeArrayLike(a, b)).toBe(a);
 
-    expect(mergeArrayLike([1, 2, 3], [4]).at(-1) === 4).toBeTruthy();
+    expect(mergeArrayLike([1, 2, 3], [4])[3] === 4).toBeTruthy();
     expect(mergeArrayLike(new Set([1, 2, 3]), new Set([4])).size === 4).toBeTruthy();
 
     const amap = new Map([['b', { a: 2 }]]);
