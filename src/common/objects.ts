@@ -84,7 +84,7 @@ export interface SimpleAssignOptions {
   mergeArrayLike?: boolean;
 }
 /**
- * 将 b 合并深度到 a
+ * 将 b 深度合并到 a
  */
 export function simpleAssign<T extends Record<string, any>, U>(
   a: T,
@@ -126,7 +126,7 @@ export function simpleAssign<T extends Record<string, any>, U>(
 }
 
 /**
- * 将 b 合并深度到 a，但不包括属性值为 nil 的属性
+ * 将 b 深度合并到 a，但不包括属性值为 null 的属性
  * @param {boolean} [isOnlyNil=true] 是否仅忽略 null 和 undefined。为 false 则忽略所有空值(![key] === true)
  */
 export function assignExceptNil<T extends object, U>(a: T, b: U, isOnlyExceptNull = true) {
