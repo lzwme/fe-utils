@@ -72,6 +72,7 @@ module.exports = {
         'unicorn/no-null': 'off',
         'unicorn/prevent-abbreviations': 'off',
         'unicorn/no-lonely-if': 'off',
+        'unicorn/explicit-length-check': 'off',
         '@typescript-eslint/no-non-null-assertion': 'off',
         'unicorn/import-style': ['error', {
             styles: {

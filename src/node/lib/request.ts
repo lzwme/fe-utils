@@ -30,7 +30,7 @@ export class Request {
     'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
     'accept-language': 'zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4,es;q=0.2',
     accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36',
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
   };
 
   constructor(cookie?: string, headers?: IncomingHttpHeaders) {
@@ -49,19 +49,19 @@ export class Request {
 
     return headers;
   }
+  setHeaders(headers: IncomingHttpHeaders) {
+    if (headers) this.headers = Object.assign(this.headers, toLowcaseKeyObject(headers));
+  }
   setCookie(cookie: string, reset = false) {
     if (reset) this.cookies = [];
     const cookies = cookie.split(';').map(d => d.trim());
     for (const c of cookies) !this.cookies.includes(c) && this.cookies.push(c);
     return this;
   }
-  setHeaders(headers: IncomingHttpHeaders) {
-    if (headers) this.headers = Object.assign(this.headers, toLowcaseKeyObject(headers));
-  }
   getCookie(isString = true) {
     return isString ? this.cookies.join('; ') : this.cookies;
   }
-  request<T = Record<string, unknown>>(method: string, url: string | URL, parameters?: AnyObject, headers?: IncomingHttpHeaders) {
+  req(method: string, url: string | URL, parameters?: AnyObject, headers?: IncomingHttpHeaders) {
     const urlObject = typeof url === 'string' ? new URL(url) : url;
     const options: https.RequestOptions = {
       hostname: urlObject.host.split(':')[0],
@@ -79,40 +79,44 @@ export class Request {
       options.headers!['content-length'] = Buffer.byteLength(postBody).toString();
     }
 
+    return new Promise<{ req: http.ClientRequest; res: IncomingMessage }>((resolve, reject) => {
+      const h = urlObject.protocol === 'http:' ? http : https;
+      const req: http.ClientRequest = h.request(options, res => resolve({ req, res })).on('error', reject);
+      if (postBody) req.write(postBody);
+      req.end();
+    });
+  }
+  async request<T = Record<string, unknown>>(method: string, url: string | URL, parameters?: AnyObject, headers?: IncomingHttpHeaders) {
+    const { res: response, req } = await this.req(method, url, parameters, headers);
+
     return new Promise<{ data: T; buffer: Buffer; headers: IncomingHttpHeaders; response: IncomingMessage }>((resolve, reject) => {
-      const request = (urlObject.protocol === 'http:' ? http : https).request(options, response => {
-        const chunks: Buffer[] = [];
-        response.on('data', data => chunks.push(data));
-        request.on('error', error => reject(error));
-        response.on('end', () => {
-          const buffer = Buffer.concat(chunks);
-          const encoding = response.headers['content-encoding'];
-          const shouldToJson = [options.headers!['content-type'], response.headers['content-type']].some(d => String(d).includes('json'));
-          const resolveData = (body: string | Buffer) => {
-            const result = { data: body as never as T, buffer, headers: response.headers, response };
-            try {
-              if (typeof body === 'string' && shouldToJson) {
-                result.data = JSON.parse(body);
-              }
-              resolve(result);
-            } catch (error) {
-              console.warn((error as Error).message, url);
-              resolve(result);
-            }
-          };
+      const chunks: Buffer[] = [];
+      response.on('error', reject);
+      response.on('data', data => chunks.push(data));
+      response.on('end', () => {
+        const buffer = Buffer.concat(chunks);
+        const encoding = response.headers['content-encoding'];
+        const shouldToJson = [req.getHeader('content-type'), response.headers['content-type']].some(d => String(d).includes('json'));
+        const resolveData = (body: string | Buffer) => {
+          const result = { data: body as never as T, buffer, headers: response.headers, response };
 
-          if (encoding === 'gzip') {
-            zlib.gunzip(buffer, (_error, decoded) => resolveData(decoded.toString()));
-          } else if (encoding === 'deflate') {
-            zlib.inflate(buffer, (_error, decoded) => resolveData(decoded.toString()));
-          } else {
-            resolveData(buffer.toString());
+          try {
+            if (typeof body === 'string' && shouldToJson) result.data = JSON.parse(body);
+            resolve(result);
+          } catch (error) {
+            console.warn((error as Error).message, url);
+            resolve(result);
           }
-        });
-      });
+        };
 
-      if (postBody) request.write(postBody);
-      request.end();
+        if (encoding === 'gzip') {
+          zlib.gunzip(buffer, (_error, decoded) => resolveData(decoded.toString()));
+        } else if (encoding === 'deflate') {
+          zlib.inflate(buffer, (_error, decoded) => resolveData(decoded.toString()));
+        } else {
+          resolveData(buffer.toString());
+        }
+      });
     });
   }
   get<T = Record<string, unknown>>(url: string, parameters?: AnyObject, headers?: IncomingHttpHeaders) {

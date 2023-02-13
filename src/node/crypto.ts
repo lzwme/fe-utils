@@ -195,5 +195,3 @@ export function aesDecrypt(data: string, key: BinaryLike, algorithm = 'aes-128-e
   decipher.setAutoPadding(true);
   return Buffer.concat([decipher.update(data, 'utf8'), decipher.final()]);
 }
-
-console.log(hash(process.argv.slice(2)[0] as never, 'abc'));

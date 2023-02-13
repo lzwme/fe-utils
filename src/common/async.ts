@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-01-12 15:10:41
  * @LastEditors: lzw
- * @LastEditTime: 2023-01-31 09:42:10
+ * @LastEditTime: 2023-02-13 13:56:51
  * @Description:
  * @see src\vs\base\common\async.ts
  */
@@ -418,22 +418,23 @@ export async function retry<T>(task: ITask<Promise<T> | T>, delay: number, retri
 export function concurrency<T, E = T | undefined>(taskList: ITask<Promise<T>>[], maxDegreeOfParalellism = 5) {
   const total = taskList.length;
   let idx = 0;
-  const resut: { result: T; error: E }[] = [];
-  const onFinish = (result: T, error?: E) => {
-    resut.push({ result, error: error as never });
+  const resut: { index: number; result: T; error: E }[] = [];
+  const onFinish = (index: number, result: T, error?: E) => {
+    resut.push({ index, result, error: error as never });
     return next();
   };
   const next = (): Promise<void> => {
     if (idx >= total) return Promise.resolve();
-    return taskList[idx++]()
-      .then(r => onFinish(r))
-      .catch(error => onFinish(null as never as T, error));
+    const index = idx++;
+    return taskList[index]()
+      .then(r => onFinish(index, r))
+      .catch(error => onFinish(index, null as never as T, error));
   };
   const size = Math.min(maxDegreeOfParalellism, total);
   const queue: Promise<void>[] = [];
   for (let i = 0; i < size; i++) queue.push(next());
 
-  return Promise.allSettled(queue).then(() => resut);
+  return Promise.allSettled(queue).then(() => resut.sort((a, b) => a.index - b.index));
 }
 
 export interface ILimitedTaskFactory<T> {
