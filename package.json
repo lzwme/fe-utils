@@ -42,8 +42,8 @@
     "doc:html": "typedoc src/ src/common src/web src/node --exclude **/*.spec.ts --out docs --tsconfig tsconfig.module.json",
     "doc:json": "typedoc src/ src/common src/web src/node --exclude **/*.spec.ts --json docs/typedoc.json --tsconfig tsconfig.module.json",
     "version": "standard-version",
-    "dist": "run-s test build doc:html",
-    "release": "run-s dist version",
+    "release": "run-s test build doc:html",
+    "release-version": "run-s release version",
     "clean": "flh rm -f ./cjs ./esm ./docs"
   },
   "engines": {

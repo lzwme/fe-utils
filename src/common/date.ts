@@ -2,6 +2,28 @@
  * 日期时间相关的工具方法(无外部依赖)
  */
 
+export function toDate(date: string | number | Date, defaults = new Date()): Date {
+  if (date instanceof Date) return date;
+  if (!date) return defaults;
+
+  // 20100801、20100801162408、20100801162408001 格式的日期支持
+  if (/^\d+$/.test(String(date)) && [8, 14, 17].includes(String(date).length)) {
+    date = yyyyMMddFormat(date).date;
+  } else if (/^\d+$/.test(String(date))) {
+    // 纯数字视为时间戳
+    date = new Date(+date);
+  } else {
+    if (typeof date === 'string') {
+      date = date.trim().replace(/\//g, '-');
+      if (/^\d{4}-\d{2}-\d{2}$/.test(date)) date += 'T00:00:00';
+    }
+
+    date = new Date(date);
+  }
+
+  return Number.isNaN(date.getDate()) ? defaults : date;
+}
+
 /**
  * 将给定时间日期按照指定格式格式化输出 -- 建议使用 moment().format 替代
  * @param fmt 格式
@@ -11,26 +33,9 @@
  */
 export function dateFormat(fmt: string, date: Date | string = new Date()): string {
   const rawDate = date;
+  if (!date) return date;
 
-  if (!(date instanceof Date)) {
-    if (!date) return date;
-
-    // 20100801 格式或 20100801162408 格式的日期支持
-    if (/^\d+$/.test(date) && [8, 14, 17].includes(String(date).length)) {
-      date = yyyyMMddFormat(date).date;
-    } else {
-      if (/^\d+$/.test(date)) {
-        // 纯数字，视为时间戳
-        date = new Date(+date);
-      } else {
-        if (typeof date === 'string') {
-          date = date.trim().replace(/\//g, '-');
-          if (/^\d{4}-\d{2}-\d{2}$/.test(date)) date += 'T00:00:00';
-        }
-        date = new Date(date);
-      }
-    }
-  }
+  date = toDate(date);
 
   if (Number.isNaN(date.getDate())) return String(rawDate || '');
 
@@ -120,7 +125,7 @@ export function formatTimeCost(startTime: number, suffix = ['days', 'hours', 'mi
  * yyyyMMddFormat('20180101'); {year: '2018', month: '01', day: '01', str: '2018年01月01日', ...}
  * yyyyMMddFormat(''); // {year: '', month: '', day: '', str: '', ...}
  */
-export function yyyyMMddFormat(dateStr: string) {
+export function yyyyMMddFormat(dateStr: string | number) {
   dateStr = (dateStr || '') + '';
 
   const year = dateStr.slice(0, 4);

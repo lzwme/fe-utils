@@ -89,7 +89,6 @@ export async function download(options: DownloadOptions): Promise<DownloadResult
 
   if (fs.existsSync(filepath)) {
     const stats = fs.statSync(filepath);
-    // console.log(options.force, stats.isFile(), stats.size, contentLength);
 
     if (!options.force && stats.isFile() && stats.size === contentLength) {
       result.isExist = true;
@@ -130,7 +129,6 @@ export async function download(options: DownloadOptions): Promise<DownloadResult
     const r = await concurrency(tasks, Number(options.paralelism) || cpus().length);
     const tmpFiles = r.map(d => d.result.filepath);
     const writeStream = fs.createWriteStream(filepath);
-    console.log(writeStream.path, filepath);
 
     for (const fp of tmpFiles) {
       await new Promise((rs, rj) => {

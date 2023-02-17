@@ -91,8 +91,8 @@ export function getHeadBranch(baseDirectory = process.cwd()) {
 }
 
 /** 获取本地或远端最新的 commitId */
-export function getHeadCommitId(isRemote = false) {
-  return execSync(`git rev-parse ${isRemote ? '@{upstream}' : 'HEAD'}`, 'pipe').stdout;
+export function getHeadCommitId(isRemote = false, cwd = process.cwd()) {
+  return isGitRepo(cwd) ? execSync(`git rev-parse ${isRemote ? '@{upstream}' : 'HEAD'}`, 'pipe', cwd).stdout : '';
 }
 
 /**

@@ -11,6 +11,8 @@ node_modules
 /debug/
 /coverage/
 /docs/
+/tmp
+/cache
 
 # manager
 npm-debug.log
