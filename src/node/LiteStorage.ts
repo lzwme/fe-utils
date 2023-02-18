@@ -34,11 +34,12 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
   // @ts-ignore
   private cache: LSCache<T>;
   private options: Required<LSOptions>;
+  private baseDir = resolve(fs.existsSync('./node_modules') ? './node_modules/.cache' : homedir(), '.liteStorage');
   constructor(options?: LSOptions) {
     this.options = {
       version: '0.0.0',
       uuid: 'defaults',
-      filepath: resolve(fs.existsSync('./node_modules') ? './node_modules/' : homedir(), '.liteStoreage/ls.json'),
+      filepath: resolve(this.baseDir, '.liteStoreage/ls.json'),
       ...options,
     };
 
@@ -48,8 +49,9 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
   private init() {
     const { filepath, uuid, version } = this.options;
     if (!filepath.endsWith('.json')) {
-      this.options.filepath = resolve(filepath, '.liteStoreage/ls.json');
+      this.options.filepath = resolve(this.baseDir, filepath, 'ls.json');
     }
+    this.options.filepath = resolve(this.baseDir, filepath);
 
     this.cache = {
       version,
