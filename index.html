@@ -40,7 +40,7 @@
 <a href="#安装" id="安装" style="color: inherit; text-decoration: none;">
   <h2>安装</h2>
 </a>
-<pre><code class="language-bash"><span class="hl-0"># use npm</span><br/><span class="hl-1">npm i @lzwme/fe-utils</span><br/><span class="hl-0"># use yarn</span><br/><span class="hl-1">yarn add @lzwme/fe-utils</span><br/><span class="hl-0"># use pnpm</span><br/><span class="hl-1">pnpm add @lzwme/fe-utils</span>
+<pre><code class="language-bash"><span class="hl-0"># use npm</span><br/><span class="hl-1">npm </span><span class="hl-2">i</span><span class="hl-1"> </span><span class="hl-2">@lzwme/fe-utils</span><br/><span class="hl-0"># use yarn</span><br/><span class="hl-1">yarn </span><span class="hl-2">add</span><span class="hl-1"> </span><span class="hl-2">@lzwme/fe-utils</span><br/><span class="hl-0"># use pnpm</span><br/><span class="hl-1">pnpm </span><span class="hl-2">add</span><span class="hl-1"> </span><span class="hl-2">@lzwme/fe-utils</span>
 </code></pre>
 
 <a href="#使用" id="使用" style="color: inherit; text-decoration: none;">
@@ -48,13 +48,13 @@
 </a>
 <p>默认导出为 <code>Node.js</code> 下的工具集。</p>
 <p><code>commonjs</code> 示例：</p>
-<pre><code class="language-ts"><span class="hl-2">const</span><span class="hl-1"> { </span><span class="hl-3">md5</span><span class="hl-1">, </span><span class="hl-3">getLoger</span><span class="hl-1"> } = </span><span class="hl-4">rquire</span><span class="hl-1">(</span><span class="hl-5">&#39;@lzwme/fe-utils&#39;</span><span class="hl-1">);</span><br/><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">logger</span><span class="hl-1"> = </span><span class="hl-4">getLoger</span><span class="hl-1">();</span><br/><br/><span class="hl-6">logger</span><span class="hl-1">.</span><span class="hl-4">info</span><span class="hl-1">(</span><span class="hl-4">md5</span><span class="hl-1">(</span><span class="hl-5">&#39;123456&#39;</span><span class="hl-1">));</span>
+<pre><code class="language-ts"><span class="hl-3">const</span><span class="hl-1"> { </span><span class="hl-4">md5</span><span class="hl-1">, </span><span class="hl-4">getLoger</span><span class="hl-1"> } = </span><span class="hl-5">rquire</span><span class="hl-1">(</span><span class="hl-2">&#39;@lzwme/fe-utils&#39;</span><span class="hl-1">);</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">logger</span><span class="hl-1"> = </span><span class="hl-5">getLoger</span><span class="hl-1">();</span><br/><br/><span class="hl-6">logger</span><span class="hl-1">.</span><span class="hl-5">info</span><span class="hl-1">(</span><span class="hl-5">md5</span><span class="hl-1">(</span><span class="hl-2">&#39;123456&#39;</span><span class="hl-1">));</span>
 </code></pre>
 <p><code>es module</code> 示例：</p>
-<pre><code class="language-ts"><span class="hl-7">import</span><span class="hl-1"> { </span><span class="hl-6">dateFormat</span><span class="hl-1"> } </span><span class="hl-7">from</span><span class="hl-1"> </span><span class="hl-5">&#39;@lzwme/fe-utils&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-6">console</span><span class="hl-1">.</span><span class="hl-4">log</span><span class="hl-1">(</span><span class="hl-4">dateFormat</span><span class="hl-1">(</span><span class="hl-5">&#39;yyyy-MM-dd&#39;</span><span class="hl-1">, </span><span class="hl-2">new</span><span class="hl-1"> </span><span class="hl-4">Date</span><span class="hl-1">()));</span>
+<pre><code class="language-ts"><span class="hl-7">import</span><span class="hl-1"> { </span><span class="hl-6">dateFormat</span><span class="hl-1"> } </span><span class="hl-7">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@lzwme/fe-utils&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-6">console</span><span class="hl-1">.</span><span class="hl-5">log</span><span class="hl-1">(</span><span class="hl-5">dateFormat</span><span class="hl-1">(</span><span class="hl-2">&#39;yyyy-MM-dd&#39;</span><span class="hl-1">, </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-5">Date</span><span class="hl-1">()));</span>
 </code></pre>
 <p>在纯浏览器的 <code>web</code> 项目中使用示例：</p>
-<pre><code class="language-ts"><span class="hl-7">import</span><span class="hl-1"> { </span><span class="hl-6">dateFormat</span><span class="hl-1">, </span><span class="hl-6">Logger</span><span class="hl-1"> } </span><span class="hl-7">from</span><span class="hl-1"> </span><span class="hl-5">&#39;@lzwme/fe-utils/esm/web&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-2">const</span><span class="hl-1"> </span><span class="hl-3">logger</span><span class="hl-1"> = </span><span class="hl-6">Logger</span><span class="hl-1">.</span><span class="hl-4">getLogger</span><span class="hl-1">();</span><br/><span class="hl-6">logger</span><span class="hl-1">.</span><span class="hl-4">log</span><span class="hl-1">(</span><span class="hl-4">dateFormat</span><span class="hl-1">(</span><span class="hl-5">&#39;yyyy-MM-dd&#39;</span><span class="hl-1">, </span><span class="hl-2">new</span><span class="hl-1"> </span><span class="hl-4">Date</span><span class="hl-1">()));</span>
+<pre><code class="language-ts"><span class="hl-7">import</span><span class="hl-1"> { </span><span class="hl-6">dateFormat</span><span class="hl-1">, </span><span class="hl-6">Logger</span><span class="hl-1"> } </span><span class="hl-7">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@lzwme/fe-utils/esm/web&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">logger</span><span class="hl-1"> = </span><span class="hl-6">Logger</span><span class="hl-1">.</span><span class="hl-5">getLogger</span><span class="hl-1">();</span><br/><span class="hl-6">logger</span><span class="hl-1">.</span><span class="hl-5">log</span><span class="hl-1">(</span><span class="hl-5">dateFormat</span><span class="hl-1">(</span><span class="hl-2">&#39;yyyy-MM-dd&#39;</span><span class="hl-1">, </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-5">Date</span><span class="hl-1">()));</span>
 </code></pre>
 <p>更多细节可参考 <a href="https://lzwme.github.io/fe-utils/">API 文档</a>。</p>
 
@@ -62,7 +62,7 @@
   <h2>开发</h2>
 </a>
 <p>本地二次开发：</p>
-<pre><code class="language-bash"><span class="hl-1">git clone https://github.com/lzwme/fe-utils</span><br/><span class="hl-1">yarn install</span><br/><span class="hl-1">npm link</span><br/><span class="hl-1">yarn dev</span>
+<pre><code class="language-bash"><span class="hl-1">git </span><span class="hl-2">clone</span><span class="hl-1"> </span><span class="hl-2">https://github.com/lzwme/fe-utils</span><br/><span class="hl-1">yarn </span><span class="hl-2">install</span><br/><span class="hl-1">npm </span><span class="hl-2">link</span><br/><span class="hl-1">yarn </span><span class="hl-2">dev</span>
 </code></pre>
 <p>或者 <a href="https://github.com/lzwme/fe-utils/fork">fork</a> 本项目进行代码贡献。</p>
 <p><strong>欢迎贡献想法与代码。</strong></p>
@@ -102,6 +102,7 @@
 <li class="current selected"><a href="modules.html">@lzwme/fe-<wbr/>utils</a>
 <ul>
 <li class="tsd-kind-module"><a href="modules/common.html">common</a></li>
+<li class="tsd-kind-module"><a href="modules/index.html">index</a></li>
 <li class="tsd-kind-module"><a href="modules/node.html">node</a></li>
 <li class="tsd-kind-module"><a href="modules/web.html">web</a></li></ul></li></ul></div></details></nav></div></div>
 <div class="container tsd-generator">
