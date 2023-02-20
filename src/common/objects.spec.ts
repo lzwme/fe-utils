@@ -1,6 +1,23 @@
-import { assign, mergeArrayLike, simpleAssign, assignExceptNil, mixin, deepClone, safeStringify, ensureArray } from './objects';
+import {
+  assign,
+  mergeArrayLike,
+  simpleAssign,
+  assignExceptNil,
+  mixin,
+  deepClone,
+  safeStringify,
+  ensureArray,
+  safeJsonParse,
+} from './objects';
 
 describe('objects/assign', () => {
+  it('safeJsonParse', () => {
+    const a: Record<string, unknown> = { a: 1, b: { c: 2, d: 3 } };
+
+    expect(safeJsonParse(safeStringify(a))).toStrictEqual(a);
+    expect(safeJsonParse('')).toStrictEqual({});
+  });
+
   it('safeStringify', () => {
     const a: Record<string, unknown> = { a: 1, b: { c: 2, d: 3 } };
 

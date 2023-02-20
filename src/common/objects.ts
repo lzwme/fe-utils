@@ -1,6 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isObject, isSet, isMap, isArray } from './is';
 
+export function safeJsonParse<T extends Record<string, string>>(input: string): T {
+  try {
+    return JSON.parse(input) as T;
+  } catch (error: any) {
+    console.error('[safeJsonParse]parse error', error.message, error.stack);
+  }
+
+  return {} as T;
+}
+
 export function safeStringify(obj: any): string {
   const seen = new Set<any>();
   return JSON.stringify(obj, (_key, value) => {
