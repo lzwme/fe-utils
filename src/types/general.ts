@@ -18,3 +18,12 @@ export type GeneralFn<T = void> = (...p: unknown[]) => T;
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyObject = Record<string, any>;
+
+export type ComputeRange<N extends number, Result extends Array<unknown> = []> = Result['length'] extends N
+  ? Result
+  : ComputeRange<N, [...Result, Result['length']]>;
+
+type Octal256 = ComputeRange<256>[number]; // 0 - 255
+type AlphaChanel = `0.${ComputeRange<999>[number]}` | '1.0';
+type AssertAlpha<Alpha extends number> = `${Alpha}` extends AlphaChanel ? Alpha : never;
+export type RGBA<Alpha extends number = 1> = [Octal256, Octal256, Octal256, AssertAlpha<Alpha>?];
