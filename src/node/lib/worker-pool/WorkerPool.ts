@@ -12,6 +12,25 @@ type Callback<R, T> = (err: Error | null, result: WorkerMsgBody<R> | null, task:
 
 const kWorkerFreedEvent = Symbol('kWorkerFreedEvent');
 
+/**
+ * create worker pools
+ * @example
+ * ```ts
+ * import { WorkerPool } from '@lzwme/fe-utils';
+ * import { isMainThread, parentPort } from 'node:worker_threads';
+ * import { statSync } from 'node:fs';
+ * import { resolve } from 'node:path';
+ *
+ * if (isMainThread) {
+ *   const wp = new WorkerPool<string, number>(path.resolve('wp-test.js'), cpus().length);
+ *   wp.runTask('/a.txt', (size) => console.log(size)); // run more tasks...
+ * } else {
+ *   parentPort.on('message', (filepath: string) => {
+ *     parentPort.postMessage(statSync(filepath).size);
+ *   });
+ * }
+ * ```
+ */
 export class WorkerPool<T = unknown, R = unknown> extends EventEmitter {
   private workers: Worker[] = [];
   private freeWorkers: Worker[] = [];
@@ -34,7 +53,7 @@ export class WorkerPool<T = unknown, R = unknown> extends EventEmitter {
       }
     });
   }
-  public addNewWorker(processorFile = this.processorFile) {
+  private addNewWorker(processorFile = this.processorFile) {
     if (!existsSync(processorFile)) {
       throw new Error(`Not Found: ${processorFile}`);
     }
@@ -44,7 +63,7 @@ export class WorkerPool<T = unknown, R = unknown> extends EventEmitter {
     worker.on('message', (result: WorkerMsgBody<R>) => {
       // 如果成功：调用传递给`runTask`的回调，删除与Worker关联的`TaskInfo`，并再次将其标记为空闲。
       const r = this.workerTaskInfo.get(worker);
-      if (r && result) {
+      if (r) {
         r.callback(null, result, r.task);
         if (result.type !== 'progress') {
           this.workerTaskInfo.delete(worker);
@@ -71,7 +90,7 @@ export class WorkerPool<T = unknown, R = unknown> extends EventEmitter {
     this.freeWorkers.push(worker);
     this.emit(kWorkerFreedEvent);
   }
-  private runTask(task: T, callback: Callback<R, T>) {
+  public runTask(task: T, callback: Callback<R, T>) {
     if (this.freeWorkers.length === 0) {
       this.tasks.push({ task, callback });
       return;
@@ -82,6 +101,14 @@ export class WorkerPool<T = unknown, R = unknown> extends EventEmitter {
       this.workerTaskInfo.set(worker, { callback, task });
       worker.postMessage(task);
     }
+  }
+  public status() {
+    return {
+      file: this.processorFile,
+      numThreads: this.numThreads,
+      tasksSize: this.tasks.length,
+      freeize: this.freeWorkers.length,
+    };
   }
   public close() {
     for (const worker of this.workers) worker.terminate();
