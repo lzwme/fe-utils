@@ -5,6 +5,7 @@ import type { AnyObject } from '../../types';
 import { concurrency } from '../../common/async';
 import { fs } from '../fs-system';
 import { Request } from './request';
+import { NLogger } from './NLogger';
 
 export interface DownloadOptions {
   url: string;
@@ -20,16 +21,18 @@ export interface DownloadOptions {
   segmentSize?: number;
   /** 大文件分段下载时，并行任务数。默认为 cpu 核数 */
   paralelism?: number;
-  onProgress?: (info: {
-    size: number;
-    downloaded: number;
-    percent: number;
-    /** bytes/s */
-    speed: number;
-  }) => void;
+  onProgress?:
+    | boolean
+    | ((info: {
+        size: number;
+        downloaded: number;
+        percent: number;
+        /** bytes/s */
+        speed: number;
+      }) => void);
 }
 
-interface DownloadResult {
+export interface DownloadResult {
   /** 文件总大小 */
   size: number;
   /** 文件下载保存的路径 */
@@ -68,7 +71,7 @@ export async function download(options: DownloadOptions): Promise<DownloadResult
   const segmentSize = Math.max(Number(options.segmentSize) || 100, 10) * 1024;
   const isSupportRange = !req.getHeader('range') && res.headers['accept-ranges'] === 'bytes';
   const startTime = Date.now();
-  let contentLength = Number(res.headers['content-length']);
+  let contentLength = Number(res.headers['content-length']) || 0;
   let downloadedLen = 0;
   let cachedLen = 0;
   const result: DownloadResult = {
@@ -78,10 +81,16 @@ export async function download(options: DownloadOptions): Promise<DownloadResult
   };
   const onProgress = () => {
     if (options.onProgress) {
+      if (typeof options.onProgress === 'boolean') {
+        options.onProgress = d => {
+          NLogger.getLogger().logInline(`${d.size} ${d.downloaded} ${d.percent.toFixed(2)}% ${(d.speed / 1024 / 1024).toFixed(2)}MB/S`);
+        };
+      }
+
       options.onProgress({
         size: contentLength,
         downloaded: downloadedLen + cachedLen,
-        percent: Number((100 * (downloadedLen + cachedLen)) / contentLength),
+        percent: contentLength ? Number((100 * (downloadedLen + cachedLen)) / contentLength) : -1,
         speed: (1000 * downloadedLen) / (Date.now() - startTime),
       });
     }
@@ -144,17 +153,18 @@ export async function download(options: DownloadOptions): Promise<DownloadResult
     writeStream.end();
   } else {
     const { res } = await request.req(options.method || 'GET', options.url, options.params, options.headers);
-    contentLength = Number(res.headers['content-length']);
-    res.pipe(fs.createWriteStream(filepath));
-
+    const chunks: Buffer[] = [];
+    contentLength = Number(res.headers['content-length']) || 0;
     await new Promise<void>((rs, reject) => {
       res.on('data', (buf: Buffer) => {
         downloadedLen += buf.byteLength;
+        chunks.push(buf);
         onProgress();
       });
-      res.on('end', rs);
-      res.on('error', reject);
+      res.on('end', rs).on('error', reject);
     });
+    fs.writeFileSync(filepath, Buffer.concat(chunks));
+    result.size = downloadedLen;
   }
 
   return result;

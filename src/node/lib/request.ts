@@ -81,7 +81,12 @@ export class Request {
 
     return new Promise<{ req: http.ClientRequest; res: IncomingMessage }>((resolve, reject) => {
       const h = urlObject.protocol === 'http:' ? http : https;
-      const req: http.ClientRequest = h.request(options, res => resolve({ req, res })).on('error', reject);
+      const req: http.ClientRequest = h.request(options, res => {
+        if (res.statusCode === 302 && res.headers['location']) {
+          this.req(method, res.headers['location'], headers).then(resolve);
+        } else resolve({ req, res });
+      });
+      req.on('error', reject);
       if (postBody) req.write(postBody);
       req.end();
     });
