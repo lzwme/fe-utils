@@ -11,6 +11,9 @@
  * @see https://github.com/substack/semver-compare/blob/master/index.js
  */
 export function semverCompare(a: string, b: string, strict = true) {
+  a = String(a || '');
+  b = String(b || '');
+
   if (!strict) {
     a = a.replace('-', '.').replace(/[^\d.]/g, '');
     b = b.replace('-', '.').replace(/[^\d.]/g, '');
