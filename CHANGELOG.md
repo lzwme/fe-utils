@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/lzwme/fe-utils/compare/v1.3.3...v1.5.0) (2023-03-07)
+
+
+### Features
+
+* 新增 LRUCache 工具类 ([10cec08](https://github.com/lzwme/fe-utils/commit/10cec083dbc5a6050e496a37696948b04b631dfe))
+* **node/download:** 新增支持并发分段下载的 download 工具方法 ([6b57d2d](https://github.com/lzwme/fe-utils/commit/6b57d2dbc01804266c1ffdab78fcc02979cafd1f))
+* **node/lib:** add WorkerPool.ts ([eab962b](https://github.com/lzwme/fe-utils/commit/eab962b604f87a8bf33bab6ef02dc5405b293029))
+* **objects:** 新增 mergeArrayLike 方法，支持数组合并与去重 ([5a8561c](https://github.com/lzwme/fe-utils/commit/5a8561cd55230bb3cc911470d9f9bc8ff041fea1))
+
+
+### Bug Fixes
+
+* **request:** 支持 302 跳转的最终请求返回 ([686d2a8](https://github.com/lzwme/fe-utils/commit/686d2a8caac33169eed0d9f2afbca1f7ed1bd421))
+* **rmrf:** 文件夹删除后移除空目录 ([71c46b3](https://github.com/lzwme/fe-utils/commit/71c46b34c7df9279dff917363d5bde9946292cb0))
+
 ## [1.4.0](https://github.com/lzwme/fe-utils/compare/v1.3.3...v1.4.0) (2023-02-18)
 
 
