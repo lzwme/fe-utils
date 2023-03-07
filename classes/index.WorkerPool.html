@@ -15,7 +15,13 @@
 <li><a href="../modules.html">@lzwme/fe-utils</a></li>
 <li><a href="../modules/index.html">index</a></li>
 <li><a href="index.WorkerPool.html">WorkerPool</a></li></ul>
-<h1>Class WorkerPool&lt;T, R&gt;</h1></div> 
+<h1>Class WorkerPool&lt;T, R&gt;</h1></div>
+<section class="tsd-panel tsd-comment">
+<div class="tsd-comment tsd-typography"><p>create worker pools</p>
+
+<h3>Example</h3><pre><code class="language-ts"><span class="hl-7">import</span><span class="hl-1"> { </span><span class="hl-6">WorkerPool</span><span class="hl-1"> } </span><span class="hl-7">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@lzwme/fe-utils&#39;</span><span class="hl-1">;</span><br/><span class="hl-7">import</span><span class="hl-1"> { </span><span class="hl-6">isMainThread</span><span class="hl-1">, </span><span class="hl-6">parentPort</span><span class="hl-1"> } </span><span class="hl-7">from</span><span class="hl-1"> </span><span class="hl-2">&#39;node:worker_threads&#39;</span><span class="hl-1">;</span><br/><span class="hl-7">import</span><span class="hl-1"> { </span><span class="hl-6">statSync</span><span class="hl-1"> } </span><span class="hl-7">from</span><span class="hl-1"> </span><span class="hl-2">&#39;node:fs&#39;</span><span class="hl-1">;</span><br/><span class="hl-7">import</span><span class="hl-1"> { </span><span class="hl-6">resolve</span><span class="hl-1"> } </span><span class="hl-7">from</span><span class="hl-1"> </span><span class="hl-2">&#39;node:path&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-7">if</span><span class="hl-1"> (</span><span class="hl-6">isMainThread</span><span class="hl-1">) {</span><br/><span class="hl-1">  </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">wp</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-5">WorkerPool</span><span class="hl-1">&lt;</span><span class="hl-8">string</span><span class="hl-1">, </span><span class="hl-8">number</span><span class="hl-1">&gt;(</span><span class="hl-6">path</span><span class="hl-1">.</span><span class="hl-5">resolve</span><span class="hl-1">(</span><span class="hl-2">&#39;wp-test.js&#39;</span><span class="hl-1">), </span><span class="hl-5">cpus</span><span class="hl-1">().</span><span class="hl-6">length</span><span class="hl-1">);</span><br/><span class="hl-1">  </span><span class="hl-6">wp</span><span class="hl-1">.</span><span class="hl-5">runTask</span><span class="hl-1">(</span><span class="hl-2">&#39;/a.txt&#39;</span><span class="hl-1">, (</span><span class="hl-6">size</span><span class="hl-1">) </span><span class="hl-3">=&gt;</span><span class="hl-1"> </span><span class="hl-6">console</span><span class="hl-1">.</span><span class="hl-5">log</span><span class="hl-1">(</span><span class="hl-6">size</span><span class="hl-1">)); </span><span class="hl-0">// run more tasks...</span><br/><span class="hl-1">} </span><span class="hl-7">else</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-6">parentPort</span><span class="hl-1">.</span><span class="hl-5">on</span><span class="hl-1">(</span><span class="hl-2">&#39;message&#39;</span><span class="hl-1">, (</span><span class="hl-6">filepath</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1">) </span><span class="hl-3">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-6">parentPort</span><span class="hl-1">.</span><span class="hl-5">postMessage</span><span class="hl-1">(</span><span class="hl-5">statSync</span><span class="hl-1">(</span><span class="hl-6">filepath</span><span class="hl-1">).</span><span class="hl-6">size</span><span class="hl-1">);</span><br/><span class="hl-1">  });</span><br/><span class="hl-1">}</span>
+</code></pre>
+</div></section> 
 <section class="tsd-panel tsd-type-parameters">
 <h4>Type Parameters</h4>
 <ul class="tsd-type-parameters">
@@ -30,7 +36,7 @@
 <ul class="tsd-hierarchy">
 <li><span class="target">WorkerPool</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/049b90d/src/node/lib/worker-pool/WorkerPool.ts#L15">src/node/lib/worker-pool/WorkerPool.ts:15</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/ccac818/src/node/lib/worker-pool/WorkerPool.ts#L34">src/node/lib/worker-pool/WorkerPool.ts:34</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -56,7 +62,7 @@
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Methods</h3>
 <div class="tsd-index-list"><a href="index.WorkerPool.html#addListener" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#FF4DB8" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-2048-path"></rect><path d="M9.162 16V7.24H10.578L11.514 10.072C11.602 10.328 11.674 10.584 11.73 10.84C11.794 11.088 11.842 11.28 11.874 11.416C11.906 11.28 11.954 11.088 12.018 10.84C12.082 10.584 12.154 10.324 12.234 10.06L13.122 7.24H14.538V16H13.482V12.82C13.482 12.468 13.49 12.068 13.506 11.62C13.53 11.172 13.558 10.716 13.59 10.252C13.622 9.78 13.654 9.332 13.686 8.908C13.726 8.476 13.762 8.1 13.794 7.78L12.366 12.16H11.334L9.894 7.78C9.934 8.092 9.97 8.456 10.002 8.872C10.042 9.28 10.078 9.716 10.11 10.18C10.142 10.636 10.166 11.092 10.182 11.548C10.206 12.004 10.218 12.428 10.218 12.82V16H9.162Z" fill="var(--color-text)" id="icon-2048-text"></path></svg><span>add<wbr/>Listener</span></a>
-<a href="index.WorkerPool.html#addNewWorker" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>add<wbr/>New<wbr/>Worker</span></a>
+<a href="index.WorkerPool.html#addNewWorker" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-private"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>add<wbr/>New<wbr/>Worker</span></a>
 <a href="index.WorkerPool.html#close" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>close</span></a>
 <a href="index.WorkerPool.html#emit" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>emit</span></a>
 <a href="index.WorkerPool.html#eventNames" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>event<wbr/>Names</span></a>
@@ -71,8 +77,9 @@
 <a href="index.WorkerPool.html#rawListeners" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>raw<wbr/>Listeners</span></a>
 <a href="index.WorkerPool.html#removeAllListeners" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>remove<wbr/>All<wbr/>Listeners</span></a>
 <a href="index.WorkerPool.html#removeListener" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>remove<wbr/>Listener</span></a>
-<a href="index.WorkerPool.html#runTask" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-private"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>run<wbr/>Task</span></a>
+<a href="index.WorkerPool.html#runTask" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>run<wbr/>Task</span></a>
 <a href="index.WorkerPool.html#setMaxListeners" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>set<wbr/>Max<wbr/>Listeners</span></a>
+<a href="index.WorkerPool.html#status" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>status</span></a>
 <a href="index.WorkerPool.html#getEventListeners" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Event<wbr/>Listeners</span></a>
 <a href="index.WorkerPool.html#listenerCount-2" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>listener<wbr/>Count</span></a>
 <a href="index.WorkerPool.html#on-2" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>on</span></a>
@@ -103,45 +110,45 @@
 <h4 class="tsd-returns-title">Returns <a href="index.WorkerPool.html" class="tsd-signature-type" data-tsd-kind="Class">WorkerPool</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Overrides EventEmitter.constructor</p>
 <ul>
-<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/049b90d/src/node/lib/worker-pool/WorkerPool.ts#L23">src/node/lib/worker-pool/WorkerPool.ts:23</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/ccac818/src/node/lib/worker-pool/WorkerPool.ts#L42">src/node/lib/worker-pool/WorkerPool.ts:42</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Properties</h2>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private"><a id="freeWorkers" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>free<wbr/>Workers</span><a href="#freeWorkers" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">free<wbr/>Workers<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Worker</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = []</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/049b90d/src/node/lib/worker-pool/WorkerPool.ts#L17">src/node/lib/worker-pool/WorkerPool.ts:17</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/ccac818/src/node/lib/worker-pool/WorkerPool.ts#L36">src/node/lib/worker-pool/WorkerPool.ts:36</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class"><a id="numThreads" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>num<wbr/>Threads</span><a href="#numThreads" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">num<wbr/>Threads<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/049b90d/src/node/lib/worker-pool/WorkerPool.ts#L23">src/node/lib/worker-pool/WorkerPool.ts:23</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/ccac818/src/node/lib/worker-pool/WorkerPool.ts#L42">src/node/lib/worker-pool/WorkerPool.ts:42</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private"><a id="processorFile" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>processor<wbr/>File</span><a href="#processorFile" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">processor<wbr/>File<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/049b90d/src/node/lib/worker-pool/WorkerPool.ts#L23">src/node/lib/worker-pool/WorkerPool.ts:23</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/ccac818/src/node/lib/worker-pool/WorkerPool.ts#L42">src/node/lib/worker-pool/WorkerPool.ts:42</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private"><a id="tasks" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>tasks</span><a href="#tasks" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">tasks<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span><br/><span>    </span>callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Callback</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span><br/><span>    </span>task<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = []</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/049b90d/src/node/lib/worker-pool/WorkerPool.ts#L19">src/node/lib/worker-pool/WorkerPool.ts:19</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/ccac818/src/node/lib/worker-pool/WorkerPool.ts#L38">src/node/lib/worker-pool/WorkerPool.ts:38</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private"><a id="workerTaskInfo" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>worker<wbr/>Task<wbr/>Info</span><a href="#workerTaskInfo" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">worker<wbr/>Task<wbr/>Info<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Map</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Worker</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Callback</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span><br/><span>    </span>task<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/049b90d/src/node/lib/worker-pool/WorkerPool.ts#L18">src/node/lib/worker-pool/WorkerPool.ts:18</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/ccac818/src/node/lib/worker-pool/WorkerPool.ts#L37">src/node/lib/worker-pool/WorkerPool.ts:37</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private"><a id="workers" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>workers</span><a href="#workers" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">workers<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Worker</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = []</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/049b90d/src/node/lib/worker-pool/WorkerPool.ts#L16">src/node/lib/worker-pool/WorkerPool.ts:16</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/ccac818/src/node/lib/worker-pool/WorkerPool.ts#L35">src/node/lib/worker-pool/WorkerPool.ts:35</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="captureRejectionSymbol" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span>capture<wbr/>Rejection<wbr/>Symbol</span><a href="#captureRejectionSymbol" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">capture<wbr/>Rejection<wbr/>Symbol<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">typeof </span><a href="index.WorkerPool.html#captureRejectionSymbol" class="tsd-signature-type" data-tsd-kind="Property">captureRejectionSymbol</a></div><aside class="tsd-sources">
 <p>Inherited from EventEmitter.captureRejectionSymbol</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:328</li></ul></aside></section>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:328</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="captureRejections" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>capture<wbr/>Rejections</span><a href="#captureRejections" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">capture<wbr/>Rejections<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
@@ -149,13 +156,13 @@
 </div><aside class="tsd-sources">
 <p>Inherited from EventEmitter.captureRejections</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:333</li></ul></aside></section>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:333</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="defaultMaxListeners" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>default<wbr/>Max<wbr/>Listeners</span><a href="#defaultMaxListeners" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">default<wbr/>Max<wbr/>Listeners<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div><aside class="tsd-sources">
 <p>Inherited from EventEmitter.defaultMaxListeners</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:334</li></ul></aside></section>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:334</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="errorMonitor" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span>error<wbr/>Monitor</span><a href="#errorMonitor" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">error<wbr/>Monitor<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">typeof </span><a href="index.WorkerPool.html#errorMonitor" class="tsd-signature-type" data-tsd-kind="Property">errorMonitor</a></div>
@@ -168,7 +175,7 @@ regular <code>&#39;error&#39;</code> listener is installed.</p>
 </div><aside class="tsd-sources">
 <p>Inherited from EventEmitter.errorMonitor</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:327</li></ul></aside></section></section>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:327</li></ul></aside></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="addListener" class="tsd-anchor"></a>
@@ -201,10 +208,10 @@ regular <code>&#39;error&#39;</code> listener is installed.</p>
 <h4 class="tsd-returns-title">Returns <a href="index.WorkerPool.html" class="tsd-signature-type" data-tsd-kind="Class">WorkerPool</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Inherited from EventEmitter.addListener</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:354</li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="addNewWorker" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>add<wbr/>New<wbr/>Worker</span><a href="#addNewWorker" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
-<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:354</li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private"><a id="addNewWorker" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>add<wbr/>New<wbr/>Worker</span><a href="#addNewWorker" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
 <li class="tsd-signature tsd-anchor-link" id="addNewWorker.addNewWorker-1">add<wbr/>New<wbr/>Worker<span class="tsd-signature-symbol">(</span>processorFile<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#addNewWorker.addNewWorker-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
@@ -214,7 +221,7 @@ regular <code>&#39;error&#39;</code> listener is installed.</p>
 <h5>processorFile: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = ...</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/049b90d/src/node/lib/worker-pool/WorkerPool.ts#L37">src/node/lib/worker-pool/WorkerPool.ts:37</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/ccac818/src/node/lib/worker-pool/WorkerPool.ts#L56">src/node/lib/worker-pool/WorkerPool.ts:56</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="close" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>close</span><a href="#close" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -222,7 +229,7 @@ regular <code>&#39;error&#39;</code> listener is installed.</p>
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/049b90d/src/node/lib/worker-pool/WorkerPool.ts#L86">src/node/lib/worker-pool/WorkerPool.ts:86</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/ccac818/src/node/lib/worker-pool/WorkerPool.ts#L113">src/node/lib/worker-pool/WorkerPool.ts:113</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="emit" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>emit</span><a href="#emit" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -246,7 +253,7 @@ to each.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
 <p>Inherited from EventEmitter.emit</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:610</li></ul></aside></li></ul></section>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:610</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="eventNames" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>event<wbr/>Names</span><a href="#eventNames" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -262,7 +269,7 @@ listeners. The values in the array are strings or <code>Symbol</code>s.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">(</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">[]</span></h4><aside class="tsd-sources">
 <p>Inherited from EventEmitter.eventNames</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:669</li></ul></aside></li></ul></section>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:669</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="getMaxListeners" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Max<wbr/>Listeners</span><a href="#getMaxListeners" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -276,7 +283,7 @@ set by <code>emitter.setMaxListeners(n)</code> or defaults to <a href="index.Wor
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
 <p>Inherited from EventEmitter.getMaxListeners</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:526</li></ul></aside></li></ul></section>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:526</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="listenerCount" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>listener<wbr/>Count</span><a href="#listenerCount" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -296,7 +303,7 @@ set by <code>emitter.setMaxListeners(n)</code> or defaults to <a href="index.Wor
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
 <p>Inherited from EventEmitter.listenerCount</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:616</li></ul></aside></li></ul></section>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:616</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="listeners" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>listeners</span><a href="#listeners" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -316,7 +323,7 @@ set by <code>emitter.setMaxListeners(n)</code> or defaults to <a href="index.Wor
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">[]</span></h4><aside class="tsd-sources">
 <p>Inherited from EventEmitter.listeners</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:539</li></ul></aside></li></ul></section>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:539</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="off" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>off</span><a href="#off" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -347,7 +354,7 @@ set by <code>emitter.setMaxListeners(n)</code> or defaults to <a href="index.Wor
 <h4 class="tsd-returns-title">Returns <a href="index.WorkerPool.html" class="tsd-signature-type" data-tsd-kind="Class">WorkerPool</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Inherited from EventEmitter.off</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:499</li></ul></aside></li></ul></section>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:499</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="on" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>on</span><a href="#on" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -392,7 +399,7 @@ event listener to the beginning of the listeners array.</p>
 <h4 class="tsd-returns-title">Returns <a href="index.WorkerPool.html" class="tsd-signature-type" data-tsd-kind="Class">WorkerPool</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Inherited from EventEmitter.on</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:385</li></ul></aside></li></ul></section>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:385</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="once" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>once</span><a href="#once" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -435,7 +442,7 @@ event listener to the beginning of the listeners array.</p>
 <h4 class="tsd-returns-title">Returns <a href="index.WorkerPool.html" class="tsd-signature-type" data-tsd-kind="Class">WorkerPool</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Inherited from EventEmitter.once</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:414</li></ul></aside></li></ul></section>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:414</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="prependListener" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>prepend<wbr/>Listener</span><a href="#prependListener" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -476,7 +483,7 @@ times.</p>
 <h4 class="tsd-returns-title">Returns <a href="index.WorkerPool.html" class="tsd-signature-type" data-tsd-kind="Class">WorkerPool</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Inherited from EventEmitter.prependListener</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:634</li></ul></aside></li></ul></section>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:634</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="prependOnceListener" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>prepend<wbr/>Once<wbr/>Listener</span><a href="#prependOnceListener" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -515,7 +522,7 @@ listener is removed, and then invoked.</p>
 <h4 class="tsd-returns-title">Returns <a href="index.WorkerPool.html" class="tsd-signature-type" data-tsd-kind="Class">WorkerPool</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Inherited from EventEmitter.prependOnceListener</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:650</li></ul></aside></li></ul></section>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:650</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="rawListeners" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>raw<wbr/>Listeners</span><a href="#rawListeners" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -536,7 +543,7 @@ including any wrappers (such as those created by <code>.once()</code>).</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">[]</span></h4><aside class="tsd-sources">
 <p>Inherited from EventEmitter.rawListeners</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:569</li></ul></aside></li></ul></section>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:569</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="removeAllListeners" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>remove<wbr/>All<wbr/>Listeners</span><a href="#removeAllListeners" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -558,7 +565,7 @@ component or module (e.g. sockets or file streams).</p>
 <h4 class="tsd-returns-title">Returns <a href="index.WorkerPool.html" class="tsd-signature-type" data-tsd-kind="Class">WorkerPool</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Inherited from EventEmitter.removeAllListeners</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:510</li></ul></aside></li></ul></section>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:510</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="removeListener" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>remove<wbr/>Listener</span><a href="#removeListener" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -611,10 +618,10 @@ recently added instance. In the example the <code>once(&#39;ping&#39;)</code>lis
 <h4 class="tsd-returns-title">Returns <a href="index.WorkerPool.html" class="tsd-signature-type" data-tsd-kind="Class">WorkerPool</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Inherited from EventEmitter.removeListener</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:494</li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private"><a id="runTask" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>run<wbr/>Task</span><a href="#runTask" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
-<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:494</li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="runTask" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>run<wbr/>Task</span><a href="#runTask" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="runTask.runTask-1">run<wbr/>Task<span class="tsd-signature-symbol">(</span>task<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span>, callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Callback</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#runTask.runTask-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
@@ -626,7 +633,7 @@ recently added instance. In the example the <code>once(&#39;ping&#39;)</code>lis
 <h5>callback: <span class="tsd-signature-type">Callback</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">&gt;</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/049b90d/src/node/lib/worker-pool/WorkerPool.ts#L74">src/node/lib/worker-pool/WorkerPool.ts:74</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/ccac818/src/node/lib/worker-pool/WorkerPool.ts#L93">src/node/lib/worker-pool/WorkerPool.ts:93</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="setMaxListeners" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Max<wbr/>Listeners</span><a href="#setMaxListeners" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -648,7 +655,24 @@ modified for this specific <code>EventEmitter</code> instance. The value can be 
 <h4 class="tsd-returns-title">Returns <a href="index.WorkerPool.html" class="tsd-signature-type" data-tsd-kind="Class">WorkerPool</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type" data-tsd-kind="Type parameter">R</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Inherited from EventEmitter.setMaxListeners</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:520</li></ul></aside></li></ul></section>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:520</li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="status" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>status</span><a href="#status" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="status.status-1">status<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>file<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span>freeize<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span>    </span>numThreads<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span>    </span>tasksSize<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><a href="#status.status-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{ </span><br/><span>    </span>file<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span><br/><span>    </span>freeize<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span>    </span>numThreads<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span>    </span>tasksSize<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></h4>
+<ul class="tsd-parameters">
+<li class="tsd-parameter">
+<h5>file<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5></li>
+<li class="tsd-parameter">
+<h5>freeize<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5></li>
+<li class="tsd-parameter">
+<h5>num<wbr/>Threads<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5></li>
+<li class="tsd-parameter">
+<h5>tasks<wbr/>Size<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5></li></ul><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/lzwme/fe-utils/blob/ccac818/src/node/lib/worker-pool/WorkerPool.ts#L105">src/node/lib/worker-pool/WorkerPool.ts:105</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="getEventListeners" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>get<wbr/>Event<wbr/>Listeners</span><a href="#getEventListeners" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -674,7 +698,7 @@ event target. This is useful for debugging and diagnostic purposes.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">[]</span></h4><aside class="tsd-sources">
 <p>Inherited from EventEmitter.getEventListeners</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:299</li></ul></aside></li></ul></section>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:299</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="listenerCount-2" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>listener<wbr/>Count</span><a href="#listenerCount-2" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -702,7 +726,7 @@ event target. This is useful for debugging and diagnostic purposes.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
 <p>Inherited from EventEmitter.listenerCount</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:271</li></ul></aside></li></ul></section>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:271</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="on-2" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>on</span><a href="#on-2" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -736,7 +760,7 @@ composed of the emitted event arguments.</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">AsyncIterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Inherited from EventEmitter.on</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:254</li></ul></aside></li></ul></section>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:254</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="once-2" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>once</span><a href="#once-2" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -773,7 +797,7 @@ special handling:</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Inherited from EventEmitter.once</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:194</li></ul></aside></li>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:194</li></ul></aside></li>
 <li class="tsd-signature tsd-anchor-link" id="once-2.once-4">once<span class="tsd-signature-symbol">(</span>emitter<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">_DOMEventTarget</span>, eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">StaticEventEmitterOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><a href="#once-2.once-4" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
@@ -788,7 +812,7 @@ special handling:</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Inherited from EventEmitter.once</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:195</li></ul></aside></li></ul></section>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:195</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a id="setMaxListeners-2" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>set<wbr/>Max<wbr/>Listeners</span><a href="#setMaxListeners-2" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
@@ -811,7 +835,7 @@ special handling:</p>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <p>Inherited from EventEmitter.setMaxListeners</p>
 <ul>
-<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.0/node_modules/@types/node/events.d.ts:317</li></ul></aside></li></ul></section></section></div>
+<li>Defined in node_modules/.pnpm/registry.npmjs.org+@types+node@18.14.6/node_modules/@types/node/events.d.ts:317</li></ul></aside></li></ul></section></section></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
@@ -853,7 +877,7 @@ special handling:</p>
 <li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="index.WorkerPool.html#defaultMaxListeners" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>default<wbr/>Max<wbr/>Listeners</a></li>
 <li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="index.WorkerPool.html#errorMonitor" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>error<wbr/>Monitor</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="index.WorkerPool.html#addListener" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>add<wbr/>Listener</a></li>
-<li class="tsd-kind-method tsd-parent-kind-class"><a href="index.WorkerPool.html#addNewWorker" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>add<wbr/>New<wbr/>Worker</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="index.WorkerPool.html#addNewWorker" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>add<wbr/>New<wbr/>Worker</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="index.WorkerPool.html#close" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>close</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="index.WorkerPool.html#emit" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>emit</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="index.WorkerPool.html#eventNames" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>event<wbr/>Names</a></li>
@@ -868,8 +892,9 @@ special handling:</p>
 <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="index.WorkerPool.html#rawListeners" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>raw<wbr/>Listeners</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="index.WorkerPool.html#removeAllListeners" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>remove<wbr/>All<wbr/>Listeners</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="index.WorkerPool.html#removeListener" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>remove<wbr/>Listener</a></li>
-<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="index.WorkerPool.html#runTask" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>run<wbr/>Task</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="index.WorkerPool.html#runTask" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>run<wbr/>Task</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="index.WorkerPool.html#setMaxListeners" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>set<wbr/>Max<wbr/>Listeners</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="index.WorkerPool.html#status" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>status</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="index.WorkerPool.html#getEventListeners" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Event<wbr/>Listeners</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="index.WorkerPool.html#listenerCount-2" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>listener<wbr/>Count</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="index.WorkerPool.html#on-2" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>on</a></li>
