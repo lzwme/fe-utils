@@ -177,21 +177,47 @@ export async function unzip(srcFilePath: string, dest?: string) {
   return import('compressing').then(({ zip }) => zip.uncompress(srcFilePath, dest || basename(srcFilePath)));
 }
 
-/** aes 加密 */
-export function aesEncrypt(data: string, key: BinaryLike, algorithm = 'aes-128-ecb', iv: BinaryLike | null = null, salt = '') {
-  if (typeof data !== 'string') data = JSON.stringify(data);
+/**
+ * aes 加密
+ * @example
+ * ```ts
+ * // default aes-128-ecb
+ * const data = { a: 1, b: [1, 2, 3] };
+ * const key = '1234567812345678';
+ * const encrypted = aesEncrypt(data, key);
+ * const decrypted = aesDecrypt(encrypted, key).toString('utf8');
+ * console.log('encrypted:', encrypted, 'decrypted: ', decrypted);
+ *
+ * // aes-128-cbc
+ * const data = { a: 1, b: [1, 2, 3] };
+ * const key = '1234567812345678';
+ * const iv = Buffer.alloc(16, 0);
+ * const algorithm = 'aes-128-cbc';
+ * const encrypted = aesEncrypt(data, key, algorithm, iv);
+ * const decrypted = aesDecrypt(encrypted, key, algorithm, iv).toString('utf8');
+ * console.log('encrypted:', encrypted, 'decrypted: ', decrypted);
+ * ```
+ */
+export function aesEncrypt(data: unknown, key: BinaryLike, algorithm = 'aes-128-ecb', iv: BinaryLike | null = null, salt = '') {
+  if (!(data instanceof Buffer)) {
+    if (typeof data !== 'string') data = JSON.stringify(data);
+    data = Buffer.from(data as string, 'utf8');
+  }
   if (salt) key = scryptSync(key, salt, 16);
 
   const cipher = createCipheriv(algorithm, key, iv);
   cipher.setAutoPadding(true);
-  return Buffer.concat([cipher.update(data, 'utf8'), cipher.final()]);
+  return Buffer.concat([cipher.update(data as Buffer), cipher.final()]);
 }
 /** aes 解密 */
-export function aesDecrypt(data: string, key: BinaryLike, algorithm = 'aes-128-ecb', iv: BinaryLike | null = null, salt = '') {
-  if (typeof data !== 'string') data = JSON.stringify(data);
+export function aesDecrypt(data: unknown, key: BinaryLike, algorithm = 'aes-128-ecb', iv: BinaryLike | null = null, salt = '') {
+  if (!(data instanceof Buffer)) {
+    if (typeof data !== 'string') data = JSON.stringify(data);
+    data = Buffer.from(data as string, 'utf8');
+  }
   if (salt) key = scryptSync(key, salt, 16);
 
   const decipher = createDecipheriv(algorithm, key, iv);
   decipher.setAutoPadding(true);
-  return Buffer.concat([decipher.update(data, 'utf8'), decipher.final()]);
+  return Buffer.concat([decipher.update(data as Buffer), decipher.final()]);
 }
