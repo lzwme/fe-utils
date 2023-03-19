@@ -1,7 +1,7 @@
 import { URL } from 'node:url';
 import zlib from 'node:zlib';
-import http, { type IncomingMessage, type IncomingHttpHeaders } from 'node:http';
-import https from 'node:https';
+import http, { type IncomingMessage, type IncomingHttpHeaders, type OutgoingHttpHeaders } from 'node:http';
+import https, { type RequestOptions } from 'node:https';
 import { urlFormat } from '../../common/url';
 import type { AnyObject } from '../../types';
 
@@ -23,7 +23,7 @@ export class Request {
     return this.instance;
   }
   private cookies: string[] = [];
-  private headers: IncomingHttpHeaders = {
+  private headers: OutgoingHttpHeaders = {
     pragma: 'no-cache',
     connection: 'keep-alive',
     'cache-control': 'no-cache',
@@ -33,11 +33,11 @@ export class Request {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
   };
 
-  constructor(cookie?: string, headers?: IncomingHttpHeaders) {
+  constructor(cookie?: string, headers?: OutgoingHttpHeaders) {
     if (cookie) this.setCookie(cookie);
     if (headers) this.setHeaders(headers);
   }
-  private getHeaders(urlObject: URL, headers?: IncomingHttpHeaders) {
+  private getHeaders(urlObject: URL, headers?: OutgoingHttpHeaders) {
     headers = {
       ...this.headers,
       host: urlObject.host,
@@ -49,7 +49,7 @@ export class Request {
 
     return headers;
   }
-  setHeaders(headers: IncomingHttpHeaders) {
+  setHeaders(headers: OutgoingHttpHeaders) {
     if (headers) this.headers = Object.assign(this.headers, toLowcaseKeyObject(headers));
   }
   setCookie(cookie: string, reset = false) {
@@ -61,14 +61,14 @@ export class Request {
   getCookie(isString = true) {
     return isString ? this.cookies.join('; ') : this.cookies;
   }
-  req(method: string, url: string | URL, parameters?: AnyObject, headers?: IncomingHttpHeaders) {
+  req(url: string | URL, parameters?: AnyObject, options: RequestOptions = {}, autoRedirect = true) {
     const urlObject = typeof url === 'string' ? new URL(url) : url;
-    const options: https.RequestOptions = {
+    options = {
+      ...options,
       hostname: urlObject.host.split(':')[0],
       port: urlObject.port,
       path: urlObject.href.split(urlObject.host)[1],
-      method: method,
-      headers: this.getHeaders(urlObject, headers),
+      headers: this.getHeaders(urlObject, options.headers),
     };
     let postBody = '';
 
@@ -82,8 +82,8 @@ export class Request {
     return new Promise<{ req: http.ClientRequest; res: IncomingMessage }>((resolve, reject) => {
       const h = urlObject.protocol === 'http:' ? http : https;
       const req: http.ClientRequest = h.request(options, res => {
-        if (res.statusCode === 302 && res.headers['location']) {
-          this.req(method, res.headers['location'], headers).then(resolve);
+        if (autoRedirect && String(res.statusCode).startsWith('30') && res.headers['location']) {
+          this.req(res.headers['location'], parameters, options, true).then(resolve);
         } else resolve({ req, res });
       });
       req.on('error', reject);
@@ -91,8 +91,8 @@ export class Request {
       req.end();
     });
   }
-  async request<T = Record<string, unknown>>(method: string, url: string | URL, parameters?: AnyObject, headers?: IncomingHttpHeaders) {
-    const { res: response, req } = await this.req(method, url, parameters, headers);
+  async request<T = AnyObject>(method: string, url: string | URL, parameters?: AnyObject, options?: RequestOptions, autoRedirect = true) {
+    const { res: response, req } = await this.req(url, parameters, { ...options, method }, autoRedirect);
 
     return new Promise<{ data: T; buffer: Buffer; headers: IncomingHttpHeaders; response: IncomingMessage }>((resolve, reject) => {
       const chunks: Buffer[] = [];
@@ -124,10 +124,10 @@ export class Request {
       });
     });
   }
-  get<T = Record<string, unknown>>(url: string, parameters?: AnyObject, headers?: IncomingHttpHeaders) {
-    return this.request<T>('GET', urlFormat(url, parameters), void 0, headers);
+  get<T = AnyObject>(url: string, parameters?: AnyObject, headers?: OutgoingHttpHeaders, options?: RequestOptions) {
+    return this.request<T>('GET', urlFormat(url, parameters), void 0, { ...options, headers: { ...options?.headers, ...headers } });
   }
-  post<T = Record<string, unknown>>(url: string, parameters: AnyObject, headers?: IncomingHttpHeaders) {
-    return this.request<T>('POST', url, parameters, headers);
+  post<T = AnyObject>(url: string, parameters: AnyObject, headers?: OutgoingHttpHeaders, options?: RequestOptions) {
+    return this.request<T>('POST', url, parameters, { ...options, headers: { ...options?.headers, ...headers } });
   }
 }

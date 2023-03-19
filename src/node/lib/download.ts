@@ -1,20 +1,18 @@
 import { basename, dirname, resolve } from 'node:path';
 import { tmpdir, cpus } from 'node:os';
-import { type IncomingHttpHeaders } from 'node:http';
 import type { AnyObject } from '../../types';
 import { concurrency } from '../../common/async';
 import { fs } from '../fs-system';
 import { Request } from './request';
 import { NLogger } from './NLogger';
+import { RequestOptions } from 'node:https';
 
 export interface DownloadOptions {
   url: string;
   /** 文件保存路径 */
   filepath?: string;
-  /** 请求方法。默认为 GET */
-  method?: string;
   params?: AnyObject;
-  headers?: IncomingHttpHeaders;
+  requestOptions?: RequestOptions;
   /** 文件已存在时是否仍强制继续下载。默认 flase */
   force?: boolean;
   /** 大文件分段下载时，分段的大小。单位 kB，应不小于 10 */
@@ -58,8 +56,8 @@ export interface DownloadResult {
  */
 export async function download(options: DownloadOptions): Promise<DownloadResult> {
   if (typeof options === 'string') options = { url: options };
-  const request = new Request('', options.headers);
-  const { req, res } = await request.req('HEAD', options.url, options.params, options.headers);
+  const request = new Request('', options.requestOptions?.headers);
+  const { req, res } = await request.req(options.url, options.params, { ...options.requestOptions, method: 'HEAD' });
   res.destroy();
   if (!options.filepath) {
     options.filepath = res.headers['content-disposition']
@@ -117,9 +115,12 @@ export async function download(options: DownloadOptions): Promise<DownloadResult
       const end = i + 1 === segments ? contentLength : (i + 1) * segmentSize - 1;
       const option: DownloadOptions = {
         ...options,
-        headers: {
-          ...options.headers,
-          range: `bytes=${start}-${end}`,
+        requestOptions: {
+          ...options.requestOptions,
+          headers: {
+            ...options.requestOptions?.headers,
+            range: `bytes=${start}-${end}`,
+          },
         },
         filepath: resolve(tmpDir, `${basename(filepath)}.${i}`),
         onProgress: () => void 0,
@@ -152,7 +153,7 @@ export async function download(options: DownloadOptions): Promise<DownloadResult
     }
     writeStream.end();
   } else {
-    const { res } = await request.req(options.method || 'GET', options.url, options.params, options.headers);
+    const { res } = await request.req(options.url, options.params, options.requestOptions);
     const chunks: Buffer[] = [];
     contentLength = Number(res.headers['content-length']) || 0;
     await new Promise<void>((rs, reject) => {
