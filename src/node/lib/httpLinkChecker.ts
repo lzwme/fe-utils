@@ -6,13 +6,29 @@ export async function httpLinkChecker(url: string, options: { reqOptions?: Reque
   const request = new Request();
   let r: Awaited<ReturnType<Request['get']>> & { data: string };
 
-  options.reqOptions = assign({ method: 'get', headers: { 'content-type': 'text/html' } }, options.reqOptions || {});
-  if (options.verify) {
-    r = await request.request<string>(options.reqOptions.method!, url, {}, options.reqOptions, false);
-  } else {
-    const { res } = await request.req(url, {}, { ...options.reqOptions, method: 'HEAD' }, false);
-    r = { response: res, headers: res.headers, data: '', buffer: Buffer.from('') };
-    res.destroy();
+  options.reqOptions = assign<RequestOptions>(
+    { method: 'get', timeout: 5000, headers: { 'content-type': 'text/html' } },
+    options.reqOptions!
+  );
+
+  try {
+    if (options.verify) {
+      r = await request.request<string>(options.reqOptions.method!, url, {}, options.reqOptions, false);
+    } else {
+      const { res } = await request.req(url, {}, { ...options.reqOptions, method: 'HEAD' }, false);
+      r = { response: res, headers: res.headers, data: '', buffer: Buffer.from('') };
+      res.destroy();
+    }
+  } catch (error) {
+    const err = error as Error & { code?: number | string };
+    return {
+      code: err.code || -1,
+      errmsg: String(err.message || err.cause || err.stack),
+      statusCode: Number(err.code) || -1,
+      url: url.replace(/\$/, ''),
+      redirected: false,
+      body: '',
+    };
   }
 
   const result = {

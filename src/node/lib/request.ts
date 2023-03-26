@@ -81,12 +81,26 @@ export class Request {
 
     return new Promise<{ req: http.ClientRequest; res: IncomingMessage }>((resolve, reject) => {
       const h = urlObject.protocol === 'http:' ? http : https;
+      let timer: NodeJS.Timer;
       const req: http.ClientRequest = h.request(options, res => {
+        clearTimeout(timer);
         if (autoRedirect && String(res.statusCode).startsWith('30') && res.headers['location']) {
           this.req(res.headers['location'], parameters, options, true).then(resolve);
         } else resolve({ req, res });
       });
-      req.on('error', reject);
+
+      req.on('error', error => {
+        clearTimeout(timer);
+        reject(error);
+      });
+
+      if (options.timeout) {
+        timer = setTimeout(() => {
+          req.destroy();
+          reject(new Error('timeout', { cause: `timeout: ${options.timeout}` }));
+        }, options.timeout);
+      }
+
       if (postBody) req.write(postBody);
       req.end();
     });
