@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.1](https://github.com/lzwme/fe-utils/compare/v1.5.0...v1.5.1) (2023-03-26)
+
+
+### Features
+
+* **request:** 新增 httpLinkChecker 方法；重构 Request 和 download 实现 ([b2121ce](https://github.com/lzwme/fe-utils/commit/b2121ce5664eb69307fc1c256cd5251388f38c6e))
+
 ## [1.5.0](https://github.com/lzwme/fe-utils/compare/v1.3.3...v1.5.0) (2023-03-07)
 
 
