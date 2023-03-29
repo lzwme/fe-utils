@@ -1,4 +1,5 @@
 export * from './download';
+export { httpLinkChecker } from './httpLinkChecker';
 export * from './NLogger';
 export * from './request';
 export * from './WXWork';
