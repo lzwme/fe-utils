@@ -39,7 +39,7 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
     this.options = {
       version: '0.0.0',
       uuid: 'defaults',
-      filepath: resolve(this.baseDir, '.liteStoreage/ls.json'),
+      filepath: resolve(this.baseDir, 'ls.json'),
       ...options,
     };
 
