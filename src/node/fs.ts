@@ -25,9 +25,10 @@ export async function rmrfAsync(filepath: string): Promise<void> {
   try {
     if (!filepath || !fs.existsSync(filepath)) return;
 
-    return fs.promises.rm(filepath, { recursive: true, maxRetries: 3 });
+    await fs.promises.rm(filepath, { recursive: true, maxRetries: 3 });
+    if (fs.existsSync(filepath) && fs.statSync(filepath).isDirectory()) fs.rmdirSync(filepath);
   } catch {
-    return rmrf(filepath);
+    rmrf(filepath);
   }
 }
 
