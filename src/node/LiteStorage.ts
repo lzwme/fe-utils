@@ -61,8 +61,8 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
     };
   }
   /** 主动保存 */
-  public save(value?: T) {
-    if (value) return this.set(value);
+  public save(value?: T, mode: 'merge' | 'cover' = 'merge') {
+    if (value) return this.set(value, mode);
 
     const cacheDir = dirname(this.cachePath);
     if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
@@ -80,21 +80,24 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
     }
     return this;
   }
-  public set(value: T) {
+  public set(value: T, mode: 'merge' | 'cover' = 'merge') {
     const uuid = this.options.uuid;
 
     if (value != null && uuid) {
       if (!this.cache.data[uuid]) this.cache.data[uuid] = {} as T;
-      if (value !== this.cache.data[uuid]) assign(this.cache.data[uuid], value);
+      if (value !== this.cache.data[uuid]) {
+        if (mode === 'merge') assign(this.cache.data[uuid], value);
+        else this.cache.data[uuid] = value;
+      }
       this.save();
     } else {
       console.warn('[LiteStorage][set]error', uuid, value);
     }
     return this;
   }
-  public get() {
+  public get(raw = false) {
     const info = this.cache.data[this.options.uuid];
-    return { ...info };
+    return raw ? info : { ...info };
   }
   public getAll() {
     return this.cache;

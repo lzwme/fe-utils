@@ -12,21 +12,27 @@ export function copyToClipboard(msg: unknown) {
 
 /** 复制内容到剪切板2 */
 export function copyToClipboard2(msg: unknown) {
-  const oInput = document.createElement('input');
-  oInput.style.display = 'none';
-  oInput.value = typeof msg === 'string' ? msg : JSON.stringify(msg);
-  document.body.append(oInput);
-  oInput.select();
+  const el = document.createElement('textarea');
+  el.style.position = 'absolute';
+  el.style.left = '-999999px';
+  el.value = typeof msg === 'string' ? msg : JSON.stringify(msg);
+  el.setAttribute('readonly', '');
+  document.body.append(el);
+  el.select();
   document.execCommand('copy');
-  oInput.remove();
+  el.remove();
 }
 
 /** 复制内容到剪切板 */
 export function writeToClipboard(msg: unknown) {
-  return navigator.clipboard
-    .writeText(typeof msg === 'string' ? msg : JSON.stringify(msg))
-    .catch(() => copyToClipboard(msg))
-    .catch(() => copyToClipboard2(msg));
+  if (navigator.clipboard) {
+    return navigator.clipboard
+      .writeText(typeof msg === 'string' ? msg : JSON.stringify(msg))
+      .catch(() => copyToClipboard(msg))
+      .catch(() => copyToClipboard2(msg));
+  }
+
+  return copyToClipboard(msg);
 }
 
 /** 复制图片到剪切板 */
