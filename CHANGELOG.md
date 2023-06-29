@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.2](https://github.com/lzwme/fe-utils/compare/v1.5.1...v1.5.2) (2023-06-29)
+
+
+### Bug Fixes
+
+* **LiteStorage:** 更新默认相对路径的取值规则 ([e3cd8c7](https://github.com/lzwme/fe-utils/commit/e3cd8c7d3e189e30d39cb1e7463bfdf070fb7caa))
+* should export for httpLinkChecker ([d1bbaa4](https://github.com/lzwme/fe-utils/commit/d1bbaa45ead9e7d9934bddd93fdd8b891b17e3e3))
+
 ### [1.5.1](https://github.com/lzwme/fe-utils/compare/v1.5.0...v1.5.1) (2023-03-26)
 
 
