@@ -378,13 +378,18 @@ export class AutoOpenBarrier extends Barrier {
 export const sleep = <T>(milliseconds = 0, value?: T | (() => T | Promise<T>)): Promise<T | undefined> =>
   new Promise(resolve => setTimeout(() => resolve(value instanceof Function ? value() : value), milliseconds));
 
-export async function retry<T>(task: ITask<Promise<T> | T>, delay: number, retries: number, validator?: (r: T) => boolean): Promise<T> {
+export async function retry<T>(
+  task: ITask<Promise<T> | T>,
+  delay: number,
+  retries: number,
+  validator?: (r: T, index: number) => boolean
+): Promise<T> {
   let lastError: Error | undefined;
 
   for (let i = 0; i < retries; i++) {
     try {
       const result = await task();
-      if (!validator || validator(result)) return result;
+      if (!validator || validator(result, i)) return result;
     } catch (error) {
       lastError = error as Error;
 
