@@ -76,7 +76,10 @@ export class Logger {
   /** 记录日志的次数 */
   private times = 0;
 
-  constructor(protected tag: string, protected options: LoggerOptions = {}) {
+  constructor(
+    protected tag: string,
+    protected options: LoggerOptions = {}
+  ) {
     const match = /(\w+)/.exec(tag);
     if (!match) throw 'Logger tag expected';
     this.tag = tag;

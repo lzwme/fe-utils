@@ -39,7 +39,10 @@ export class WorkerPool<T = unknown, R = unknown> extends EventEmitter {
     task: T;
     callback: Callback<R, T>;
   }[] = [];
-  constructor(private processorFile: string, public numThreads = 0) {
+  constructor(
+    private processorFile: string,
+    public numThreads = 0
+  ) {
     super();
 
     if (!numThreads || numThreads < 1) numThreads = cpus().length;
