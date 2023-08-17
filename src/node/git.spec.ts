@@ -1,4 +1,4 @@
-import { getGitLog, isGitRepo, getHeadBranch, getHeadCommitId, getHeadDiffFileList, getUserEmail, setChmod } from './git';
+import { getGitLog, isGitRepo, getHeadBranch, getHeadCommitId, getHeadDiffFileList, getUserEmail, gitSetChmod } from './git';
 import cp from 'node:child_process';
 import fs from 'node:fs';
 
@@ -102,8 +102,8 @@ describe('git.ts', () => {
     expect(getUserEmail()).toBe(mockedId);
   });
 
-  it('setChmod', () => {
-    expect(setChmod('abc').stdout).toBe('');
+  it('gitSetChmod', () => {
+    expect(gitSetChmod('abc').stdout).toBe('');
   });
 
   it('isGitRepo', () => {

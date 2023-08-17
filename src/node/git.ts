@@ -68,7 +68,7 @@ export function getGitLog(num = 1, cwd?: string) {
   return result;
 }
 
-/** 获取当前的本地分支名 */
+/** 【git】获取当前的本地分支名 */
 export function getHeadBranch(baseDirectory = process.cwd()) {
   // 支持在 Jenkins CI 中从环境变量直接获取
   let branch = process.env.CI_COMMIT_REF_NAME;
@@ -90,26 +90,31 @@ export function getHeadBranch(baseDirectory = process.cwd()) {
   return branch.trim();
 }
 
-/** 获取本地或远端最新的 commitId */
+/** 【git】获取本地或远端最新的 commitId */
 export function getHeadCommitId(isRemote = false, cwd = process.cwd()) {
   return isGitRepo(cwd) ? execSync(`git rev-parse ${isRemote ? '@{upstream}' : 'HEAD'}`, 'pipe', cwd).stdout : '';
 }
 
+/** 【git】获取本地或远端最新的 short commitId */
+export function gitHashShort(length = 7, isRemote = false, cwd = process.cwd()) {
+  return getHeadCommitId(isRemote, cwd).slice(0, length || 7);
+}
+
 /**
- * 获取指定 HEAD 的变更文件列表
+ * 【git】获取指定 HEAD 的变更文件列表
  * @param headIndex HEAD 顺序，默认为 0，即最新的本地未提交变更
  */
 export function getHeadDiffFileList(headIndex = 0, cwd?: string, debug = false) {
-  return execSync(`git diff HEAD~${headIndex} --name-only`, 'pipe', cwd, debug).stdout.trim().split('\n').filter(Boolean);
+  return execSync(`git diff HEAD~${headIndex} --name-only`, 'pipe', cwd, debug).stdout.split('\n').filter(Boolean);
 }
 
-/** 获取 git user eamil 地址 */
+/** 【git】获取 git user eamil 地址 */
 export function getUserEmail() {
   return execSync('git config --get user.email', 'pipe').stdout;
 }
 
-/** 给文件增加或撤销可执行权限 */
-export function setChmod(filepath: string, type: 'add' | 'del' = 'add') {
+/** 【git】给文件增加或撤销可执行权限 */
+export function gitSetChmod(filepath: string, type: 'add' | 'del' = 'add') {
   return execSync(`git update-index --add --chmod=${type === 'del' ? '-' : '+'}x ${filepath}`);
 }
 
@@ -123,4 +128,71 @@ export function isGitRepo(rootDir = process.cwd(), useCache = true): boolean {
   }
   // @ts-ignore
   return isGitRepo[rootDir];
+}
+
+/** 【git】是否存在未暂存的变更 */
+export function gitHasUnstagedChanges(cwd = process.cwd()) {
+  return execSync(`git status --short`, 'pipe', cwd).stdout.length === 0;
+}
+
+/** 获取 git 远程仓库地址 */
+export function gitRemoteUrl(cwd = process.cwd()) {
+  return execSync(`git ls-remote --get-url`, 'pipe', cwd).stdout;
+}
+
+/** 【git】是否存在未提交的变更 */
+export function gitIsDirty(cwd = process.cwd()) {
+  return execSync(`git diff-index HEAD`, 'pipe', cwd).stdout.length > 0;
+}
+
+/** 【git】最近一次的 tag 是否已过期（tag 之后存在新的提交） */
+export function gitIsTagDirty(cwd = process.cwd()) {
+  const r = execSync(`git describe --exact-match --tags`, 'pipe', cwd);
+
+  if (r.stderr.includes('no tag exactly matches')) return true;
+  if (r.stderr.includes('No names found')) return true;
+  if (r.error) throw r.error;
+  return false;
+}
+
+/** 【git】获取最近一次的修改日期 */
+export function gitDate(cwd = process.cwd()) {
+  return new Date(getGitLog(1, cwd)[0].ad!);
+}
+
+/** 【git】获取最近一次的修改提交信息 */
+export function gitMessage(cwd = process.cwd()) {
+  return getGitLog(1, cwd)[0]?.s;
+}
+
+/** 【git】获取历史提交总次数 */
+export function gitCount(cwd = process.cwd()) {
+  return +execSync(`git rev-list --all --count`, 'pipe', cwd).stdout;
+}
+
+/**
+ * 【git】获取 .git 目录的绝对路径
+ * @param cwd 工作目录。默认为当前目录
+ */
+export function gitDir(cwd = process.cwd()) {
+  return resolve(execSync(`git rev-parse --absolute-git-dir`, 'pipe', cwd).stdout);
+}
+
+/**
+ * 【git】获取 git 项目根目录绝对路径
+ * @param cwd 工作目录。默认为当前目录
+ */
+export function gitGetTopDir(cwd = process.cwd()) {
+  return resolve(execSync(`git rev-parse --show-toplevel`, 'pipe', cwd).stdout, cwd);
+}
+
+/** 【git】获取最新的 git tag */
+export function gitGetTag(firstParent = false, cwd = process.cwd()) {
+  // return gitGetAllTags()[0];
+  return execSync(`git describe --always --tag --abbrev=0 ${firstParent ? '--first-parent' : ''}`, 'pipe', cwd).stdout;
+}
+
+/** 【git】获取全部的 tags 列表 */
+export function gitGetAllTags(cwd = process.cwd()) {
+  return execSync(`git tag --list`, 'pipe', cwd).stdout.split('\n').reverse().filter(Boolean);
 }
