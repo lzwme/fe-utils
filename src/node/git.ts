@@ -132,7 +132,7 @@ export function isGitRepo(rootDir = process.cwd(), useCache = true): boolean {
 
 /** 【git】是否存在未暂存的变更 */
 export function gitHasUnstagedChanges(cwd = process.cwd()) {
-  return execSync(`git status --short`, 'pipe', cwd).stdout.length === 0;
+  return execSync(`git status --short`, 'pipe', cwd).stdout.length > 0;
 }
 
 /** 获取 git 远程仓库地址 */
@@ -142,7 +142,7 @@ export function gitRemoteUrl(cwd = process.cwd()) {
 
 /** 【git】是否存在未提交的变更 */
 export function gitIsDirty(cwd = process.cwd()) {
-  return execSync(`git diff-index HEAD`, 'pipe', cwd).stdout.length > 0;
+  return execSync(`git diff-index HEAD --name-only`, 'pipe', cwd).stdout.length > 0;
 }
 
 /** 【git】最近一次的 tag 是否已过期（tag 之后存在新的提交） */
