@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.5](https://github.com/lzwme/fe-utils/compare/v1.5.4...v1.5.5) (2023-08-18)
+
+
+### Bug Fixes
+
+* 修复 gitHasUnstagedChanges 方法返回值错误的问题 ([9dcc652](https://github.com/lzwme/fe-utils/commit/9dcc6529a05d0f71559a84e7a1a2a193bb4df9a2))
+
 ### [1.5.4](https://github.com/lzwme/fe-utils/compare/v1.5.4-0...v1.5.4) (2023-08-18)
 
 ### [1.5.4-0](https://github.com/lzwme/fe-utils/compare/v1.5.3...v1.5.4-0) (2023-08-18)
