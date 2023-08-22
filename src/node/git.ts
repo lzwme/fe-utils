@@ -130,9 +130,13 @@ export function isGitRepo(rootDir = process.cwd(), useCache = true): boolean {
   return isGitRepo[rootDir];
 }
 
-/** 【git】是否存在未暂存的变更 */
-export function gitHasUnstagedChanges(cwd = process.cwd()) {
-  return execSync(`git status --short`, 'pipe', cwd).stdout.length > 0;
+/**
+ * 【git】是否存在未暂存的变更
+ * @param dir 指定具体的文件或目录路径。默认为当前目录
+ * @param cwd 工作目录
+ */
+export function gitHasUnstagedChanges(dir = '.', cwd = process.cwd()) {
+  return execSync(`git status --short "${dir}"`, 'pipe', cwd).stdout.length > 0;
 }
 
 /** 获取 git 远程仓库地址 */
