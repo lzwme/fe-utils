@@ -3,6 +3,8 @@ import { isObject, isSet, isMap, isArray } from './is';
 
 export function safeJsonParse<T extends Record<string, string>>(input: string): T {
   try {
+    if (input == null) return {} as T;
+    if (typeof input === 'object') return input;
     return JSON.parse(input) as T;
   } catch (error: any) {
     console.error('[safeJsonParse]parse error', error.message, error.stack);

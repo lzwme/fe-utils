@@ -14,8 +14,10 @@ describe('objects/assign', () => {
   it('safeJsonParse', () => {
     const a: Record<string, unknown> = { a: 1, b: { c: 2, d: 3 } };
 
+    expect(safeJsonParse(a as never)).toEqual(a);
     expect(safeJsonParse(safeStringify(a))).toStrictEqual(a);
     expect(safeJsonParse('')).toStrictEqual({});
+    expect(safeJsonParse(null as never)).toStrictEqual({});
   });
 
   it('safeStringify', () => {
