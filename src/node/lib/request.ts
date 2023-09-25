@@ -81,9 +81,9 @@ export class Request {
 
     return new Promise<{ req: http.ClientRequest; res: IncomingMessage }>((resolve, reject) => {
       const h = urlObject.protocol === 'http:' ? http : https;
-      let timer: NodeJS.Timer;
+      let timer: NodeJS.Timeout;
       const req: http.ClientRequest = h.request(options, res => {
-        clearTimeout(timer);
+        globalThis.clearTimeout(timer);
         if (autoRedirect && String(res.statusCode).startsWith('30') && res.headers['location']) {
           this.req(res.headers['location'], parameters, options, true).then(resolve);
         } else resolve({ req, res });

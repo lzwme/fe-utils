@@ -16,7 +16,7 @@ export interface IDisposable {
 }
 
 export function raceTimeout<T>(promise: Promise<T>, timeout: number, onTimeout?: () => T | undefined): Promise<T | undefined> {
-  let timer: NodeJS.Timer;
+  let timer: NodeJS.Timeout;
 
   return Promise.race([
     promise.finally(() => clearTimeout(timer)),
@@ -362,7 +362,7 @@ export class Barrier {
  * time or when open is called explicitly
  */
 export class AutoOpenBarrier extends Barrier {
-  private readonly _timeout: NodeJS.Timer;
+  private readonly _timeout: NodeJS.Timeout;
 
   constructor(autoOpenTimeMs: number) {
     super();
