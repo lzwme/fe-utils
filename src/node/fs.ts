@@ -101,3 +101,21 @@ export function copyDir(src: string, dest: string, filter: (filepath: string, st
     }
   }
 }
+
+/** 删除指定路径下所有的空目录 */
+export function rmEmptyDir(dir: string) {
+  if (fs.statSync(dir).isDirectory() === false) return;
+
+  let files = fs.readdirSync(dir);
+
+  if (files.length > 0) {
+    for (const filename of files) {
+      const filepath = resolve(dir, filename);
+      if (fs.statSync(filepath).isDirectory()) rmEmptyDir(filepath);
+    }
+
+    files = fs.readdirSync(dir);
+  }
+
+  if (files.length === 0) return fs.rmdirSync(dir);
+}
