@@ -1,8 +1,8 @@
 /*
  * @Author: lzw
  * @Date: 2021-08-25 10:12:21
- * @LastEditors: lzw
- * @LastEditTime: 2022-09-07 15:33:08
+ * @LastEditors: renxia
+ * @LastEditTime: 2023-11-03 14:23:57
  * @Description: 在 fork 子进程中执行 Check 任务
  */
 
@@ -27,7 +27,7 @@ export function createChildProcess<T>(options: CreateThreadOptions, onMessage?: 
   const { signal } = controller;
   const worker = fork(options.workerFile, { silent: false, signal });
   let heartbeat = 0;
-  let heartbeatTimer: NodeJS.Timer;
+  let heartbeatTimer: NodeJS.Timeout;
   const exit = () => {
     controller.abort();
     if (!worker.killed) worker.kill();
