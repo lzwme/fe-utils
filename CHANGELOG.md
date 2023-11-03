@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.6](https://github.com/lzwme/fe-utils/compare/v1.5.5...v1.5.6) (2023-11-03)
+
+
+### Bug Fixes
+
+* **gitHasUnstagedChanges:** 增加 dir 输入参数，支持针对指定的文件或目录检测是否存在未提交的变更 ([915f78c](https://github.com/lzwme/fe-utils/commit/915f78cd9c700609ffcf535ae059c5b95de31a62))
+
 ### [1.5.5](https://github.com/lzwme/fe-utils/compare/v1.5.4...v1.5.5) (2023-08-18)
 
 
