@@ -60,6 +60,9 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
       },
     };
   }
+  public get config() {
+    return { ...this.options };
+  }
   /** 主动保存 */
   public save(value?: T, mode: 'merge' | 'cover' = 'merge') {
     if (value) return this.set(value, mode);
