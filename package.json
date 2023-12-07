@@ -64,6 +64,7 @@
   "devDependencies": {
     "@jest/core": "^29",
     "@jest/types": "^29",
+    "@ltd/j-toml": "^1.38.0",
     "@lzwme/fed-lint-helper": "^2.4.1",
     "@types/eslint": "^8.44.6",
     "@types/jest": "^29.5.7",
@@ -90,6 +91,7 @@
     "windows-process-tree": "^0.4.0"
   },
   "peerDependencies": {
+    "@ltd/j-toml": "^1.38.0",
     "compressing": "^1.7.0",
     "windows-process-tree": "^0.4.0"
   },
@@ -98,6 +100,9 @@
       "optional": true
     },
     "windows-process-tree": {
+      "optional": true
+    },
+    "@ltd/j-toml": {
       "optional": true
     }
   },

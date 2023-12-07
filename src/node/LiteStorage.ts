@@ -10,13 +10,15 @@ export interface LSCache<T> {
   };
 }
 
-export interface LSOptions {
+export interface LSOptions<T extends object = Record<string, unknown>> {
   /** 缓存文件保存的路径 */
   filepath?: string;
   /** 缓存版本。当版本不匹配时将清空已有数据 */
   version?: string;
   /** 存储类型的唯一标记，用于区分多个不同类型的存储。默认为 defaults */
   uuid?: string;
+  /** 默认初始值 */
+  initial?: T;
 }
 
 /**
@@ -31,6 +33,9 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
   private get cachePath() {
     return this.options.filepath;
   }
+  private get isToml() {
+    return /\.toml$/.test(this.options.filepath);
+  }
   // @ts-ignore
   private cache: LSCache<T>;
   private options: Required<LSOptions>;
@@ -40,6 +45,7 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
       version: '0.0.0',
       uuid: 'defaults',
       filepath: resolve(this.baseDir, 'ls.json'),
+      initial: {},
       ...options,
     };
 
@@ -48,7 +54,7 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
   }
   private init() {
     const { filepath, uuid, version } = this.options;
-    if (!filepath.endsWith('.json')) {
+    if (!filepath.endsWith('.json') && !filepath.endsWith('.toml')) {
       this.options.filepath = resolve(this.baseDir, filepath, 'ls.json');
     }
     this.options.filepath = resolve(this.baseDir, filepath);
@@ -56,7 +62,7 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
     this.cache = {
       version,
       data: {
-        [uuid]: {} as T,
+        [uuid]: (this.options.initial || {}) as T,
       },
     };
   }
@@ -64,21 +70,37 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
     return { ...this.options };
   }
   /** 主动保存 */
-  public save(value?: T, mode: 'merge' | 'cover' = 'merge') {
+  public async save(value?: T, mode: 'merge' | 'cover' = 'merge') {
     if (value) return this.set(value, mode);
 
     const cacheDir = dirname(this.cachePath);
     if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
-    this.reload();
-    fs.writeFileSync(this.cachePath, JSON.stringify(this.cache, null, 4), 'utf8');
+    await this.reload();
+    let content = '';
+    if (this.isToml) {
+      const TOML = await import('@ltd/j-toml');
+      content = TOML.stringify(this.cache as never, { newline: '\n' });
+    } else {
+      content = JSON.stringify(this.cache, null, 4);
+    }
+    fs.writeFileSync(this.cachePath, content, 'utf8');
     return this;
   }
   /** 从文件中重载数据至内存。在多进程、多线程模式下，需读取最新数据时，可手动调用 */
-  public reload() {
+  public async reload() {
     if (fs.existsSync(this.cachePath)) {
-      const localCache = JSON.parse(fs.readFileSync(this.cachePath, 'utf8')) as LSCache<T>;
+      const content = fs.readFileSync(this.cachePath, 'utf8');
+      let localCache: LSCache<T>;
+      if (this.isToml) {
+        const TOML = await import('@ltd/j-toml');
+        localCache = TOML.default.parse(content, '\n', false) as never;
+        // localCache = JSON.parse(JSON.stringify(TOML.default.parse(content, '\n', false)));
+      } else {
+        localCache = JSON.parse(content) as LSCache<T>;
+      }
+
       if (localCache.version === this.options.version) {
-        assign(this.cache, assign({}, localCache, this.cache));
+        assign(this.cache, assign(localCache, this.cache));
       } else fs.rmSync(this.cachePath, { force: true });
     }
     return this;
