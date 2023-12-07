@@ -31,9 +31,9 @@ export function toDate(date: string | number | Date, defaults = new Date()): Dat
  * @example
  * dateFormat('yyyy-MM-dd hh:mm:ss.S', new Date(1526895082375)); // 2018-05-21 17:31:22.375
  */
-export function dateFormat(fmt: string, date: Date | string = new Date()): string {
+export function dateFormat(fmt: string, date: Date | string | number = new Date()): string {
   const rawDate = date;
-  if (!date) return date;
+  if (!date) return '';
 
   date = toDate(date);
 

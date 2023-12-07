@@ -78,11 +78,12 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
     await this.reload();
     let content = '';
     if (this.isToml) {
-      const TOML = await import('@ltd/j-toml');
-      content = TOML.stringify(this.cache as never, { newline: '\n' });
+      const TOML = await import('@iarna/toml');
+      content = TOML.stringify(this.cache as never);
     } else {
       content = JSON.stringify(this.cache, null, 4);
     }
+    console.log(this.cache, content, this.cachePath);
     fs.writeFileSync(this.cachePath, content, 'utf8');
     return this;
   }
@@ -92,12 +93,14 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
       const content = fs.readFileSync(this.cachePath, 'utf8');
       let localCache: LSCache<T>;
       if (this.isToml) {
-        const TOML = await import('@ltd/j-toml');
-        localCache = TOML.default.parse(content, '\n', false) as never;
-        // localCache = JSON.parse(JSON.stringify(TOML.default.parse(content, '\n', false)));
+        const TOML = await import('@iarna/toml');
+        // localCache = TOML.default.parse(content, '\n', false) as never;
+        localCache = JSON.parse(JSON.stringify(TOML.default.parse(content)));
       } else {
         localCache = JSON.parse(content) as LSCache<T>;
       }
+
+      // console.log(localCache, content);
 
       if (localCache.version === this.options.version) {
         assign(this.cache, assign(localCache, this.cache));
