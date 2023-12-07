@@ -83,7 +83,6 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
     } else {
       content = JSON.stringify(this.cache, null, 4);
     }
-    console.log(this.cache, content, this.cachePath);
     fs.writeFileSync(this.cachePath, content, 'utf8');
     return this;
   }
@@ -99,8 +98,6 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
       } else {
         localCache = JSON.parse(content) as LSCache<T>;
       }
-
-      // console.log(localCache, content);
 
       if (localCache.version === this.options.version) {
         assign(this.cache, assign(localCache, this.cache));
