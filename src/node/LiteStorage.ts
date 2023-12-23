@@ -25,9 +25,9 @@ export interface LSOptions<T extends object = Record<string, unknown>> {
  * 轻量的本地文件持久性数据存储。主要用于简单的配置信息持久化
  */
 export class LiteStorage<T extends object = Record<string, unknown>> {
-  private static instance: LiteStorage<object>;
+  private static instance: LiteStorage;
   static getInstance<T extends object>(options?: LSOptions) {
-    if (!LiteStorage.instance) LiteStorage.instance = new LiteStorage<T>(options);
+    if (!LiteStorage.instance) LiteStorage.instance = new LiteStorage(options);
     return LiteStorage.instance as LiteStorage<T>;
   }
   private get cachePath() {
@@ -66,6 +66,9 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
       },
     };
   }
+  public get length() {
+    return Object.keys(this.get(true)).length;
+  }
   public get config() {
     return { ...this.options };
   }
@@ -93,7 +96,6 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
       let localCache: LSCache<T>;
       if (this.isToml) {
         const TOML = await import('@iarna/toml');
-        // localCache = TOML.default.parse(content, '\n', false) as never;
         localCache = JSON.parse(JSON.stringify(TOML.default.parse(content)));
       } else {
         localCache = JSON.parse(content) as LSCache<T>;
@@ -121,12 +123,13 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
     return this;
   }
   public get(raw = false) {
-    const info = this.cache.data[this.options.uuid];
+    const info = this.cache.data[this.options.uuid] || {};
     return raw ? info : { ...info };
   }
   public getAll() {
     return this.cache;
   }
+  /** 移除一项数据 */
   public del(key: keyof T) {
     const info = this.cache.data[this.options.uuid];
     if (key in info) {
@@ -135,6 +138,26 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
     }
     return this;
   }
+  public setItem<K extends keyof T>(key: K, value: Partial<T[K]>, mode: 'merge' | 'cover' = 'merge') {
+    const data = this.get(true);
+    if (mode === 'cover') data[key] = value as T[K];
+    else assign(data, { [key]: value });
+
+    return this.set(data, 'cover');
+  }
+  public getItem(key: keyof T) {
+    const value = this.get(true)[key];
+    if (value && typeof value === 'object') return assign({}, value) as T[keyof T];
+    return value;
+  }
+  /** 移除一项数据。同 del 方法 */
+  public removeItem(key: keyof T) {
+    return this.del(key);
+  }
+  /**
+   * 清理缓存
+   * @param isAll 是否清空全部缓存（即移除缓存文件重新初始化）。默认为 false，只清空当前 uuid 约束下的缓存数据
+   */
   public clear(isAll = false) {
     if (isAll) {
       if (fs.existsSync(this.cachePath)) fs.rmSync(this.cachePath, { force: true });
