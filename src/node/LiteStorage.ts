@@ -1,7 +1,7 @@
 import { homedir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { fs } from './fs-system';
-import { assign } from '../common/objects';
+import { assign, safeJsonParse, safeStringify } from '../common/objects';
 
 export interface LSCache<T> {
   version: string;
@@ -84,7 +84,7 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
       const TOML = await import('@iarna/toml');
       content = TOML.stringify(this.cache as never);
     } else {
-      content = JSON.stringify(this.cache, null, 4);
+      content = safeStringify(this.cache, 4, true);
     }
     fs.writeFileSync(this.cachePath, content, 'utf8');
     return this;
@@ -98,7 +98,7 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
         const TOML = await import('@iarna/toml');
         localCache = JSON.parse(JSON.stringify(TOML.default.parse(content)));
       } else {
-        localCache = JSON.parse(content) as LSCache<T>;
+        localCache = safeJsonParse<never>(content, true) as LSCache<T>;
       }
 
       if (localCache.version === this.options.version) {

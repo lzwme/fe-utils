@@ -1,30 +1,54 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any, unicorn/prefer-top-level-await */
 import { isObject, isSet, isMap, isArray } from './is';
 
-export function safeJsonParse<T extends Record<string, string>>(input: string): T {
+let JSON5: typeof globalThis.JSON;
+
+export async function tryLoadJSON5() {
+  if (!JSON5) {
+    JSON5 = globalThis.JSON;
+    try {
+      // @ts-ignore
+      if (globalThis.JSON5) JSON5 = globalThis.JSON5;
+      else {
+        const t = await import('json5');
+        JSON5 = (t.default || t) as never;
+      }
+    } catch {
+      // quit
+    }
+  }
+  return JSON5;
+}
+tryLoadJSON5();
+
+export function safeJsonParse<T extends Record<string, string>>(input: string, useJSON5 = false, ignoreError = false): T {
   try {
     if (input == null) return {} as T;
     if (typeof input === 'object') return input;
-    return JSON.parse(input) as T;
+    return (useJSON5 ? JSON5 : JSON).parse(input) as T;
   } catch (error: any) {
-    console.error('[safeJsonParse]parse error', error.message, error.stack);
+    if (!ignoreError) console.error('[safeJsonParse]parse error', error.message, error.stack);
   }
 
   return {} as T;
 }
 
-export function safeStringify(obj: any): string {
+export function safeStringify(obj: any, space?: string | number, useJSON5 = false): string {
   const seen = new Set<any>();
-  return JSON.stringify(obj, (_key, value) => {
-    if (isObject(value) || Array.isArray(value)) {
-      if (seen.has(value)) {
-        return '[Circular]';
-      } else {
-        seen.add(value);
+  return (useJSON5 ? JSON5 : JSON).stringify(
+    obj,
+    (_key, value) => {
+      if (isObject(value) || Array.isArray(value)) {
+        if (seen.has(value)) {
+          return '[Circular]';
+        } else {
+          seen.add(value);
+        }
       }
-    }
-    return value;
-  });
+      return value;
+    },
+    space
+  );
 }
 
 /**

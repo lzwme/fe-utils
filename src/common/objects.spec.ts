@@ -8,6 +8,7 @@ import {
   safeStringify,
   ensureArray,
   safeJsonParse,
+  tryLoadJSON5,
 } from './objects';
 
 describe('objects/assign', () => {
@@ -18,6 +19,13 @@ describe('objects/assign', () => {
     expect(safeJsonParse(safeStringify(a))).toStrictEqual(a);
     expect(safeJsonParse('')).toStrictEqual({});
     expect(safeJsonParse(null as never)).toStrictEqual({});
+    expect(safeJsonParse('abc', true, true)).toStrictEqual({});
+  });
+
+  it('safeJsonParse use JSON5', async () => {
+    const jsonStr = `{\n// test\n "a": 1, 'b': 2, c: 3}`;
+    await tryLoadJSON5();
+    expect(safeJsonParse(jsonStr, true).c).toBe(3);
   });
 
   it('safeStringify', () => {
