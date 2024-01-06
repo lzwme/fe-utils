@@ -1,8 +1,8 @@
 /*
  * @Author: lzw
  * @Date: 2022-01-12 15:10:41
- * @LastEditors: lzw
- * @LastEditTime: 2023-02-13 13:56:51
+ * @LastEditors: renxia
+ * @LastEditTime: 2024-01-06 15:12:13
  * @Description:
  * @see src\vs\base\common\async.ts
  */
@@ -377,6 +377,17 @@ export class AutoOpenBarrier extends Barrier {
 
 export const sleep = <T>(milliseconds = 0, value?: T | (() => T | Promise<T>)): Promise<T | undefined> =>
   new Promise(resolve => setTimeout(() => resolve(value instanceof Function ? value() : value), milliseconds));
+/**
+ * 随机等待一定范围的时间（单位为毫秒）
+ * @param min 等待最小时间
+ * @param max 等待最大时间。若小于 min 则取值为为 max + min
+ * @returns 返回实际等待的时间
+ */
+export function wait(min = 0, max = 0) {
+  if (max > 0 && max < min) max += min;
+  const delay = max > min ? Math.round(Math.random() * (max - min)) + min : min;
+  return sleep(delay).then(() => delay);
+}
 
 export async function retry<T>(
   task: ITask<Promise<T> | T>,
