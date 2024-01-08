@@ -1,7 +1,7 @@
 import { homedir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { fs } from './fs-system';
-import { assign, safeJsonParse, safeStringify } from '../common/objects';
+import { assign, safeJsonParse, safeStringify, tryLoadJSON5 } from '../common/objects';
 
 export interface LSCache<T> {
   version: string;
@@ -98,6 +98,7 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
         const TOML = await import('@iarna/toml');
         localCache = JSON.parse(JSON.stringify(TOML.default.parse(content)));
       } else {
+        await tryLoadJSON5();
         localCache = safeJsonParse<never>(content, true) as LSCache<T>;
       }
 

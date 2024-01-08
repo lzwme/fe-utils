@@ -10,8 +10,11 @@ export async function tryLoadJSON5() {
       // @ts-ignore
       if (globalThis.JSON5) JSON5 = globalThis.JSON5;
       else {
-        const t = await import('json5');
-        JSON5 = (t.default || t) as never;
+        if (typeof require === 'function') JSON5 = require('json5');
+        else {
+          const t = await import('json5');
+          JSON5 = (t.default || t) as never;
+        }
       }
     } catch {
       // quit
