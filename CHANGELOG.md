@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.10](https://github.com/lzwme/fe-utils/compare/v1.5.9...v1.5.10) (2024-01-08)
+
+
+### Bug Fixes
+
+* **objects:** 优化 load json5 在 cjs 模式下的逻辑 ([50aba5f](https://github.com/lzwme/fe-utils/commit/50aba5f063d99fb63c1ec84814ece459e22290ec))
+
 ### [1.5.9](https://github.com/lzwme/fe-utils/compare/v1.5.8...v1.5.9) (2024-01-08)
 
 ### [1.5.8](https://github.com/lzwme/fe-utils/compare/v1.5.7...v1.5.8) (2023-12-07)
