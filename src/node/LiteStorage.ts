@@ -33,9 +33,9 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
   private get cachePath() {
     return this.options.filepath;
   }
-  private get isToml() {
-    return /\.toml$/.test(this.options.filepath);
-  }
+  private isToml = false;
+  private isJson5 = false;
+
   // @ts-ignore
   private cache: LSCache<T>;
   private options: Required<LSOptions>;
@@ -44,7 +44,7 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
     this.options = {
       version: '0.0.0',
       uuid: 'defaults',
-      filepath: resolve(this.baseDir, 'ls.json'),
+      filepath: 'ls.json',
       initial: {},
       ...options,
     };
@@ -53,11 +53,13 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
     this.reload();
   }
   private init() {
-    const { filepath, uuid, version } = this.options;
+    const { filepath = 'ls.json', uuid, version } = this.options;
     if (!filepath.endsWith('.json') && !filepath.endsWith('.toml')) {
       this.options.filepath = resolve(this.baseDir, filepath, 'ls.json');
     }
     this.options.filepath = resolve(this.baseDir, filepath);
+    this.isJson5 = /\.json5$/i.test(this.options.filepath);
+    this.isToml = /\.toml$/i.test(this.options.filepath);
 
     this.cache = {
       version,
@@ -84,7 +86,7 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
       const TOML = await import('@iarna/toml');
       content = TOML.stringify(this.cache as never);
     } else {
-      content = safeStringify(this.cache, 4, true);
+      content = safeStringify(this.cache, 4, this.isJson5);
     }
     fs.writeFileSync(this.cachePath, content, 'utf8');
     return this;
@@ -98,13 +100,13 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
         const TOML = await import('@iarna/toml');
         localCache = JSON.parse(JSON.stringify(TOML.default.parse(content)));
       } else {
-        await tryLoadJSON5();
-        localCache = safeJsonParse<never>(content, true) as LSCache<T>;
+        if (this.isJson5) await tryLoadJSON5();
+        localCache = safeJsonParse<never>(content, this.isJson5) as LSCache<T>;
       }
 
       if (localCache.version === this.options.version) {
         assign(this.cache, assign(localCache, this.cache));
-      } else fs.rmSync(this.cachePath, { force: true });
+      } else fs.renameSync(this.cachePath, this.cachePath + `-${localCache.version}.bak`);
     }
     return this;
   }

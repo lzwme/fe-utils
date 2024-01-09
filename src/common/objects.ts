@@ -3,8 +3,8 @@ import { isObject, isSet, isMap, isArray } from './is';
 
 let JSON5: typeof globalThis.JSON;
 
-export async function tryLoadJSON5() {
-  if (!JSON5) {
+export async function tryLoadJSON5(useCache = false) {
+  if (!JSON5 || !useCache) {
     JSON5 = globalThis.JSON;
     try {
       // @ts-ignore
@@ -16,13 +16,13 @@ export async function tryLoadJSON5() {
           JSON5 = (t.default || t) as never;
         }
       }
-    } catch {
-      // quit
+    } catch (error) {
+      if (!useCache) console.error(error);
     }
   }
   return JSON5;
 }
-tryLoadJSON5();
+tryLoadJSON5(true);
 
 export function safeJsonParse<T extends Record<string, string>>(input: string, useJSON5 = false, ignoreError = false): T {
   try {
