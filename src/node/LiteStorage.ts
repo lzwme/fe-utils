@@ -1,7 +1,8 @@
 import { homedir } from 'node:os';
 import { dirname, resolve } from 'node:path';
-import { fs } from './fs-system';
-import { assign, safeJsonParse, safeStringify, tryLoadJSON5 } from '../common/objects';
+import { fs } from './fs-system.js';
+import { assign, safeJsonParse, safeStringify, tryLoadJSON5 } from '../common/objects.js';
+import { Barrier } from '../common/async.js';
 
 export interface LSCache<T> {
   version: string;
@@ -23,6 +24,16 @@ export interface LSOptions<T extends object = Record<string, unknown>> {
 
 /**
  * 轻量的本地文件持久性数据存储。主要用于简单的配置信息持久化
+ * @example
+ * ```ts
+ * const stor = await new LiteStorage({ uuid: 'test1' }).ready();
+ * const config = stor.get();
+ * console.log(config);
+ * stor.getItem('key1');
+ * stor.setItem('key2', { a: 1 });
+ * stor.removeItem('key2');
+ * stor.clear();
+ * ```
  */
 export class LiteStorage<T extends object = Record<string, unknown>> {
   private static instance: LiteStorage;
@@ -33,6 +44,7 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
   private get cachePath() {
     return this.options.filepath;
   }
+  private barrier = new Barrier();
   private isToml = false;
   private isJson5 = false;
 
@@ -50,7 +62,7 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
     };
 
     this.init();
-    this.reload();
+    this.reload().then(() => this.barrier.open());
   }
   private init() {
     const { filepath = 'ls.json', uuid, version } = this.options;
@@ -73,6 +85,10 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
   }
   public get config() {
     return { ...this.options };
+  }
+  public async ready() {
+    await this.barrier.wait();
+    return this;
   }
   /** 主动保存 */
   public async save(value?: T, mode: 'merge' | 'cover' = 'merge') {
