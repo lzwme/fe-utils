@@ -1,4 +1,5 @@
 export * from './async';
+export * from './cookie';
 export * from './date';
 export * from './helper';
 export * from './is';

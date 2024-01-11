@@ -1,3 +1,5 @@
+import { fs } from './fs-system';
+
 /**
  * 清除指定模块的 require 缓存（内存清理或实现热更新）
  * @example
@@ -29,4 +31,25 @@ export function clearRequireCache(filePath: string) {
   delete require.cache[filePath];
   for (const id of children) clearRequireCache(id);
   return true;
+}
+
+const hotLoadCache = new Map<string, number>();
+// cache.delete(cache.keys().next().value);
+
+/** require 热加载指定的文件 */
+export function requireHotLoad(filePath: string, force = false) {
+  let needClearCache = force;
+  let lastModified = 0;
+
+  if (!needClearCache) {
+    lastModified = fs.statSync(filePath).mtimeMs;
+    needClearCache = hotLoadCache.get(filePath) !== lastModified;
+  }
+
+  if (needClearCache) {
+    clearRequireCache(filePath);
+    hotLoadCache.set(filePath, lastModified || fs.statSync(filePath).mtimeMs);
+  }
+
+  return require(filePath);
 }

@@ -1,5 +1,12 @@
+/*
+ * @Author: renxia
+ * @Date: 2023-03-23 23:05:16
+ * @LastEditors: renxia
+ * @LastEditTime: 2024-01-11 10:58:35
+ * @Description:
+ */
 /**
- *
+ * url 格式化，返回一个 URL 对象
  * @param url
  * @param params 参数
  * @param isRepalce 是否替换已存在于 url 中的参数
