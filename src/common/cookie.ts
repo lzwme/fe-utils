@@ -2,13 +2,15 @@
  * cookie 相关处理工具方法
  */
 
-export function cookieParse(cookie = '') {
+export function cookieParse(cookie = '', filterNilValue = false) {
   const obj: Record<string, string> = {};
   if (!cookie && typeof document !== 'undefined') cookie = document.cookie;
 
   if (typeof cookie === 'string' && cookie.length > 0) {
     for (const d of cookie.split(';')) {
       const [key, value] = d.split('=').map(d => d.trim());
+      if (filterNilValue && !value) continue;
+
       try {
         if (value != null) obj[key] = decodeURIComponent(value);
       } catch {
@@ -25,12 +27,12 @@ export function cookieParse(cookie = '') {
 
 export function cookieStringfiy(
   cookieObj: Record<string, string | number | boolean>,
-  options: { filterKeys?: string[]; onlyKeys?: string[]; removeNil?: boolean } = {}
+  options: { removeKeys?: string[]; onlyKeys?: string[]; removeNil?: boolean } = {}
 ) {
   return Object.keys(cookieObj)
     .filter(key => {
-      if (options.filterKeys?.length && options.filterKeys.includes(key)) return false;
-      if (options.onlyKeys?.length && !options.onlyKeys.includes(key)) return false;
+      if (options.removeKeys?.includes(key)) return false;
+      if (options.onlyKeys?.includes(key)) return false;
       if (options.removeNil && (cookieObj[key] == null || cookieObj[key] === '')) return false;
       return true;
     })

@@ -3,63 +3,17 @@ import zlib from 'node:zlib';
 import http, { type IncomingMessage, type IncomingHttpHeaders, type OutgoingHttpHeaders } from 'node:http';
 import https, { type RequestOptions } from 'node:https';
 import { urlFormat } from '../../common/url';
+import { ReqBase } from '../../common/ReqFetch';
 import type { AnyObject } from '../../types';
 
-function toLowcaseKeyObject(info: Record<string, unknown> = {}) {
-  for (const key of Object.keys(info)) {
-    const lowCaseKey = key.toLocaleLowerCase();
-    if (key !== lowCaseKey) {
-      info[lowCaseKey] = info[key];
-      delete info[key];
-    }
-  }
-  return info;
-}
-
-export class Request {
+export class Request extends ReqBase {
   static instance: Request;
   static getInstance() {
     if (!this.instance) this.instance = new Request();
     return this.instance;
   }
-  private cookies: string[] = [];
-  private headers: OutgoingHttpHeaders = {
-    pragma: 'no-cache',
-    connection: 'keep-alive',
-    'cache-control': 'no-cache',
-    'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
-    'accept-language': 'zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4,es;q=0.2',
-    accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
-  };
-
   constructor(cookie?: string, headers?: OutgoingHttpHeaders) {
-    if (cookie) this.setCookie(cookie);
-    if (headers) this.setHeaders(headers);
-  }
-  private getHeaders(urlObject: URL, headers?: OutgoingHttpHeaders) {
-    headers = {
-      ...this.headers,
-      host: urlObject.host,
-      origin: urlObject.origin || `${urlObject.protocol}://${urlObject.hostname}`,
-      ...toLowcaseKeyObject(headers),
-    };
-
-    if (!headers.cookie && this.cookies.length > 0) headers.cookie = this.getCookie() as string;
-
-    return headers;
-  }
-  setHeaders(headers: OutgoingHttpHeaders) {
-    if (headers) this.headers = Object.assign(this.headers, toLowcaseKeyObject(headers));
-  }
-  setCookie(cookie: string, reset = false) {
-    if (reset) this.cookies = [];
-    const cookies = cookie.split(';').map(d => d.trim());
-    for (const c of cookies) !this.cookies.includes(c) && this.cookies.push(c);
-    return this;
-  }
-  getCookie(isString = true) {
-    return isString ? this.cookies.join('; ') : this.cookies;
+    super(cookie, headers);
   }
   req(url: string | URL, parameters?: AnyObject, options: RequestOptions = {}, autoRedirect = true) {
     const urlObject = typeof url === 'string' ? new URL(url) : url;

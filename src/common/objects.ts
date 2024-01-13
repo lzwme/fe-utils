@@ -189,3 +189,32 @@ export function ensureArray<T>(input: readonly T[] | T | undefined | null): read
   if (input == null) return [];
   return [input as T];
 }
+
+/** 将 object 所有 key 转换为小写 */
+export function toLowcaseKeyObject<T extends Record<string, unknown>>(info: T = {} as T) {
+  for (const key of Object.keys(info)) {
+    const lowCaseKey = key.toLocaleLowerCase();
+    if (key !== lowCaseKey) {
+      // @ts-expect-error
+      info[lowCaseKey] = info[key];
+      delete info[key];
+    }
+  }
+  return info;
+}
+
+/** 过滤指定的key或空值，返回新的对象 */
+export function getFilteredObject(
+  obj: Record<string, string | number | boolean>,
+  options: { removeKeys?: string[]; onlyKeys?: string[]; removeNil?: boolean } = {}
+) {
+  const keys = Object.keys(obj).filter(key => {
+    if (options.removeKeys?.includes(key)) return false;
+    if (options.onlyKeys?.includes(key)) return false;
+    if (options.removeNil && (obj[key] == null || obj[key] === '')) return false;
+    return true;
+  });
+  const newObj = {} as typeof obj;
+  for (const k of keys) newObj[k] = obj[k];
+  return newObj;
+}

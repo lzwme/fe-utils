@@ -5,5 +5,6 @@ export * from './helper';
 export * from './is';
 export * from './Logger';
 export * from './objects';
+export * from './ReqFetch';
 export * from './semver';
 export * from './uuid';
