@@ -18,6 +18,7 @@ export enum LogLevel {
   info,
   log,
   debug,
+  trace,
 }
 
 export interface LoggerOptions {
@@ -53,6 +54,7 @@ const LogLevelHeadTip = {
   info: ['[INFO]', 'blueBright'],
   log: ['[LOG]', 'cyanBright'],
   debug: ['[DEBUG]', 'gray'],
+  trace: ['TRACE', 'magenta'],
 } as const;
 
 export class Logger {
@@ -66,6 +68,7 @@ export class Logger {
   public info: GeneralFn = this._log.bind(this, 'info');
   public log: GeneralFn = this._log.bind(this, 'log');
   public debug: GeneralFn = this._log.bind(this, 'debug');
+  public trace: GeneralFn = this._log.bind(this, 'trace');
 
   /** 日志路径 */
   protected logPath = '';

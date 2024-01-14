@@ -50,7 +50,6 @@ export class NLogger extends Logger {
       this.log((error as Error).message);
     }
   }
-
   /** 历史日志清理 */
   cleanup(validityDays?: number, logDir?: string): number {
     let count = 0;
@@ -76,11 +75,10 @@ export class NLogger extends Logger {
     };
     cleanDir(logDir);
 
-    if (count > 0) this.log(`log cleanup:`, count);
+    if (count > 0) this.info(`log cleanup:`, count);
 
     return count;
   }
-
   /**
    * 写入到日志文件
    * @todo 增加分包支持
@@ -96,13 +94,11 @@ export class NLogger extends Logger {
     // eslint-disable-next-line no-control-regex
     logFsStream.write(msg.replace(/\u001B\[\d+m/g, ''), 'utf8');
   }
-
   public logInline(msg: string, start = 0) {
     cursorTo(process.stdout as never, start);
     clearScreenDown(process.stdout as never);
     process.stdout.write(msg, 'utf8');
   }
-
   public static getLogger(tag?: string, options?: LoggerOptions): NLogger {
     if (!tag) tag = '[general]';
     if (!NLogger.map[tag]) NLogger.map[tag] = new NLogger(tag, options);
