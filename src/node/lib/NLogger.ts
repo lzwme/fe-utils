@@ -9,6 +9,7 @@
 import { dirname, resolve } from 'node:path';
 import type { WriteStream } from 'node:fs';
 import { clearScreenDown, cursorTo } from 'node:readline';
+import { color } from 'console-log-colors';
 import { fs } from '../fs-system';
 import { Logger, type LoggerOptions } from '../../common/Logger';
 
@@ -19,6 +20,7 @@ export class NLogger extends Logger {
   public static map: { [tag: string]: NLogger } = {};
 
   constructor(tag: string, options: LoggerOptions = {}) {
+    if (!options.color) options.color = color;
     super(tag, options);
   }
   public override setLogDir(logDir: string) {
