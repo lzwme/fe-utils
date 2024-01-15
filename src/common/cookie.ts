@@ -1,6 +1,12 @@
 /*
- * cookie 相关处理工具方法
+ * @Author: renxia
+ * @Date: 2024-01-15 11:26:52
+ * @LastEditors: renxia
+ * @LastEditTime: 2024-01-15 11:53:38
+ * @Description: cookie 相关处理工具方法
  */
+
+import { objectFilterByKeys } from './objects';
 
 export function cookieParse(cookie = '', filterNilValue = false) {
   const obj: Record<string, string> = {};
@@ -26,16 +32,11 @@ export function cookieParse(cookie = '', filterNilValue = false) {
 }
 
 export function cookieStringfiy(
-  cookieObj: Record<string, string | number | boolean>,
-  options: { removeKeys?: string[]; onlyKeys?: string[]; removeNil?: boolean } = {}
+  cookieObj: Record<string, string | number | boolean | undefined>,
+  options: { removeKeys?: (string | RegExp)[]; onlyKeys?: (string | RegExp)[]; removeNil?: boolean } = {}
 ) {
-  return Object.keys(cookieObj)
-    .filter(key => {
-      if (options.removeKeys?.includes(key)) return false;
-      if (options.onlyKeys?.includes(key)) return false;
-      if (options.removeNil && (cookieObj[key] == null || cookieObj[key] === '')) return false;
-      return true;
-    })
-    .map(key => `${key}=${cookieObj[key] ? encodeURIComponent(cookieObj[key]) : ''}`)
+  cookieObj = objectFilterByKeys(cookieObj, options);
+  return Object.values(cookieObj)
+    .map((key, value) => `${key}=${value ? encodeURIComponent(value) : ''}`)
     .join('; ');
 }

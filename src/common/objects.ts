@@ -204,17 +204,17 @@ export function toLowcaseKeyObject<T extends Record<string, unknown>>(info: T = 
 }
 
 /** 过滤指定的key或空值，返回新的对象 */
-export function getFilteredObject(
-  obj: Record<string, string | number | boolean>,
-  options: { removeKeys?: string[]; onlyKeys?: string[]; removeNil?: boolean } = {}
+export function objectFilterByKeys<T extends Record<string, unknown>>(
+  obj: T,
+  options: { removeKeys?: (string | RegExp)[]; onlyKeys?: (string | RegExp)[]; removeNil?: boolean } = {}
 ) {
   const keys = Object.keys(obj).filter(key => {
-    if (options.removeKeys?.includes(key)) return false;
-    if (options.onlyKeys?.includes(key)) return false;
+    if (options.removeKeys?.some(d => (d instanceof RegExp ? d.test(key) : d === key))) return false;
+    if (!options.onlyKeys?.some(d => (d instanceof RegExp ? d.test(key) : d === key))) return false;
     if (options.removeNil && (obj[key] == null || obj[key] === '')) return false;
     return true;
   });
-  const newObj = {} as typeof obj;
+  const newObj: Record<string, any> = {};
   for (const k of keys) newObj[k] = obj[k];
-  return newObj;
+  return newObj as Partial<typeof obj>;
 }
