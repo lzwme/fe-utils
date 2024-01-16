@@ -9,6 +9,8 @@ import {
   ensureArray,
   safeJsonParse,
   tryLoadJSON5,
+  toLowcaseKeyObject,
+  objectFilterByKeys,
 } from './objects';
 
 describe('objects/assign', () => {
@@ -164,5 +166,97 @@ describe('objects/assign', () => {
     expect(ensureArray(a)[0]).toBe(a);
     expect(ensureArray(null).length).toBe(0);
     expect(ensureArray([1])[0]).toBe(1);
+  });
+});
+
+describe('objects/toLowcaseKeyObject', () => {
+  test('should return an empty object when no object is provided', () => {
+    expect(toLowcaseKeyObject()).toBeDefined();
+  });
+
+  test('should return a new object with lowercase keys', () => {
+    const cookieObj = {
+      Key1: 'value1',
+      KeY2: 'value2',
+      Key3: 'value3',
+    };
+    const expectedObj = {
+      key1: 'value1',
+      key2: 'value2',
+      key3: 'value3',
+    };
+
+    expect(toLowcaseKeyObject(cookieObj)).toEqual(expectedObj);
+  });
+
+  test('should return a new object with lowercase keys and ignore non-string keys', () => {
+    const cookieObj = {
+      Key1: 'value1',
+      Key2: 'value2',
+      Key3: 'value3',
+      nUm: 42,
+    };
+    const expectedObj = {
+      key1: 'value1',
+      key2: 'value2',
+      key3: 'value3',
+      num: 42,
+    };
+
+    expect(toLowcaseKeyObject(cookieObj)).toEqual(expectedObj);
+  });
+});
+
+describe('objects/objectFilterByKeys', () => {
+  test('should return an empty object when no object is provided', () => {
+    expect(objectFilterByKeys(void 0 as never)).toBeDefined();
+  });
+
+  test('should return an empty object when object is empty', () => {
+    expect(objectFilterByKeys({})).toBeDefined();
+  });
+
+  test('should return a new object with filtered keys', () => {
+    const cookieObj = {
+      key1: 'value1',
+      key2: 'value2',
+      key3: 'value3',
+    };
+    const removeKeys = ['key2'];
+    const expectedObj = {
+      key1: 'value1',
+      key3: 'value3',
+    };
+
+    expect(objectFilterByKeys(cookieObj, { removeKeys })).toEqual(expectedObj);
+  });
+
+  test('should return a new object with filtered keys and onlyKeys', () => {
+    const cookieObj = {
+      key1: 'value1',
+      key2: 'value2',
+      key3: 'value3',
+    };
+    const onlyKeys = ['key1'];
+    const expectedObj = {
+      key1: 'value1',
+    };
+
+    expect(objectFilterByKeys(cookieObj, { onlyKeys })).toEqual(expectedObj);
+  });
+
+  test('should return a new object with filtered keys and removeNil', () => {
+    const cookieObj = {
+      key1: 'value1',
+      key2: null,
+      key3: 'value3',
+    };
+    const removeNil = true;
+    const expectedObj = {
+      key1: 'value1',
+      key3: 'value3',
+    };
+
+    expect(objectFilterByKeys(cookieObj, { removeNil })).toEqual(expectedObj);
   });
 });

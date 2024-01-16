@@ -2,7 +2,7 @@
  * @Author: renxia
  * @Date: 2024-01-15 11:26:52
  * @LastEditors: renxia
- * @LastEditTime: 2024-01-15 11:53:38
+ * @LastEditTime: 2024-01-16 16:38:39
  * @Description: cookie 相关处理工具方法
  */
 
@@ -35,8 +35,37 @@ export function cookieStringfiy(
   cookieObj: Record<string, string | number | boolean | undefined>,
   options: { removeKeys?: (string | RegExp)[]; onlyKeys?: (string | RegExp)[]; removeNil?: boolean } = {}
 ) {
-  cookieObj = objectFilterByKeys(cookieObj, options);
-  return Object.values(cookieObj)
-    .map((key, value) => `${key}=${value ? encodeURIComponent(value) : ''}`)
+  const obj = objectFilterByKeys(cookieObj, options);
+  return Object.entries(obj)
+    .map(([key, value]) => `${key}=${value ? encodeURIComponent(value) : ''}`)
     .join('; ');
+}
+
+/**
+ * 将 cookie 设置到浏览器
+ * @param name - cookie 名称
+ * @param value - cookie 值
+ * @param options - cookie 选项
+ */
+export function setCookie(
+  name: string,
+  value: string,
+  options: {
+    expires?: number | Date;
+    path?: string;
+    domain?: string;
+    secure?: boolean;
+    sameSite?: 'lax' | 'strict' | 'none';
+  } = {}
+): boolean {
+  if (!globalThis.document) return false;
+  const { expires = 365, path = '/', domain = '', secure = false, sameSite = 'strict' } = options;
+  const expiresValue = expires instanceof Date ? expires.toUTCString() : `${expires}`;
+  const cookieStr = `${name}=${value}; path=${path}; domain=${domain}; expires=${expiresValue}; ${
+    secure ? 'secure; ' : ''
+  }httponly; samesite=${sameSite}`;
+
+  // eslint-disable-next-line unicorn/no-document-cookie
+  document.cookie = cookieStr;
+  return document.cookie.includes(name);
 }

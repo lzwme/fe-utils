@@ -208,13 +208,16 @@ export function objectFilterByKeys<T extends Record<string, unknown>>(
   obj: T,
   options: { removeKeys?: (string | RegExp)[]; onlyKeys?: (string | RegExp)[]; removeNil?: boolean } = {}
 ) {
+  const newObj: Record<string, any> = {};
+  if (!obj || typeof obj !== 'object') return newObj;
+
   const keys = Object.keys(obj).filter(key => {
-    if (options.removeKeys?.some(d => (d instanceof RegExp ? d.test(key) : d === key))) return false;
-    if (!options.onlyKeys?.some(d => (d instanceof RegExp ? d.test(key) : d === key))) return false;
+    if (options.removeKeys?.length && options.removeKeys.some(d => (d instanceof RegExp ? d.test(key) : d === key))) return false;
+    if (options.onlyKeys?.length && !options.onlyKeys.some(d => (d instanceof RegExp ? d.test(key) : d === key))) return false;
     if (options.removeNil && (obj[key] == null || obj[key] === '')) return false;
     return true;
   });
-  const newObj: Record<string, any> = {};
+
   for (const k of keys) newObj[k] = obj[k];
   return newObj as Partial<typeof obj>;
 }
