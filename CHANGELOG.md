@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/lzwme/fe-utils/compare/v1.5.10...v1.6.0) (2024-01-16)
+
+
+### Features
+
+* 新增基于 fetch 的通用 API 请求简易封装类 ([82a1e83](https://github.com/lzwme/fe-utils/commit/82a1e834de8f6caf547536a4bd854f24c46e65e4))
+* **cookie:** 新增 cookie 解析相关方法 ([9902d02](https://github.com/lzwme/fe-utils/commit/9902d02cc0d9d874c0b087b8fa65adbd13a9e1c0))
+* **Logger:** 增加 trace 日志级别，用于调试跟踪更细粒度的日志 ([eddf027](https://github.com/lzwme/fe-utils/commit/eddf02734d11db77d06003a15cd5912cb750c544))
+
 ### [1.5.10](https://github.com/lzwme/fe-utils/compare/v1.5.9...v1.5.10) (2024-01-08)
 
 
