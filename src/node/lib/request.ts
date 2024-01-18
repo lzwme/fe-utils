@@ -3,7 +3,7 @@ import zlib from 'node:zlib';
 import http, { type IncomingMessage, type IncomingHttpHeaders, type OutgoingHttpHeaders } from 'node:http';
 import https, { type RequestOptions } from 'node:https';
 import { urlFormat } from '../../common/url';
-import { ReqBase } from '../../common/ReqFetch';
+import { ReqBase } from '../../common/lib/ReqFetch';
 import type { AnyObject } from '../../types';
 
 export class Request extends ReqBase {

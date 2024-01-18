@@ -1,8 +1,15 @@
+/*
+ * @Author: renxia
+ * @Date: 2024-01-15 11:26:52
+ * @LastEditors: renxia
+ * @LastEditTime: 2024-01-18 11:15:16
+ * @Description:
+ */
 import type { OutgoingHttpHeaders } from 'node:http';
-import { urlFormat } from './url';
-import { toLowcaseKeyObject } from './objects';
-import type { AnyObject } from '../types';
-import { cookieParse, cookieStringfiy } from './cookie';
+import { urlFormat } from '../url';
+import { toLowcaseKeyObject } from '../objects';
+import type { AnyObject } from '../../types';
+import { cookieParse, cookieStringfiy } from '../cookie';
 
 interface ReqOptions extends Omit<RequestInit, 'headers'> {
   headers?: OutgoingHttpHeaders;
@@ -93,3 +100,5 @@ export class ReqFetch extends ReqBase {
     return this.request<T>('POST', url, parameters, { ...options, headers: { ...options?.headers, ...headers } });
   }
 }
+
+// new ReqFetch().get('https://www.baidu.com').then(d => console.log(d.response.status, d.data.length));

@@ -11,7 +11,7 @@ import type { WriteStream } from 'node:fs';
 import { clearScreenDown, cursorTo } from 'node:readline';
 import { color } from 'console-log-colors';
 import { fs } from '../fs-system';
-import { Logger, type LoggerOptions } from '../../common/Logger';
+import { Logger, type LoggerOptions } from '../../common/lib/Logger';
 
 const fsStreamCache: { [logPath: string]: WriteStream } = {};
 

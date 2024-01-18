@@ -1,14 +1,14 @@
 /*
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
- * @LastEditors: lzw
- * @LastEditTime: 2022-11-15 16:16:45
+ * @LastEditors: renxia
+ * @LastEditTime: 2024-01-18 11:05:29
  * @Description:
  */
 /* eslint no-console: 0 */
 
-import { type GeneralFn } from '../types';
-import { safeStringify } from './objects';
+import { type GeneralFn } from '../../types';
+import { safeStringify } from '../objects';
 
 /** 日志级别 */
 export enum LogLevel {

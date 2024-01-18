@@ -2,15 +2,12 @@
 /*
  * @Author: lzw
  * @Date: 2021-12-24 13:01:39
- * @LastEditors: lzw
- * @LastEditTime: 2022-07-26 21:01:43
+ * @LastEditors: renxia
+ * @LastEditTime: 2024-01-18 10:59:55
  * @Description: 企业微信机器人通知
  */
 
 import { Request } from './request';
-
-const api = new Request();
-const webhook = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=';
 
 export interface WxWorkReqParams {
   msgtype: string;
@@ -130,6 +127,7 @@ export function wxWorkNotify(params: string | WxWorkReqParams, webhookUrl: strin
     return Promise.resolve({ errcode: -2, errmsg: '[wxWorkNotify][webhook]invalid format' });
   }
 
+  const webhook = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=';
   if (!webhookUrl.startsWith('http')) webhookUrl = webhook + webhookUrl;
 
   if (typeof params === 'string') {
@@ -141,7 +139,7 @@ export function wxWorkNotify(params: string | WxWorkReqParams, webhookUrl: strin
     };
   }
 
-  return api.post<WxWorkResult>(webhookUrl, params, { 'content-type': 'application/json' }).then(d => {
+  return new Request().post<WxWorkResult>(webhookUrl, params, { 'content-type': 'application/json' }).then(d => {
     if (debug) console.log(`[wxWorkNotify][${d.data.errcode}]`, JSON.stringify(d.data));
     return d.data;
   });
