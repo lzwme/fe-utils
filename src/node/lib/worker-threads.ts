@@ -10,7 +10,7 @@
  */
 
 import { Worker, isMainThread, workerData } from 'node:worker_threads'; // parentPort
-import { getLogger } from './get-logger';
+import { getLogger } from '../get-logger';
 interface CreateThreadOptions {
   debug?: boolean;
   type: string;
@@ -61,8 +61,8 @@ if (!isMainThread) {
   // };
   // const resetConfig = { checkOnInit: false, exitOnError: false, mode: 'current' };
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  require(config.workerFile)(config);
+  // eslint-disable-next-line unicorn/prefer-top-level-await
+  if (config.workerFile) import(config.workerFile).then(f => (f.default || f)(config));
 
   // heartbeat and more...
 }

@@ -2,6 +2,7 @@ export * from './lib';
 export * from './clearRequireCache';
 export * from './clipboard';
 export * from './common';
+export * from './createChildProcess';
 export * from './createFilePathFilter';
 export * from './crypto';
 export * from './exec';

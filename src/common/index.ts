@@ -6,4 +6,5 @@ export * from './helper';
 export * from './is';
 export * from './objects';
 export * from './semver';
+export * from './url';
 export * from './uuid';
