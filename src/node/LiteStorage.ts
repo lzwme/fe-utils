@@ -65,13 +65,13 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
     this.reload().then(() => this.barrier.open());
   }
   private init() {
-    const { filepath = 'ls.json', uuid, version } = this.options;
-    if (!filepath.endsWith('.json') && !filepath.endsWith('.toml')) {
-      this.options.filepath = resolve(this.baseDir, filepath, 'ls.json');
+    let { filepath = 'ls.json', uuid, version } = this.options;
+    if (!/\.(json5?|toml)$/i.test(filepath)) {
+      filepath = resolve(this.baseDir, filepath, 'ls.json');
     }
+    this.isJson5 = /\.json5$/i.test(filepath);
+    this.isToml = /\.toml$/i.test(filepath);
     this.options.filepath = resolve(this.baseDir, filepath);
-    this.isJson5 = /\.json5$/i.test(this.options.filepath);
-    this.isToml = /\.toml$/i.test(this.options.filepath);
 
     this.cache = {
       version,

@@ -30,6 +30,7 @@ export function safeJsonParse<T extends Record<string, string>>(input: string, u
     if (typeof input === 'object') return input;
     return (useJSON5 ? JSON5 : JSON).parse(input) as T;
   } catch (error: any) {
+    if (useJSON5 && !JSON5) console.error('[safeJsonParse]JSON5 尚未加载, 请先调用方法 `tryLoadJSON5`');
     if (!ignoreError) console.error('[safeJsonParse]parse error', error.message, error.stack);
   }
 
