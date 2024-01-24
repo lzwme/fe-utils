@@ -1,4 +1,5 @@
 import { fs } from './fs-system';
+import { LRUCache } from '../common/lib/LRUCache';
 
 /**
  * 清除指定模块的 require 缓存（内存清理或实现热更新）
@@ -33,7 +34,7 @@ export function clearRequireCache(filePath: string) {
   return true;
 }
 
-const hotLoadCache = new Map<string, number>();
+const hotLoadCache = new LRUCache({ max: 1000 });
 // cache.delete(cache.keys().next().value);
 
 /** require 热加载指定的文件 */
@@ -43,7 +44,7 @@ export function requireHotLoad(filePath: string, force = false) {
 
   if (!needClearCache) {
     lastModified = fs.statSync(filePath).mtimeMs;
-    needClearCache = hotLoadCache.get(filePath) !== lastModified;
+    needClearCache = hotLoadCache.get<number>(filePath) !== lastModified;
   }
 
   if (needClearCache) {
