@@ -2,17 +2,23 @@
  * @Author: renxia
  * @Date: 2024-01-15 11:26:52
  * @LastEditors: renxia
- * @LastEditTime: 2024-01-18 11:15:16
+ * @LastEditTime: 2024-02-01 10:10:05
  * @Description:
  */
 import type { OutgoingHttpHeaders } from 'node:http';
 import { urlFormat } from '../url';
-import { toLowcaseKeyObject } from '../objects';
+import { assign, toLowcaseKeyObject } from '../objects';
 import type { AnyObject } from '../../types';
 import { cookieParse, cookieStringfiy } from '../cookie';
 
 interface ReqOptions extends Omit<RequestInit, 'headers'> {
   headers?: OutgoingHttpHeaders;
+}
+
+export interface ReqConfig {
+  cookie?: string;
+  headers?: OutgoingHttpHeaders;
+  prefixUrl?: string;
 }
 
 export class ReqBase {
@@ -26,8 +32,15 @@ export class ReqBase {
     accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
   };
-  constructor(cookie?: string, headers?: OutgoingHttpHeaders) {
-    if (cookie) this.setCookie(cookie);
+  protected config: ReqConfig = {};
+  constructor(config?: string | ReqConfig, headers?: OutgoingHttpHeaders) {
+    if (config) {
+      if (typeof config === 'string') config = { cookie: config };
+      config = assign(this.config, config);
+    }
+
+    if (this.config.cookie) this.setCookie(this.config.cookie);
+    if (this.config.headers) this.setHeaders(this.config.headers);
     if (headers) this.setHeaders(headers);
   }
   getHeaders(urlObject?: URL, headers?: OutgoingHttpHeaders) {
@@ -40,8 +53,7 @@ export class ReqBase {
       if (!headers.host) headers.host = urlObject.host;
       if (!headers.origin) headers.origin = urlObject.origin || `${urlObject.protocol}://${urlObject.hostname}`;
     }
-
-    if (!headers.cookie && Object.keys(this.cookies).length > 0) headers.cookie = this.getCookie() as string;
+    if (!headers.cookie && Object.keys(this.cookies).length > 0) headers.cookie = this.getCookie();
 
     return headers;
   }
@@ -54,6 +66,8 @@ export class ReqBase {
     Object.assign(this.cookies, cookieParse(cookie));
     return this;
   }
+  getCookie(isString?: true): string;
+  getCookie(isString: false): Record<string, string>;
   getCookie(isString = true) {
     return isString ? cookieStringfiy(this.cookies) : this.cookies;
   }
@@ -69,17 +83,19 @@ export class ReqFetch extends ReqBase {
     super(cookie, headers);
   }
   req(url: string | URL, parameters?: AnyObject, options: ReqOptions = {}) {
-    const urlObject = typeof url === 'string' ? new URL(url) : url;
-    options = { ...options, headers: this.getHeaders(urlObject, options.headers) };
+    if (typeof url === 'string') {
+      if (!url.startsWith('http') && this.config.prefixUrl) url = this.config.prefixUrl + url;
+      url = new URL(url);
+    }
+    options = { ...options, headers: this.getHeaders(url, options.headers) };
 
     if (parameters) {
       options.body = String(options.headers!['content-type']).includes('application/json')
         ? JSON.stringify(parameters)
         : new URLSearchParams(parameters as Record<string, string>).toString();
-      options.headers!['content-length'] = Buffer.byteLength(options.body).toString();
     }
 
-    return fetch(urlObject, options as never);
+    return fetch(url, options as never);
   }
   async request<T = AnyObject>(method: string, url: string | URL, parameters?: AnyObject, options?: ReqOptions) {
     const response = await this.req(url, parameters, { ...options, method });

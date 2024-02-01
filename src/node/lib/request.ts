@@ -12,19 +12,21 @@ export class Request extends ReqBase {
     if (!this.instance) this.instance = new Request();
     return this.instance;
   }
-  constructor(cookie?: string, headers?: OutgoingHttpHeaders) {
-    super(cookie, headers);
-  }
   req(url: string | URL, parameters?: AnyObject, options: RequestOptions = {}, autoRedirect = true) {
-    const urlObject = typeof url === 'string' ? new URL(url) : url;
+    if (typeof url === 'string') {
+      if (!url.startsWith('http')) url = this.config.prefixUrl + url;
+      url = new URL(url);
+    }
+
+    let postBody = '';
+    const { protocol, port } = url;
     options = {
       ...options,
-      hostname: urlObject.host.split(':')[0],
-      port: urlObject.port,
-      path: urlObject.href.split(urlObject.host)[1],
-      headers: this.getHeaders(urlObject, options.headers),
+      hostname: url.host.split(':')[0],
+      port,
+      path: url.href.split(url.host)[1],
+      headers: this.getHeaders(url, options.headers),
     };
-    let postBody = '';
 
     if (parameters) {
       postBody = String(options.headers!['content-type']).includes('application/json')
@@ -34,7 +36,7 @@ export class Request extends ReqBase {
     }
 
     return new Promise<{ req: http.ClientRequest; res: IncomingMessage }>((resolve, reject) => {
-      const h = urlObject.protocol === 'http:' ? http : https;
+      const h = protocol === 'http:' ? http : https;
       let timer: NodeJS.Timeout;
       const req: http.ClientRequest = h.request(options, res => {
         globalThis.clearTimeout(timer);
