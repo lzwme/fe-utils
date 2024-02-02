@@ -2,7 +2,7 @@
  * @Author: renxia
  * @Date: 2024-01-15 11:26:52
  * @LastEditors: renxia
- * @LastEditTime: 2024-02-01 10:10:05
+ * @LastEditTime: 2024-02-02 11:08:37
  * @Description:
  */
 import type { OutgoingHttpHeaders } from 'node:http';
@@ -84,7 +84,7 @@ export class ReqFetch extends ReqBase {
   }
   req(url: string | URL, parameters?: AnyObject, options: ReqOptions = {}) {
     if (typeof url === 'string') {
-      if (!url.startsWith('http') && this.config.prefixUrl) url = this.config.prefixUrl + url;
+      if (!/^[A-Za-z]+:\/\//.test(url) && this.config.prefixUrl) url = this.config.prefixUrl + url;
       url = new URL(url);
     }
     options = { ...options, headers: this.getHeaders(url, options.headers) };
