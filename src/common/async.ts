@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-01-12 15:10:41
  * @LastEditors: renxia
- * @LastEditTime: 2024-01-06 15:12:13
+ * @LastEditTime: 2024-02-27 13:17:29
  * @Description:
  * @see src\vs\base\common\async.ts
  */
@@ -122,7 +122,7 @@ export class Throttler {
 export class Sequencer {
   private current: Promise<unknown> = Promise.resolve(null);
 
-  queue<T>(promiseTask: ITask<Promise<T>>): Promise<T> {
+  queue<T>(promiseTask: ITask<T | Promise<T>>): Promise<T> {
     return (this.current = this.current.then(
       () => promiseTask(),
       () => promiseTask()
@@ -380,11 +380,11 @@ export const sleep = <T>(milliseconds = 0, value?: T | (() => T | Promise<T>)): 
 /**
  * 随机等待一定范围的时间（单位为毫秒）
  * @param min 等待最小时间
- * @param max 等待最大时间。若小于 min 则取值为为 max + min
+ * @param max 等待最大时间
  * @returns 返回实际等待的时间
  */
-export function wait(min = 0, max = 0) {
-  if (max > 0 && max < min) max += min;
+export function wait(min = 0, max = min) {
+  if (max < min) [min, max] = [max, min];
   const delay = max > min ? Math.round(Math.random() * (max - min)) + min : min;
   return sleep(delay).then(() => delay);
 }
@@ -446,7 +446,7 @@ export function concurrency<T, E = T | undefined>(taskList: ITask<Promise<T>>[],
       .then(r => onFinish(index, r))
       .catch(error => onFinish(index, null as never as T, error));
   };
-  const size = Math.min(maxDegreeOfParalellism, total);
+  const size = Math.max(1, Math.min(maxDegreeOfParalellism, total));
   const queue: Promise<void>[] = [];
   for (let i = 0; i < size; i++) queue.push(next());
 
@@ -521,4 +521,12 @@ export class Limiter<T> {
   dispose(): void {
     this.onFinishCallbackFns = [];
   }
+}
+
+export function getPromiseState(p: Promise<unknown>) {
+  const t = {};
+  return Promise.race([p, t]).then(
+    v => (v === t ? 'pending' : 'fulfilled'),
+    () => 'rejected'
+  );
 }
