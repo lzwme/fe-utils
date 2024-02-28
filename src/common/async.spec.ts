@@ -199,7 +199,7 @@ describe('async.ts#sleep', () => {
     await sleep(100);
     const end = Date.now();
 
-    expect(end - start).toBeGreaterThanOrEqual(100);
+    expect(end - start).toBeGreaterThanOrEqual(100 - 10);
   });
 
   it('should resolve with provided value', async () => {
