@@ -1,7 +1,7 @@
 {
   "name": "@lzwme/fe-utils",
   "description": "前端 node、web 项目常用工具函数集合。",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "main": "cjs/index.js",
   "module": "esm/index.js",
   "typings": "cjs/index.d.ts",

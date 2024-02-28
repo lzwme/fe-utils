@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/lzwme/fe-utils/compare/v1.6.0...v1.7.0) (2024-02-28)
+
+
+### Features
+
+* **TOTP:** 新增 TOTP 类，用于 Node.js 下简易的验证 2FA ([34a3d28](https://github.com/lzwme/fe-utils/commit/34a3d28380d1498d1ca92f3d3de48dca48e4e782))
+
+
+### Bug Fixes
+
+* **LiteStorage:** 修复 filepath 为目录时无效的问题 ([cd4842f](https://github.com/lzwme/fe-utils/commit/cd4842f479a13a40318d5fc3aa3e5e934b1f93a8))
+
 ## [1.6.0](https://github.com/lzwme/fe-utils/compare/v1.5.10...v1.6.0) (2024-01-16)
 
 
