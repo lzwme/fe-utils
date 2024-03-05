@@ -5,5 +5,4 @@ export * from './request';
 export * from './TOTP';
 export * from './WXWork';
 export { WorkerPool } from './worker-pool/WorkerPool';
-
-export { color } from 'console-log-colors';
+export { default as color } from 'console-log-colors';
