@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
  * @LastEditors: renxia
- * @LastEditTime: 2024-01-18 11:05:29
+ * @LastEditTime: 2024-03-07 09:35:51
  * @Description:
  */
 /* eslint no-console: 0 */
@@ -85,7 +85,7 @@ export class Logger {
   ) {
     const match = /(\w+)/.exec(tag);
     if (!match) throw 'Logger tag expected';
-    this.tag = tag;
+    this.tag = tag.startsWith('[') ? tag : `[${tag}]`;
 
     if (!options.levelType || !(options.levelType in LogLevel)) {
       if (process.env.FE_LOG_LEVEL) options.levelType = process.env.FE_LOG_LEVEL as LogLevelType;
@@ -123,7 +123,8 @@ export class Logger {
     if (lvl <= this.level) {
       this.times++;
       const now = this.getSeverTime(true);
-      const curTime = now.toTimeString().slice(0, 8) + '.' + String(now.getMilliseconds()).padStart(3, '0');
+      now.setUTCHours(now.getHours());
+      const curTime = now.toISOString();
       const msg = args.map(s => (typeof s === 'string' ? s : safeStringify(s))).join(' ');
 
       if (this.writeToFile) this.writeToFile(`[${curTime}]${this.tag}[${type}] ${msg}\n`);
