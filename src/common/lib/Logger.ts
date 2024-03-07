@@ -2,13 +2,14 @@
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
  * @LastEditors: renxia
- * @LastEditTime: 2024-03-07 09:35:51
+ * @LastEditTime: 2024-03-07 09:43:33
  * @Description:
  */
 /* eslint no-console: 0 */
 
 import { type GeneralFn } from '../../types';
 import { safeStringify } from '../objects';
+import { dateFormat } from '../date';
 
 /** 日志级别 */
 export enum LogLevel {
@@ -35,6 +36,8 @@ export interface LoggerOptions {
   /** 通过外部注入 color 能力 */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   color?: Record<string, any>;
+  /** 日志时间格式。默认为：yyyy-MM-dd hh:mm:ss.S */
+  timeFormat?: string;
 }
 
 export type LogLevelType = keyof typeof LogLevel;
@@ -45,6 +48,7 @@ const defaultOptions: LoggerOptions = {
   silent: false,
   logDir: '',
   color: void 0,
+  timeFormat: 'yyyy-MM-dd hh:mm:ss.S',
 };
 
 let headTipColored = false;
@@ -123,8 +127,7 @@ export class Logger {
     if (lvl <= this.level) {
       this.times++;
       const now = this.getSeverTime(true);
-      now.setUTCHours(now.getHours());
-      const curTime = now.toISOString();
+      const curTime = dateFormat(this.options.timeFormat!, now);
       const msg = args.map(s => (typeof s === 'string' ? s : safeStringify(s))).join(' ');
 
       if (this.writeToFile) this.writeToFile(`[${curTime}]${this.tag}[${type}] ${msg}\n`);

@@ -164,9 +164,9 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
 
     return this.set(data, 'cover');
   }
-  public getItem(key: keyof T) {
+  public getItem<K extends keyof T>(key: K): T[K] {
     const value = this.get(true)[key];
-    if (value && !Array.isArray(value) && typeof value === 'object') return assign({}, value) as T[keyof T];
+    if (value && !Array.isArray(value) && typeof value === 'object') return assign({}, value) as T[K];
     return value;
   }
   /** 移除一项数据。同 del 方法 */
