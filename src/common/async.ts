@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-01-12 15:10:41
  * @LastEditors: renxia
- * @LastEditTime: 2024-02-27 13:17:29
+ * @LastEditTime: 2024-03-12 15:36:09
  * @Description:
  * @see src\vs\base\common\async.ts
  */
@@ -431,7 +431,7 @@ export async function retry<T>(
  * await concurrencyTest(100);
  * ```
  */
-export function concurrency<T, E = T | undefined>(taskList: ITask<Promise<T>>[], maxDegreeOfParalellism = 5) {
+export function concurrency<T, E = T | Error>(taskList: ITask<Promise<T>>[], maxDegreeOfParalellism = 5) {
   const total = taskList.length;
   let idx = 0;
   const resut: { index: number; result: T; error: E }[] = [];

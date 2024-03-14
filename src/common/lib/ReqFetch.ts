@@ -2,7 +2,7 @@
  * @Author: renxia
  * @Date: 2024-01-15 11:26:52
  * @LastEditors: renxia
- * @LastEditTime: 2024-02-02 11:08:37
+ * @LastEditTime: 2024-03-14 09:46:01
  * @Description:
  */
 import type { OutgoingHttpHeaders } from 'node:http';
@@ -32,6 +32,7 @@ export class ReqBase {
     accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
   };
+  protected isBrowser = typeof document !== 'undefined' && typeof window !== 'undefined';
   protected config: ReqConfig = {};
   constructor(config?: string | ReqConfig, headers?: OutgoingHttpHeaders) {
     if (config) {
@@ -39,6 +40,7 @@ export class ReqBase {
       config = assign(this.config, config);
     }
 
+    if (this.isBrowser && !this.config.prefixUrl) this.config.prefixUrl = location.origin;
     if (this.config.cookie) this.setCookie(this.config.cookie);
     if (this.config.headers) this.setHeaders(this.config.headers);
     if (headers) this.setHeaders(headers);
@@ -49,7 +51,7 @@ export class ReqBase {
       ...toLowcaseKeyObject(headers),
     };
 
-    if (urlObject) {
+    if (!this.isBrowser && urlObject) {
       if (!headers.host) headers.host = urlObject.host;
       if (!headers.origin) headers.origin = urlObject.origin || `${urlObject.protocol}://${urlObject.hostname}`;
     }

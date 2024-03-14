@@ -1,9 +1,9 @@
 // @see https://www.npmjs.com/package/lru-cache
 
 export interface LRUCacheOptions<K = string, V = unknown> {
-  /** The maximum number of items that remain in the cache */
+  /** The maximum number of items that remain in the cache. default 500 */
   max?: number;
-  /** how long to live in ms */
+  /** how long to live in ms. default 0 */
   ttl?: number;
   updateAgeOnGet?: boolean;
   /** Function that is called on items when they are dropped from the cache */
