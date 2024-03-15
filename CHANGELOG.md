@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.2](https://github.com/lzwme/fe-utils/compare/v1.7.1...v1.7.2) (2024-03-15)
+
+
+### Bug Fixes
+
+* 修复 color 导出导致的引用异常 ([12e1a4c](https://github.com/lzwme/fe-utils/commit/12e1a4c18004412f5af077458f2364f99aa3ede2))
+
 ### [1.7.1](https://github.com/lzwme/fe-utils/compare/v1.7.0...v1.7.1) (2024-03-15)
 
 
