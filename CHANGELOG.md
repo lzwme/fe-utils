@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.1](https://github.com/lzwme/fe-utils/compare/v1.7.0...v1.7.1) (2024-03-15)
+
+
+### Bug Fixes
+
+* **LiteStorage:** 修复 setItem 方法 value 为数组时异常的问题 ([19cb525](https://github.com/lzwme/fe-utils/commit/19cb52530bcadda79bc1937bbf236923c0939ab1))
+* **ReqFetch:** 浏览器环境下设置默认 prefixUrl 值，修复 pathname 格式的 api 请求异常的问题 ([e70a76e](https://github.com/lzwme/fe-utils/commit/e70a76e8385d9c5f2091cfc41808131483990582))
+
 ## [1.7.0](https://github.com/lzwme/fe-utils/compare/v1.6.0...v1.7.0) (2024-02-28)
 
 
