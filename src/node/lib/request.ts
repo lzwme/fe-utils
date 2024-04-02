@@ -3,7 +3,7 @@ import zlib from 'node:zlib';
 import http, { type IncomingMessage, type IncomingHttpHeaders, type OutgoingHttpHeaders } from 'node:http';
 import https, { type RequestOptions } from 'node:https';
 import { urlFormat } from '../../common/url';
-import { ReqBase } from '../../common/lib/ReqFetch';
+import { ReqBase, type ReqConfig } from '../../common/lib/ReqFetch';
 import type { AnyObject } from '../../types';
 
 export class Request extends ReqBase {
@@ -11,6 +11,9 @@ export class Request extends ReqBase {
   static getInstance() {
     if (!this.instance) this.instance = new Request();
     return this.instance;
+  }
+  constructor(cookie?: string | (Omit<ReqConfig, 'reqOptions'> & { reqOptions?: RequestOptions }), headers?: OutgoingHttpHeaders) {
+    super(cookie, headers);
   }
   req(url: string | URL, parameters?: AnyObject, options: RequestOptions = {}, autoRedirect = true) {
     if (typeof url === 'string') {
@@ -21,6 +24,7 @@ export class Request extends ReqBase {
     let postBody = '';
     const { protocol, port } = url;
     options = {
+      ...(this.config.reqOptions as RequestOptions),
       ...options,
       hostname: url.host.split(':')[0],
       port,

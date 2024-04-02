@@ -2,10 +2,11 @@
  * @Author: renxia
  * @Date: 2024-01-15 11:26:52
  * @LastEditors: renxia
- * @LastEditTime: 2024-03-14 09:46:01
+ * @LastEditTime: 2024-04-02 13:44:22
  * @Description:
  */
 import type { OutgoingHttpHeaders } from 'node:http';
+import type { RequestOptions } from 'node:https';
 import { urlFormat } from '../url';
 import { assign, toLowcaseKeyObject } from '../objects';
 import type { AnyObject } from '../../types';
@@ -19,6 +20,7 @@ export interface ReqConfig {
   cookie?: string;
   headers?: OutgoingHttpHeaders;
   prefixUrl?: string;
+  reqOptions?: ReqOptions | RequestOptions;
 }
 
 export class ReqBase {
@@ -30,7 +32,7 @@ export class ReqBase {
     'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
     'accept-language': 'zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4,es;q=0.2',
     accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36',
   };
   protected isBrowser = typeof document !== 'undefined' && typeof window !== 'undefined';
   protected config: ReqConfig = {};
@@ -44,6 +46,7 @@ export class ReqBase {
     if (this.config.cookie) this.setCookie(this.config.cookie);
     if (this.config.headers) this.setHeaders(this.config.headers);
     if (headers) this.setHeaders(headers);
+    if (this.config.reqOptions?.headers) this.setHeaders(this.config.reqOptions.headers);
   }
   getHeaders(urlObject?: URL, headers?: OutgoingHttpHeaders) {
     headers = {
@@ -81,7 +84,7 @@ export class ReqFetch extends ReqBase {
     if (!this.instance) this.instance = new ReqFetch();
     return this.instance;
   }
-  constructor(cookie?: string, headers?: OutgoingHttpHeaders) {
+  constructor(cookie?: string | (Omit<ReqConfig, 'reqOptions'> & { reqOptions?: ReqOptions }), headers?: OutgoingHttpHeaders) {
     super(cookie, headers);
   }
   req(url: string | URL, parameters?: AnyObject, options: ReqOptions = {}) {
@@ -89,7 +92,7 @@ export class ReqFetch extends ReqBase {
       if (!/^[A-Za-z]+:\/\//.test(url) && this.config.prefixUrl) url = this.config.prefixUrl + url;
       url = new URL(url);
     }
-    options = { ...options, headers: this.getHeaders(url, options.headers) };
+    options = { ...this.config.reqOptions, ...options, headers: this.getHeaders(url, options.headers) };
 
     if (parameters) {
       options.body = String(options.headers!['content-type']).includes('application/json')
@@ -119,4 +122,4 @@ export class ReqFetch extends ReqBase {
   }
 }
 
-// new ReqFetch().get('https://www.baidu.com').then(d => console.log(d.response.status, d.data.length));
+// new ReqFetch({}).get('https://www.baidu.com').then(d => console.log(d.response.status, d.data.length));

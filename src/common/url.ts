@@ -2,7 +2,7 @@
  * @Author: renxia
  * @Date: 2023-03-23 23:05:16
  * @LastEditors: renxia
- * @LastEditTime: 2024-01-11 10:58:35
+ * @LastEditTime: 2024-04-01 11:23:08
  * @Description:
  */
 /**
@@ -52,7 +52,8 @@ export function toQueryString(params: Record<string, unknown>) {
 export function getUrlParams(query = location.search) {
   const ret: Record<string, string> = {};
   if (query) {
-    const parts = query.slice(1).split('&');
+    if (query.includes('?')) query = query.slice(query.indexOf('?') + 1);
+    const parts = query.split('&');
     for (const line of parts) {
       const kv = line.split('=').map(d => decodeURIComponent(d));
       ret[kv[0]] = kv[1] || '';
