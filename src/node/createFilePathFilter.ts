@@ -84,7 +84,7 @@ export function createFilePathFilter(options: FilePathFilterOptions = {}) {
     extensions = extensions.filter(Boolean).map(d => (d.startsWith('.') ? d : `.${d}`));
   }
 
-  return function result(id: string | unknown): boolean {
+  return function result(id: unknown): boolean {
     if (typeof id !== 'string') return false;
     if (/\0/.test(id)) return false;
 

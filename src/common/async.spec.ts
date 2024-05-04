@@ -1,4 +1,4 @@
-/* eslint-disable jest/no-conditional-expect */
+/* -eslint-disable jest/no-conditional-expect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { raceTimeout, sleep, Barrier, getPromiseState, Limiter, ITask, concurrency, retry, wait, Throttler, Sequencer } from './async';
 
@@ -159,7 +159,7 @@ describe('async.ts#Sequencer', () => {
 });
 
 describe('async.ts#Barrier', () => {
-  it('should initially be closed', async () => {
+  it('should initially be closed', () => {
     const barrier = new Barrier();
     expect(barrier.isOpen()).toBe(false);
   });
@@ -218,7 +218,7 @@ describe('async.ts#sleep', () => {
 
   it('should resolve with the result of a provided async function', async () => {
     const value = 'test value from async function';
-    const result = await sleep(0, async () => value);
+    const result = await sleep(0, () => value);
 
     expect(result).toBe(value);
   });
@@ -443,7 +443,7 @@ describe('async.ts#Limiter', () => {
     }
   });
 
-  // eslint-disable-next-line jest/no-done-callback
+  // -eslint-disable-next-line jest/no-done-callback
   it('should handle multiple errors correctly', done => {
     const errors: Error[] = [];
     for (let i = 0; i < 3; i++) {

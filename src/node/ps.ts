@@ -83,7 +83,7 @@ export function listProcesses(rootPid: number, formatName?: (cmd: string) => str
       do {
         matches = JS.exec(cmd);
         if (matches) {
-          result += matches + ' ';
+          result += matches[0] + ' ';
         }
       } while (matches);
 
