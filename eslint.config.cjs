@@ -1,6 +1,3 @@
-// module.exports = [
-//   ...require('./preset/eslint'),
-// ];
 const path = require('path');
 const eslint = require('@eslint/js');
 const tseslint = require('typescript-eslint');
@@ -13,8 +10,8 @@ module.exports = [
       languageOptions: {
         parserOptions: {
           tsconfigRootDir: path.resolve(__dirname),
-          project: path.resolve('./tsconfig.eslint.json'),
-          projectFolderIgnoreList: ['**/node_modules/**', '**/dist/**'],
+          project: './tsconfig.eslint.json',
+          projectFolderIgnoreList: ['**/node_modules/**', '**/dist/**', '**/dist-admin/**'],
           warnOnUnsupportedTypeScriptVersion: false,
           ecmaFeatures: {
             jsx: true,
@@ -29,6 +26,7 @@ module.exports = [
       plugins: {
         prettier: require('eslint-plugin-prettier'),
         unicorn: require('eslint-plugin-unicorn'),
+        jest: require('eslint-plugin-jest'),
       },
       ignores: ['**/node_modules/**', 'dist/**', 'cjs/**', 'esm/**', 'docs/**', 'mock/**', '**/*.js', '**/*.d.ts'],
       rules: {
@@ -39,9 +37,9 @@ module.exports = [
           'error',
           {
             destructuring: 'all',
-            ignoreReadBeforeAssign: false,
           },
         ],
+
         '@typescript-eslint/explicit-module-boundary-types': 'off',
         '@typescript-eslint/no-unused-vars': ['warn', { varsIgnorePattern: '^_', argsIgnorePattern: '^_', ignoreRestSiblings: true }],
         // TODO
@@ -56,9 +54,10 @@ module.exports = [
         '@typescript-eslint/unbound-method': 'off',
         '@typescript-eslint/await-thenable': 'off',
         '@typescript-eslint/no-unsafe-return': 'off',
+        '@typescript-eslint/no-redundant-type-constituents': 'off',
+
         'unicorn/no-array-for-each': 'off',
         'unicorn/no-await-expression-member': 'off',
-        '@typescript-eslint/no-redundant-type-constituents': 'off',
       },
       files: ['src/**/*.ts'],
     },

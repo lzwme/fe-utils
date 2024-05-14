@@ -1,8 +1,8 @@
 /*
  * @Author: lzw
  * @Date: 2021-08-25 10:12:21
- * @LastEditors: lzw
- * @LastEditTime: 2022-08-31 18:05:08
+ * @LastEditors: renxia
+ * @LastEditTime: 2024-05-14 16:49:23
  * @Description: worker_threads 实现在 worker 线程中执行
  *
  * - worker_threads 比 child_process 和 cluster 更为轻量级的并行性，而且 worker_threads 可有效地共享内存
@@ -52,6 +52,7 @@ export function createWorkerThreads<T>(options: CreateThreadOptions, onMessage?:
 
 if (!isMainThread) {
   const config: CreateThreadOptions = workerData;
+  // eslint-disable-next-line no-console
   if (config.debug) console.log('workerData:', config);
   // const done = (data: unknown) => {
   //   if (config.debug) console.log('emit msg from worker thread:', { type: config.type, data, end: true });
@@ -62,7 +63,7 @@ if (!isMainThread) {
   // const resetConfig = { checkOnInit: false, exitOnError: false, mode: 'current' };
 
   // eslint-disable-next-line unicorn/prefer-top-level-await
-  if (config.workerFile) import(config.workerFile).then(f => (f.default || f)(config));
+  if (config.workerFile) import(config.workerFile).then(f => (f.default || f)(config)).catch(console.error);
 
   // heartbeat and more...
 }

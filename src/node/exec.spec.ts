@@ -3,6 +3,7 @@ import { execSync, execPromisfy } from './exec';
 
 describe('utils/exec', () => {
   beforeAll(() => {
+    // eslint-disable-next-line no-console
     console.error = console.warn = console.log = () => null;
   });
 

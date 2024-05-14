@@ -142,7 +142,7 @@ export function listProcesses(rootPid: number, formatName?: (cmd: string) => str
         return value;
       };
 
-      import('windows-process-tree').then(windowsProcessTree => {
+      return import('windows-process-tree').then(windowsProcessTree => {
         windowsProcessTree.getProcessList(
           rootPid,
           processList => {
@@ -189,7 +189,7 @@ export function listProcesses(rootPid: number, formatName?: (cmd: string) => str
     } else {
       // OS X & Linux
 
-      exec('which ps', {}, (err, stdout, stderr) => {
+      return exec('which ps', {}, (err, stdout, stderr) => {
         if (err || stderr) {
           if (process.platform !== 'linux') {
             reject(err || new Error(stderr.toString()));

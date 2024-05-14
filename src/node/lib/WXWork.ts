@@ -3,7 +3,7 @@
  * @Author: lzw
  * @Date: 2021-12-24 13:01:39
  * @LastEditors: renxia
- * @LastEditTime: 2024-01-18 10:59:55
+ * @LastEditTime: 2024-05-14 16:48:11
  * @Description: 企业微信机器人通知
  */
 
@@ -140,6 +140,7 @@ export function wxWorkNotify(params: string | WxWorkReqParams, webhookUrl: strin
   }
 
   return new Request().post<WxWorkResult>(webhookUrl, params, { 'content-type': 'application/json' }).then(d => {
+    // eslint-disable-next-line no-console
     if (debug) console.log(`[wxWorkNotify][${d.data.errcode}]`, JSON.stringify(d.data));
     return d.data;
   });
