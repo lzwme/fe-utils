@@ -45,7 +45,9 @@ export class Request extends ReqBase {
       const req: http.ClientRequest = h.request(options, res => {
         globalThis.clearTimeout(timer);
         if (autoRedirect && String(res.statusCode).startsWith('30') && res.headers['location']) {
-          this.req(res.headers['location'], parameters, options, true).then(resolve);
+          let rurl = res.headers['location'];
+          if (!rurl.startsWith('http')) rurl = (res.headers['host'] || url.host) + rurl;
+          this.req(rurl, parameters, options, true).then(resolve);
         } else resolve({ req, res });
       });
 
