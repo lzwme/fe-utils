@@ -26,3 +26,13 @@ export function formatQty(number: number | string) {
   const [int, de] = String(num).split('.');
   return Number(int).toLocaleString() + (de ? `.${de}` : '');
 }
+
+/** 生成指定长度的随机字符串 */
+export function genRandomString(length: number) {
+  let ret = '';
+  while (length--) {
+    const rdm62 = 0 | (Math.random() * 62);
+    ret += String.fromCharCode(rdm62 + (rdm62 < 10 ? 48 : rdm62 < 36 ? 55 : 61));
+  }
+  return ret;
+}
