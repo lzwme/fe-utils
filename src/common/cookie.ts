@@ -2,7 +2,7 @@
  * @Author: renxia
  * @Date: 2024-01-15 11:26:52
  * @LastEditors: renxia
- * @LastEditTime: 2024-01-16 16:38:39
+ * @LastEditTime: 2024-07-24 11:38:51
  * @Description: cookie 相关处理工具方法
  */
 
@@ -14,7 +14,9 @@ export function cookieParse(cookie = '', filterNilValue = false) {
 
   if (typeof cookie === 'string' && cookie.length > 0) {
     for (const d of cookie.split(';')) {
-      const [key, value] = d.split('=').map(d => d.trim());
+      const arr = d.split('=');
+      const key = arr[0].trim();
+      const value = arr.slice(1).join('=').trim();
       if (filterNilValue && !value) continue;
 
       try {

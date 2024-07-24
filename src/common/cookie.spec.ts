@@ -13,6 +13,7 @@ describe('cookie.ts', () => {
       ['a=1;b=b', { a: '1', b: 'b' }],
       ['a=;b=b', { a: '', b: 'b' }],
       ['a=%E6%B5%8B%E8%AF%95001;b=b', { a: '测试001', b: 'b' }],
+      ['a=%E6%B5%8B%E8%AF%95001=123;b=b', { a: '测试001=123', b: 'b' }],
     ] as const;
     for (const [cookie, obj] of list) {
       expect(cookieParse(cookie as never)).toEqual(obj);
