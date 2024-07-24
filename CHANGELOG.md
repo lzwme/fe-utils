@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.5](https://github.com/lzwme/fe-utils/compare/v1.7.3...v1.7.5) (2024-07-24)
+
+
+### Bug Fixes
+
+* **cookie:** 修复 cookieParse 解析 value 包含 = 时会丢失后半部分的问题 ([bbc0914](https://github.com/lzwme/fe-utils/commit/bbc0914c5e9ccc25378717baec5eab1c24fed121))
+* **request:** 修复 301 重定向不包含完整域名时会失败的问题 ([c9ad372](https://github.com/lzwme/fe-utils/commit/c9ad3720b13f2dabd975174e851d18a0f4ceada3))
+
+### [1.7.4](https://github.com/lzwme/fe-utils/compare/v1.7.3...v1.7.4) (2024-07-24)
+
+
+### Bug Fixes
+
+* **cookie:** 修复 cookieParse 解析 value 包含 = 时会丢失后半部分的问题 ([bbc0914](https://github.com/lzwme/fe-utils/commit/bbc0914c5e9ccc25378717baec5eab1c24fed121))
+* **request:** 修复 301 重定向不包含完整域名时会失败的问题 ([c9ad372](https://github.com/lzwme/fe-utils/commit/c9ad3720b13f2dabd975174e851d18a0f4ceada3))
+
 ### [1.7.3](https://github.com/lzwme/fe-utils/compare/v1.7.2...v1.7.3) (2024-05-04)
 
 ### [1.7.2](https://github.com/lzwme/fe-utils/compare/v1.7.1...v1.7.2) (2024-03-15)
