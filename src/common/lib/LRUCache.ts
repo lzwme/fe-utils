@@ -1,5 +1,5 @@
 // @see https://www.npmjs.com/package/lru-cache
-
+type DisposeReason = 'set' | 'delete' | 'evict' | 'expired';
 export interface LRUCacheOptions<K = string, V = unknown> {
   /** The maximum number of items that remain in the cache. default 500 */
   max?: number;
@@ -7,7 +7,7 @@ export interface LRUCacheOptions<K = string, V = unknown> {
   ttl?: number;
   updateAgeOnGet?: boolean;
   /** Function that is called on items when they are dropped from the cache */
-  dispose?(val: LRUCacheItem<V>, key: K, reason: string): void;
+  dispose?(val: LRUCacheItem<V>, key: K, reason: DisposeReason): void;
 }
 
 interface LRUCacheItem<V> {
@@ -65,7 +65,7 @@ export class LRUCache<K = string, V = unknown> {
     return value.v as T;
   }
   /** Deletes a key out of the cache */
-  delete(key: K, reason = 'delete') {
+  delete(key: K, reason: DisposeReason = 'delete') {
     if (!this.cache.has(key)) return false;
     const val = this.cache.get(key);
     this.cache.delete(key);
