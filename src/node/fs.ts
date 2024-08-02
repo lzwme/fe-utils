@@ -119,3 +119,34 @@ export function rmEmptyDir(dir: string) {
 
   if (files.length === 0) return fs.rmdirSync(dir);
 }
+
+/**
+ * 一个查找文件函数。递归地在源目录中查找符合条件的文件，并将找到的文件路径添加到数组中返回。
+ *
+ * @param {string} srcDir - 需要查找的源目录，如果未指定或指定的目录不存在，则直接返回空数组。
+ * @param {function} validate - 验证函数，用于判断文件是否符合条件。如果未指定或验证失败，则直接返回空数组。
+ * @param {number} limit - 限制返回的文件数量，默认值为99999。当找到的文件数量达到这个值时，停止查找并返回结果。
+ * @return {string[]} 返回一个包含所有找到的文件路径的字符串数组。如果没有找到任何文件，或者因为达到了限制而停止查找，则返回空数组。
+ */
+export function findFiles(srcDir?: string, validate?: (filepath: string, stat: Stats) => boolean, limit = 99999) {
+  const files: string[] = [];
+
+  if (!srcDir || !fs.existsSync(srcDir)) return files;
+
+  const stat = fs.statSync(srcDir);
+
+  if (validate && !validate(srcDir, stat)) return files;
+
+  if (stat.isFile()) return [resolve(srcDir)];
+
+  if (stat.isDirectory()) {
+    for (const filename of fs.readdirSync(srcDir)) {
+      for (const f of findFiles(resolve(srcDir, filename), validate, limit - files.length)) {
+        files.push(f);
+        if (limit > 0 && files.length >= limit) return files;
+      }
+    }
+  }
+
+  return files;
+}
