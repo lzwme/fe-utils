@@ -1,5 +1,12 @@
-// eslint-disable-next-line @typescript-eslint/ban-types
-export function isObject(obj: unknown): obj is Object {
+/*
+ * @Author: renxia
+ * @Date: 2023-03-23 23:05:16
+ * @LastEditors: renxia
+ * @LastEditTime: 2024-08-02 13:40:01
+ * @Description:
+ */
+
+export function isObject(obj: unknown): obj is object {
   return (
     typeof obj === 'object' &&
     obj !== null &&
@@ -41,7 +48,7 @@ export function isUndefinedOrNull(value: unknown) {
   return null == value;
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function isFunction(obj: unknown): obj is Function {
   return typeof obj === 'function';
 }

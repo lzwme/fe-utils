@@ -1,3 +1,4 @@
+import { AnyObject } from '../types';
 import {
   assign,
   mergeArrayLike,
@@ -77,7 +78,7 @@ describe('objects/assign', () => {
     expect(c.b.c).toBeNull();
     expect(c.b.d).toBe(5);
 
-    expect(mixin(null, a)).toEqual(a);
+    expect(mixin(null as never as AnyObject, a)).toEqual(a);
   });
 
   it('mergeArrayLike', () => {

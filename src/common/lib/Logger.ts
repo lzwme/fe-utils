@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
  * @LastEditors: renxia
- * @LastEditTime: 2024-03-07 09:43:33
+ * @LastEditTime: 2024-08-02 13:39:45
  * @Description:
  */
 /* eslint no-console: 0 */
@@ -88,7 +88,7 @@ export class Logger {
     protected options: LoggerOptions = {}
   ) {
     const match = /(\w+)/.exec(tag);
-    if (!match) throw 'Logger tag expected';
+    if (!match) throw new Error('Logger tag expected');
     this.tag = tag.startsWith('[') ? tag : `[${tag}]`;
 
     if (!options.levelType || !(options.levelType in LogLevel)) {

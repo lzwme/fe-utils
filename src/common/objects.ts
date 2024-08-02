@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, unicorn/prefer-top-level-await */
+import type { AnyObject } from '../types';
 import { isObject, isSet, isMap, isArray } from './is';
 
 let JSON5: typeof globalThis.JSON;
@@ -73,8 +74,8 @@ export function deepClone<T extends object>(obj: T): T {
   return result;
 }
 
-export function mixin<T = any>(destination: any, source: any, overwrite = true): T {
-  if (!isObject(destination)) return source;
+export function mixin<T = any>(destination: AnyObject, source: AnyObject, overwrite = true): T {
+  if (!isObject(destination)) return source as T;
 
   if (isObject(source)) {
     for (const key of Object.keys(source)) {
@@ -91,7 +92,7 @@ export function mixin<T = any>(destination: any, source: any, overwrite = true):
       }
     }
   }
-  return destination;
+  return destination as T;
 }
 
 /** 合并类数组对象。若执行了合并，会去除重复的值 */

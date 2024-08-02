@@ -55,6 +55,8 @@ module.exports = [
         '@typescript-eslint/await-thenable': 'off',
         '@typescript-eslint/no-unsafe-return': 'off',
         '@typescript-eslint/no-redundant-type-constituents': 'off',
+        '@typescript-eslint/prefer-promise-reject-errors': 'off',
+        '@typescript-eslint/no-require-imports': 'off',
 
         'unicorn/no-array-for-each': 'off',
         'unicorn/no-await-expression-member': 'off',

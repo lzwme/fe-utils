@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-01-12 15:10:41
  * @LastEditors: renxia
- * @LastEditTime: 2024-03-12 15:36:09
+ * @LastEditTime: 2024-08-02 13:42:47
  * @Description:
  * @see src\vs\base\common\async.ts
  */
@@ -408,7 +408,7 @@ export async function retry<T>(
     }
   }
 
-  throw lastError;
+  throw lastError!;
 }
 /**
  * 并发执行多任务
