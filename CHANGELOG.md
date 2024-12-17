@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/lzwme/fe-utils/compare/v1.7.5...v1.8.0) (2024-12-17)
+
+
+### Features
+
+* **fs:** 新增 findFiles 文件查找函数，以满足简单的目录文件查找需求 ([84b1687](https://github.com/lzwme/fe-utils/commit/84b168745012d4200037ef417c7ec270b1a0db37))
+
 ### [1.7.5](https://github.com/lzwme/fe-utils/compare/v1.7.3...v1.7.5) (2024-07-24)
 
 
