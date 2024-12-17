@@ -20,7 +20,7 @@ export function execPromisfy(cmd: string, debug = process.env.DEBUG != null, opt
 }
 
 export function execSync(cmd: string, stdio?: StdioOptions, cwd = process.cwd(), debug = false, options: ExecOptions = {}) {
-  if (debug) getLogger().debug(color.cyanBright('exec cmd:'), color.cyan(cwd));
+  if (debug) getLogger().log(color.cyanBright('exec cmd:'), color.cyan(cwd));
   const result = { stdout: '', stderr: '', error: null as unknown as Error };
 
   try {

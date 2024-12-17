@@ -25,7 +25,7 @@ export async function tryLoadJSON5(useCache = false) {
 }
 tryLoadJSON5(true);
 
-export function safeJsonParse<T extends Record<string, string>>(input: string, useJSON5 = false, ignoreError = false): T {
+export function safeJsonParse<T extends AnyObject>(input: string, useJSON5 = false, ignoreError = false): T {
   try {
     if (input == null) return {} as T;
     if (typeof input === 'object') return input;

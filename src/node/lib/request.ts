@@ -16,10 +16,7 @@ export class Request extends ReqBase {
     super(cookie, headers);
   }
   req(url: string | URL, parameters?: AnyObject, options: RequestOptions = {}, autoRedirect = true) {
-    if (typeof url === 'string') {
-      if (!url.startsWith('http')) url = this.config.prefixUrl + url;
-      url = new URL(url);
-    }
+    url = this.formatUrl(url);
 
     let postBody = '';
     const { protocol, port } = url;

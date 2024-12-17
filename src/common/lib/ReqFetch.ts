@@ -2,7 +2,7 @@
  * @Author: renxia
  * @Date: 2024-01-15 11:26:52
  * @LastEditors: renxia
- * @LastEditTime: 2024-04-02 13:44:22
+ * @LastEditTime: 2024-12-17 16:03:18
  * @Description:
  */
 import type { OutgoingHttpHeaders } from 'node:http';
@@ -48,6 +48,16 @@ export class ReqBase {
     if (headers) this.setHeaders(headers);
     if (this.config.reqOptions?.headers) this.setHeaders(this.config.reqOptions.headers);
   }
+  protected formatUrl(url: string | URL) {
+    if (typeof url === 'string') {
+      if (!url.startsWith('http')) {
+        if (!this.config.prefixUrl?.endsWith('/')) this.config.prefixUrl += '/';
+        url = this.config.prefixUrl + (url.startsWith('/') ? url.slice(1) : url);
+      }
+      url = new URL(url);
+    }
+    return url;
+  }
   getHeaders(urlObject?: URL, headers?: OutgoingHttpHeaders) {
     headers = {
       ...this.headers,
@@ -88,10 +98,7 @@ export class ReqFetch extends ReqBase {
     super(cookie, headers);
   }
   req(url: string | URL, parameters?: AnyObject, options: ReqOptions = {}) {
-    if (typeof url === 'string') {
-      if (!/^[A-Za-z]+:\/\//.test(url) && this.config.prefixUrl) url = this.config.prefixUrl + url;
-      url = new URL(url);
-    }
+    url = this.formatUrl(url);
     options = { ...this.config.reqOptions, ...options, headers: this.getHeaders(url, options.headers) };
 
     if (parameters) {
