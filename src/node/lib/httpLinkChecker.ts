@@ -23,7 +23,7 @@ export async function httpLinkChecker(url: string, options: { reqOptions?: Reque
     const err = error as Error & { code?: number | string };
     return {
       code: err.code || -1,
-      errmsg: String(err.message || err.cause || err.stack),
+      errmsg: String(err.message || (err.cause as string) || err.stack),
       statusCode: Number(err.code) || -1,
       url: url.replace(/\$/, ''),
       redirected: false,

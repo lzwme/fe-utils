@@ -44,7 +44,7 @@ export class LRUCache<K = string, V = unknown> {
 
     if (cache.size > this.options.max) {
       const delKey = cache.keys().next().value;
-      this.delete(delKey, 'evict');
+      if (delKey) this.delete(delKey, 'evict');
     }
   }
   /** Return a value from the cache */
