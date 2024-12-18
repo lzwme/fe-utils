@@ -17,6 +17,7 @@ export class Request extends ReqBase {
   }
   req(url: string | URL, parameters?: AnyObject, options: RequestOptions = {}, autoRedirect = true) {
     url = this.formatUrl(url);
+    if (options.method === 'GET' && parameters) url = urlFormat(url.toString(), parameters);
 
     let postBody = '';
     const { protocol, port } = url;
@@ -98,9 +99,13 @@ export class Request extends ReqBase {
     });
   }
   get<T = AnyObject>(url: string, parameters?: AnyObject, headers?: OutgoingHttpHeaders, options?: RequestOptions) {
-    return this.request<T>('GET', urlFormat(url, parameters), void 0, { ...options, headers: { ...options?.headers, ...headers } });
+    return this.request<T>('GET', url, parameters, { ...options, headers: { ...options?.headers, ...headers } });
   }
   post<T = AnyObject>(url: string, parameters: AnyObject, headers?: OutgoingHttpHeaders, options?: RequestOptions) {
     return this.request<T>('POST', url, parameters, { ...options, headers: { ...options?.headers, ...headers } });
   }
 }
+
+// new Request({ baseURL: 'https://www.baidu.com' })
+//   .get('s?wd=pinphp')
+//   .then(d => console.log('title:', String(d.data).match(/title>([^<]+)</)?.[1]));

@@ -2,7 +2,7 @@
  * @Author: renxia
  * @Date: 2024-01-15 11:26:52
  * @LastEditors: renxia
- * @LastEditTime: 2024-12-17 16:03:18
+ * @LastEditTime: 2024-12-18 09:12:30
  * @Description:
  */
 import type { OutgoingHttpHeaders } from 'node:http';
@@ -19,7 +19,7 @@ interface ReqOptions extends Omit<RequestInit, 'headers'> {
 export interface ReqConfig {
   cookie?: string;
   headers?: OutgoingHttpHeaders;
-  prefixUrl?: string;
+  baseURL?: string;
   reqOptions?: ReqOptions | RequestOptions;
 }
 
@@ -42,7 +42,8 @@ export class ReqBase {
       config = assign(this.config, config);
     }
 
-    if (this.isBrowser && !this.config.prefixUrl) this.config.prefixUrl = location.origin;
+    if ('prefixUrl' in this.config) this.config.baseURL = this.config.prefixUrl as string;
+    if (this.isBrowser && !this.config.baseURL) this.config.baseURL = location.origin;
     if (this.config.cookie) this.setCookie(this.config.cookie);
     if (this.config.headers) this.setHeaders(this.config.headers);
     if (headers) this.setHeaders(headers);
@@ -51,8 +52,8 @@ export class ReqBase {
   protected formatUrl(url: string | URL) {
     if (typeof url === 'string') {
       if (!url.startsWith('http')) {
-        if (!this.config.prefixUrl?.endsWith('/')) this.config.prefixUrl += '/';
-        url = this.config.prefixUrl + (url.startsWith('/') ? url.slice(1) : url);
+        if (!this.config.baseURL?.endsWith('/')) this.config.baseURL += '/';
+        url = this.config.baseURL + (url.startsWith('/') ? url.slice(1) : url);
       }
       url = new URL(url);
     }
@@ -99,6 +100,7 @@ export class ReqFetch extends ReqBase {
   }
   req(url: string | URL, parameters?: AnyObject, options: ReqOptions = {}) {
     url = this.formatUrl(url);
+    if (options.method === 'GET' && parameters) url = urlFormat(url.toString(), parameters);
     options = { ...this.config.reqOptions, ...options, headers: this.getHeaders(url, options.headers) };
 
     if (parameters) {
@@ -122,11 +124,13 @@ export class ReqFetch extends ReqBase {
     return r;
   }
   get<T = AnyObject>(url: string, parameters?: AnyObject, headers?: OutgoingHttpHeaders, options?: ReqOptions) {
-    return this.request<T>('GET', urlFormat(url, parameters), void 0, { ...options, headers: { ...options?.headers, ...headers } });
+    return this.request<T>('GET', url, parameters, { ...options, headers: { ...options?.headers, ...headers } });
   }
   post<T = AnyObject>(url: string, parameters: AnyObject, headers?: OutgoingHttpHeaders, options?: ReqOptions) {
     return this.request<T>('POST', url, parameters, { ...options, headers: { ...options?.headers, ...headers } });
   }
 }
 
-// new ReqFetch({}).get('https://www.baidu.com').then(d => console.log(d.response.status, d.data.length));
+// new ReqFetch({ baseURL: 'https://www.baidu.com' })
+//   .get('s?wd=pinphp')
+//   .then(d => console.log('title:', String(d.data).match(/title>([^<]+)</)?.[1]));
