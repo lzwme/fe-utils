@@ -27,8 +27,14 @@ export interface LSOptions<T extends object = Record<string, unknown>> {
  * @example
  * ```ts
  * const stor = await new LiteStorage({ uuid: 'test1' }).ready();
+ *
+ * // 示例1： 读取缓存
  * const config = stor.get();
  * console.log(config);
+ * // 缓存操作
+ * // 存入
+ * stor.save(config);
+ *
  * stor.getItem('key1');
  * stor.setItem('key2', { a: 1 });
  * stor.removeItem('key2');
@@ -66,13 +72,11 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
   }
   private init() {
     let { filepath = 'ls.json', uuid, version } = this.options;
-    if (!/\.(json5?|toml)$/i.test(filepath)) {
-      filepath = resolve(this.baseDir, filepath, 'ls.json');
-    }
+    if (!/\.(json5?|toml)$/i.test(filepath)) filepath = resolve(this.baseDir, filepath, 'ls.json');
+
     this.isJson5 = /\.json5$/i.test(filepath);
     this.isToml = /\.toml$/i.test(filepath);
     this.options.filepath = resolve(this.baseDir, filepath);
-
     this.cache = {
       version,
       data: {
@@ -93,10 +97,13 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
   /** 主动保存 */
   public async save(value?: T, mode: 'merge' | 'cover' = 'merge') {
     if (value) return this.set(value, mode);
-
+    await this.reload();
+    return this.toCache();
+  }
+  private async toCache() {
     const cacheDir = dirname(this.cachePath);
     if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
-    await this.reload();
+
     let content = '';
     if (this.isToml) {
       const TOML = await import('@iarna/toml');
@@ -126,6 +133,7 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
     }
     return this;
   }
+  /** 以 options.uuid 为 key 设置数据 */
   public set(value: T, mode: 'merge' | 'cover' = 'merge') {
     const uuid = this.options.uuid;
 
@@ -141,22 +149,29 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
     }
     return this;
   }
+  /**
+   * 以 options.uuid 为 key 获取数据
+   * @param raw 是否返回原始数据（不进行深拷贝）。默认为 false
+   */
   public get(raw = false) {
     const info = this.cache.data[this.options.uuid] || {};
     return raw ? info : { ...info };
   }
+  /** 获取全量缓存的原始数据 */
   public getAll() {
     return this.cache;
   }
   /** 移除一项数据 */
-  public del(key: keyof T) {
+  public async del(key: keyof T) {
     const info = this.cache.data[this.options.uuid];
     if (key in info) {
+      await this.reload();
       delete info[key];
-      this.save();
+      return this.toCache();
     }
     return this;
   }
+  /** 设置并保存一个数据项。提示：setItem、removeItem 都会触发文件读写，应避免密集高频调用 */
   public setItem<K extends keyof T>(key: K, value: Partial<T[K]>, mode: 'merge' | 'cover' = 'merge') {
     const data = this.get(true);
     if (mode === 'cover') data[key] = value as T[K];
@@ -177,14 +192,18 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
    * 清理缓存
    * @param isAll 是否清空全部缓存（即移除缓存文件重新初始化）。默认为 false，只清空当前 uuid 约束下的缓存数据
    */
-  public clear(isAll = false) {
+  public async clear(isAll = false) {
     if (isAll) {
       if (fs.existsSync(this.cachePath)) fs.rmSync(this.cachePath, { force: true });
       this.init();
     } else {
       const uuid = this.options.uuid;
-      if (this.cache.data[uuid]) delete this.cache.data[uuid];
-      this.save();
+      if (this.cache.data[uuid]) {
+        await this.reload();
+        delete this.cache.data[uuid];
+        return this.toCache();
+      }
     }
+    return this;
   }
 }
