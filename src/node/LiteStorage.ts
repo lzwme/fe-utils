@@ -53,6 +53,7 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
   private barrier = new Barrier();
   private isToml = false;
   private isJson5 = false;
+  private isChanged = false;
 
   // @ts-ignore
   private cache: LSCache<T>;
@@ -97,6 +98,7 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
   /** 主动保存 */
   public async save(value?: T, mode: 'merge' | 'cover' = 'merge') {
     if (value) return this.set(value, mode);
+    if (!this.isChanged) return this;
     await this.reload();
     return this.toCache();
   }
@@ -143,6 +145,7 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
         if (mode === 'merge') assign(this.cache.data[uuid], value);
         else this.cache.data[uuid] = value;
       }
+      this.isChanged = true;
       this.save();
     } else {
       console.warn('[LiteStorage][set]error', uuid, value);
