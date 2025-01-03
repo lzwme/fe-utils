@@ -1,14 +1,16 @@
-// @ts-check
-
-/** @type {import('ts-jest').InitialOptionsTsJest  } */
+/** @type {import('ts-jest').JestConfigWithTsJest} **/
+// eslint-disable-next-line no-undef
 module.exports = {
-  preset: "ts-jest",
+  preset: 'ts-jest',
+  resolver: 'ts-jest-resolver',
   testEnvironment: 'node',
-  moduleFileExtensions: [
-    "ts",
-    "tsx",
-    "js"
-  ],
+  moduleFileExtensions: ['ts', 'tsx', 'js'],
+  moduleNameMapper: {
+    '^src/(.*).js$': '$1.ts',
+  },
+  transform: {
+    '^.+.tsx?$': ['ts-jest', { isolatedModules: true }],
+  },
   // transform: {
   //   '^.+\\.(t|j)sx?$': [
   //     '@swc/jest',
