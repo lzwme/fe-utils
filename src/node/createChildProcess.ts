@@ -29,9 +29,9 @@ export function createChildProcess<T>(options: CreateThreadOptions, onMessage?: 
   let heartbeat = 0;
   let heartbeatTimer: NodeJS.Timeout;
   const exit = () => {
-    controller.abort();
-    if (!worker.killed) worker.kill();
     clearInterval(heartbeatTimer);
+    // if (!worker.killed) controller.abort();
+    if (!worker.killed) worker.kill();
   };
 
   worker.send(options);
@@ -52,16 +52,16 @@ export function createChildProcess<T>(options: CreateThreadOptions, onMessage?: 
       if (onMessage) onMessage(info);
 
       if (info.end) {
-        exit();
         resolve(info.data as never as T);
+        exit();
       }
     });
 
     worker.on('error', error => console.log(`[worker][${options.type}]err:`, error));
     worker.on('exit', code => {
       if (options.debug) console.log(`[worker][${options.type}]exit worker`, code);
-      exit();
       if (code !== 0) reject(code);
+      exit();
     });
 
     if (options.debug) {
