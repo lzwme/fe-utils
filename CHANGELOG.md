@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.2](https://github.com/lzwme/fe-utils/compare/v1.8.1...v1.8.2) (2025-01-23)
+
+
+### Bug Fixes
+
+* **createChildProcess:** 主动退出子进程时不发送 abort 信号 ([eb8886e](https://github.com/lzwme/fe-utils/commit/eb8886e4ddd9cdb95728c710f64e8b8579be1e1d))
+* **LiteStorage:** 修复删除缓存项无效的问题 ([383fdc8](https://github.com/lzwme/fe-utils/commit/383fdc8a451e3ec9634ec585108996c0ef764ab2))
+
 ### [1.8.1](https://github.com/lzwme/fe-utils/compare/v1.8.0...v1.8.1) (2024-12-18)
 
 ## [1.8.0](https://github.com/lzwme/fe-utils/compare/v1.7.5...v1.8.0) (2024-12-17)
