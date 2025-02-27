@@ -36,7 +36,7 @@ export async function rmrfAsync(filepath: string): Promise<void> {
  * 创建一个深度的目录
  */
 export function mkdirp(dirpath: string) {
-  if (fs.existsSync(dirpath)) return true;
+  if (fs.existsSync(dirpath)) return false;
 
   try {
     fs.mkdirSync(dirpath, { recursive: true });
@@ -45,11 +45,9 @@ export function mkdirp(dirpath: string) {
     for (let i = 0; i < list.length; i++) {
       const p = list.slice(0, i + 1).join(sep);
       if (p === '') continue;
-      if (fs.existsSync(p)) {
-        if (!fs.statSync(p).isDirectory()) return false;
-        continue;
+      if (!fs.existsSync(p) || !fs.statSync(p).isDirectory()) {
+        fs.mkdirSync(p);
       }
-      fs.mkdirSync(p);
     }
   }
   return true;
@@ -95,7 +93,8 @@ export function copyDir(src: string, dest: string, filter: (filepath: string, st
     }
 
     try {
-      fs.promises.copyFile(filepath, outpath);
+      mkdirp(dest);
+      fs.copyFileSync(filepath, outpath);
     } catch {
       fs.createReadStream(filepath).pipe(fs.createWriteStream(outpath));
     }

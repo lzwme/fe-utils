@@ -1,15 +1,19 @@
-const path = require('path');
-const eslint = require('@eslint/js');
-const tseslint = require('typescript-eslint');
+// import path from 'path';
+import eslint from '@eslint/js';
+// import globals from 'globals';
+import tseslint from 'typescript-eslint';
+import eslintPluginUnicorn from 'eslint-plugin-unicorn';
+import eslintPluginJest from 'eslint-plugin-jest';
+import eslintPluginPrettier from 'eslint-plugin-prettier';
 
-module.exports = [
+export default [
   ...tseslint.config(
     eslint.configs.recommended,
     ...tseslint.configs.recommendedTypeChecked,
     {
       languageOptions: {
         parserOptions: {
-          tsconfigRootDir: path.resolve(__dirname),
+          // tsconfigRootDir: path.resolve(__dirname),
           project: './tsconfig.eslint.json',
           projectFolderIgnoreList: ['**/node_modules/**', '**/dist/**', '**/dist-admin/**'],
           warnOnUnsupportedTypeScriptVersion: false,
@@ -24,9 +28,9 @@ module.exports = [
         reportUnusedDisableDirectives: false,
       },
       plugins: {
-        prettier: require('eslint-plugin-prettier'),
-        unicorn: require('eslint-plugin-unicorn'),
-        jest: require('eslint-plugin-jest'),
+        prettier: eslintPluginPrettier,
+        unicorn: eslintPluginUnicorn,
+        jest: eslintPluginJest,
       },
       ignores: ['**/node_modules/**', 'dist/**', 'cjs/**', 'esm/**', 'docs/**', 'mock/**', '**/*.js', '**/*.d.ts'],
       rules: {
