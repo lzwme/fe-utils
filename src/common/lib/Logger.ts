@@ -2,7 +2,7 @@
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
  * @LastEditors: renxia
- * @LastEditTime: 2024-08-02 13:39:45
+ * @LastEditTime: 2025-04-22 17:21:25
  * @Description:
  */
 /* eslint no-console: 0 */
@@ -65,6 +65,10 @@ export class Logger {
   public static map: { [tag: string]: Logger } = {};
   /** 日志记录级别 */
   private level: LogLevel = LogLevel.log;
+
+  public get levelType(): LogLevelType {
+    return LogLevel[this.level] as LogLevelType;
+  }
 
   public silent: GeneralFn = this._log.bind(this, 'error');
   public error: GeneralFn = this._log.bind(this, 'error');
