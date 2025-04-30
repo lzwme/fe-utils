@@ -2,7 +2,7 @@
  * @Author: renxia
  * @Date: 2024-01-15 11:26:52
  * @LastEditors: renxia
- * @LastEditTime: 2024-12-18 09:12:30
+ * @LastEditTime: 2025-04-30 13:24:39
  * @Description:
  */
 import type { OutgoingHttpHeaders } from 'node:http';
@@ -10,7 +10,7 @@ import type { RequestOptions } from 'node:https';
 import { urlFormat } from '../url';
 import { assign, toLowcaseKeyObject } from '../objects';
 import type { AnyObject } from '../../types';
-import { cookieParse, cookieStringfiy } from '../cookie';
+import { cookieParse } from '../cookie';
 
 interface ReqOptions extends Omit<RequestInit, 'headers'> {
   headers?: OutgoingHttpHeaders;
@@ -24,7 +24,6 @@ export interface ReqConfig {
 }
 
 export class ReqBase {
-  protected cookies: Record<string, string> = {};
   protected headers: OutgoingHttpHeaders = {
     pragma: 'no-cache',
     connection: 'keep-alive',
@@ -41,13 +40,10 @@ export class ReqBase {
       if (typeof config === 'string') config = { cookie: config };
       config = assign(this.config, config);
     }
+    if (headers) this.config.headers = headers;
+    this.setConfig(this.config);
 
-    if ('prefixUrl' in this.config) this.config.baseURL = this.config.prefixUrl as string;
     if (this.isBrowser && !this.config.baseURL) this.config.baseURL = location.origin;
-    if (this.config.cookie) this.setCookie(this.config.cookie);
-    if (this.config.headers) this.setHeaders(this.config.headers);
-    if (headers) this.setHeaders(headers);
-    if (this.config.reqOptions?.headers) this.setHeaders(this.config.reqOptions.headers);
   }
   protected formatUrl(url: string | URL) {
     if (typeof url === 'string') {
@@ -59,6 +55,17 @@ export class ReqBase {
     }
     return url;
   }
+  getConfig() {
+    return { ...this.config };
+  }
+  setConfig(cfg: ReqConfig) {
+    assign(this.config, cfg);
+
+    if ('prefixUrl' in cfg) this.config.baseURL = cfg.prefixUrl as string;
+    if (cfg.cookie) this.setHeaders({ cookie: cfg.cookie });
+    if (cfg.headers) this.setHeaders(cfg.headers);
+    if (cfg.reqOptions?.headers) this.setHeaders(cfg.reqOptions.headers);
+  }
   getHeaders(urlObject?: URL, headers?: OutgoingHttpHeaders) {
     headers = {
       ...this.headers,
@@ -69,23 +76,19 @@ export class ReqBase {
       if (!headers.host) headers.host = urlObject.host;
       if (!headers.origin) headers.origin = urlObject.origin || `${urlObject.protocol}://${urlObject.hostname}`;
     }
-    if (!headers.cookie && Object.keys(this.cookies).length > 0) headers.cookie = this.getCookie();
 
     return headers;
   }
-  setHeaders(headers: OutgoingHttpHeaders) {
-    if (headers) this.headers = Object.assign(this.headers, toLowcaseKeyObject(headers));
-    return this;
-  }
-  setCookie(cookie: string, reset = false) {
-    if (reset) this.cookies = {};
-    Object.assign(this.cookies, cookieParse(cookie));
+  setHeaders(headers: OutgoingHttpHeaders, type: 'merge' | 'reset' = 'merge') {
+    if (type === 'reset') this.headers = {};
+    this.headers = Object.assign(this.headers, toLowcaseKeyObject(headers));
     return this;
   }
   getCookie(isString?: true): string;
   getCookie(isString: false): Record<string, string>;
   getCookie(isString = true) {
-    return isString ? cookieStringfiy(this.cookies) : this.cookies;
+    const ck = this.headers.cookie! as string;
+    return isString ? this.headers.ck : cookieParse(ck);
   }
 }
 
