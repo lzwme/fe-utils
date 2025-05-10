@@ -1,11 +1,12 @@
 import { basename, dirname, resolve } from 'node:path';
 import { tmpdir, cpus } from 'node:os';
+import { RequestOptions } from 'node:https';
+import { type OutgoingHttpHeaders } from 'node:http';
 import type { AnyObject } from '../../types';
 import { concurrency } from '../../common/async';
 import { fs } from '../fs-system';
 import { Request } from './request';
 import { NLogger } from './NLogger';
-import { RequestOptions } from 'node:https';
 
 export interface DownloadOptions {
   url: string;
@@ -56,7 +57,7 @@ export interface DownloadResult {
  */
 export async function download(options: DownloadOptions): Promise<DownloadResult> {
   if (typeof options === 'string') options = { url: options };
-  const request = new Request('', options.requestOptions?.headers);
+  const request = new Request('', options.requestOptions?.headers as OutgoingHttpHeaders);
   const { req, res } = await request.req(options.url, options.params, { ...options.requestOptions, method: 'HEAD' });
   res.destroy();
   if (!options.filepath) {

@@ -2,7 +2,7 @@
  * @Author: renxia
  * @Date: 2024-01-15 11:26:52
  * @LastEditors: renxia
- * @LastEditTime: 2025-04-30 13:24:39
+ * @LastEditTime: 2025-05-09 13:50:02
  * @Description:
  */
 import type { OutgoingHttpHeaders } from 'node:http';
@@ -64,7 +64,7 @@ export class ReqBase {
     if ('prefixUrl' in cfg) this.config.baseURL = cfg.prefixUrl as string;
     if (cfg.cookie) this.setHeaders({ cookie: cfg.cookie });
     if (cfg.headers) this.setHeaders(cfg.headers);
-    if (cfg.reqOptions?.headers) this.setHeaders(cfg.reqOptions.headers);
+    if (cfg.reqOptions?.headers) this.setHeaders(cfg.reqOptions.headers as OutgoingHttpHeaders);
   }
   getHeaders(urlObject?: URL, headers?: OutgoingHttpHeaders) {
     headers = {
@@ -88,7 +88,7 @@ export class ReqBase {
   getCookie(isString: false): Record<string, string>;
   getCookie(isString = true) {
     const ck = this.headers.cookie! as string;
-    return isString ? this.headers.ck : cookieParse(ck);
+    return isString ? ck : cookieParse(ck);
   }
 }
 

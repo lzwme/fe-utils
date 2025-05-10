@@ -8,7 +8,7 @@ interface WorkerMsgBody<T> {
   data: T;
   [key: string]: unknown;
 }
-type Callback<R, T> = (err: Error | null, result: WorkerMsgBody<R> | null, task: T) => void;
+type Callback<R, T> = (err: Error | null, result: WorkerMsgBody<R> | null, task: T, startTime: number) => void;
 
 const kWorkerFreedEvent = Symbol('kWorkerFreedEvent');
 
@@ -34,7 +34,7 @@ const kWorkerFreedEvent = Symbol('kWorkerFreedEvent');
 export class WorkerPool<T = unknown, R = unknown> extends EventEmitter {
   private workers: Worker[] = [];
   private freeWorkers: Worker[] = [];
-  private workerTaskInfo = new Map<Worker, { callback: Callback<R, T>; task: T }>();
+  private workerTaskInfo = new Map<Worker, { callback: Callback<R, T>; task: T; startTime: number }>();
   private tasks: {
     task: T;
     callback: Callback<R, T>;
@@ -67,7 +67,7 @@ export class WorkerPool<T = unknown, R = unknown> extends EventEmitter {
       // 如果成功：调用传递给`runTask`的回调，删除与Worker关联的`TaskInfo`，并再次将其标记为空闲。
       const r = this.workerTaskInfo.get(worker);
       if (r) {
-        r.callback(null, result, r.task);
+        r.callback(null, result, r.task, r.startTime);
         if (result.type !== 'progress') {
           this.workerTaskInfo.delete(worker);
           this.freeWorkers.push(worker);
@@ -80,7 +80,7 @@ export class WorkerPool<T = unknown, R = unknown> extends EventEmitter {
       // 如果发生未捕获的异常：调用传递给 `runTask` 并出现错误的回调。
       const r = this.workerTaskInfo.get(worker);
       if (r) {
-        r.callback(err, null, r.task);
+        r.callback(err, null, r.task, r.startTime);
         this.workerTaskInfo.delete(worker);
       } else this.emit('error', err);
 
@@ -101,9 +101,15 @@ export class WorkerPool<T = unknown, R = unknown> extends EventEmitter {
 
     const worker = this.freeWorkers.pop();
     if (worker) {
-      this.workerTaskInfo.set(worker, { callback, task });
+      this.workerTaskInfo.set(worker, { callback, task, startTime: Date.now() });
       worker.postMessage(task);
     }
+  }
+  removeTask(task: T | ((task: T) => boolean)) {
+    const filter = (typeof task === 'function' ? task : (t: T) => t === task) as (t: T) => boolean;
+    const count = this.tasks.length;
+    this.tasks = this.tasks.filter(item => !filter(item.task));
+    return count - this.tasks.length;
   }
   public status() {
     return {

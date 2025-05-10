@@ -21,20 +21,21 @@ export class Request extends ReqBase {
 
     let postBody = '';
     const { protocol, port } = url;
+    const headers = this.getHeaders(url, options.headers as OutgoingHttpHeaders);
     options = {
       ...(this.config.reqOptions as RequestOptions),
       ...options,
       hostname: url.host.split(':')[0],
       port,
       path: url.href.split(url.host)[1],
-      headers: this.getHeaders(url, options.headers),
+      headers,
     };
 
     if (parameters) {
-      postBody = String(options.headers!['content-type']).includes('application/json')
+      postBody = String(headers!['content-type']).includes('application/json')
         ? JSON.stringify(parameters)
         : new URLSearchParams(parameters as Record<string, string>).toString();
-      options.headers!['content-length'] = Buffer.byteLength(postBody).toString();
+      headers!['content-length'] = Buffer.byteLength(postBody).toString();
     }
 
     return new Promise<{ req: http.ClientRequest; res: IncomingMessage }>((resolve, reject) => {
