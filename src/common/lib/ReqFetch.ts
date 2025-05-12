@@ -2,7 +2,7 @@
  * @Author: renxia
  * @Date: 2024-01-15 11:26:52
  * @LastEditors: renxia
- * @LastEditTime: 2025-05-09 13:50:02
+ * @LastEditTime: 2025-05-12 14:26:25
  * @Description:
  */
 import type { OutgoingHttpHeaders } from 'node:http';
@@ -23,6 +23,21 @@ export interface ReqConfig {
   reqOptions?: ReqOptions | RequestOptions;
 }
 
+export function getRandomUA(keyword = '') {
+  const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
+  let ua = [
+    `Mozilla/5.0 (Windows NT ${randomInt(10, 11)}.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${randomInt(70, 136)}.0.0.0 Safari/537.36`,
+    `Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1 Mobile/15E148 Safari/604.1 Edg/122.0.0.0`,
+  ];
+
+  if (keyword) {
+    const u = ua.filter(d => d.includes(keyword));
+    if (u.length) ua = u;
+  }
+
+  return ua[Math.floor(Math.random() * ua.length)];
+}
+
 export class ReqBase {
   protected headers: OutgoingHttpHeaders = {
     pragma: 'no-cache',
@@ -31,7 +46,7 @@ export class ReqBase {
     'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
     'accept-language': 'zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4,es;q=0.2',
     accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36',
+    'user-agent': getRandomUA('Win64'),
   };
   protected isBrowser = typeof document !== 'undefined' && typeof window !== 'undefined';
   protected config: ReqConfig = {};
