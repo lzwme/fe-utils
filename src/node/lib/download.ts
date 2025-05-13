@@ -7,6 +7,7 @@ import { concurrency } from '../../common/async';
 import { fs } from '../fs-system';
 import { Request } from './request';
 import { NLogger } from './NLogger';
+import { md5 } from '../crypto';
 
 export interface DownloadOptions {
   url: string;
@@ -20,6 +21,7 @@ export interface DownloadOptions {
   segmentSize?: number;
   /** 大文件分段下载时，并行任务数。默认为 cpu 核数 */
   paralelism?: number;
+  /** 下载进度回调。若返回 false 则取消下载 */
   onProgress?:
     | boolean
     | ((info: {
@@ -28,7 +30,8 @@ export interface DownloadOptions {
         percent: number;
         /** bytes/s */
         speed: number;
-      }) => void);
+        errmsg: string;
+      }) => void | boolean);
 }
 
 export interface DownloadResult {
@@ -38,6 +41,8 @@ export interface DownloadResult {
   filepath: string;
   /** 文件是否已存在（没有从网络下载） */
   isExist: boolean;
+  /** 下载失败原因 */
+  errmsg?: string;
 }
 
 /**
@@ -46,13 +51,11 @@ export interface DownloadResult {
  * @example
  * ```ts
  *  download({
- *    url: 'https://vscode.cdn.azure.cn/stable/97dec172d3256f8ca4bfb2143f3f76b503ca0534/VSCodeUserSetup-x64-1.74.3.exe?1',
+ *    url: 'https://vscode.download.prss.microsoft.com/dbazure/download/stable/19e0f9e681ecb8e5c09d8784acaa601316ca4571/VSCodeUserSetup-x64-1.100.0.exe',
  *    onProgress(d) {
  *      NLogger.getLogger().logInline(`${d.size} ${d.downloaded} ${d.percent.toFixed(2)}% ${(d.speed / 1024 / 1024).toFixed(2)}MB/S`);
  *    },
- *  })
- *    // eslint-disable-next-line unicorn/prefer-top-level-await
- *    .then(d => console.log(d));
+ *  }).then(d => console.log(d));
  * ```
  */
 export async function download(options: DownloadOptions): Promise<DownloadResult> {
@@ -62,23 +65,24 @@ export async function download(options: DownloadOptions): Promise<DownloadResult
   res.destroy();
   if (!options.filepath) {
     options.filepath = res.headers['content-disposition']
-      ? decodeURIComponent(res.headers['content-disposition'].split('filename=')[1].trim().slice(1))
+      ? decodeURIComponent(res.headers['content-disposition'].split('filename=')[1].trim().split(';')[0].replace(/['"]/g, ''))
       : basename(req.path.split('?')[0]);
   }
 
   const filepath = resolve(options.filepath);
-  const segmentSize = Math.max(Number(options.segmentSize) || 100, 10) * 1024;
+  const segmentSize = Math.max(Number(options.segmentSize) || 512, 10) * 1024;
   const isSupportRange = !req.getHeader('range') && res.headers['accept-ranges'] === 'bytes';
   const startTime = Date.now();
   let contentLength = Number(res.headers['content-length']) || 0;
   let downloadedLen = 0;
   let cachedLen = 0;
+  let isCanceled = false;
   const result: DownloadResult = {
     filepath,
     size: contentLength,
     isExist: false,
   };
-  const onProgress = () => {
+  const onProgress = (errmsg = '') => {
     if (options.onProgress) {
       if (typeof options.onProgress === 'boolean') {
         options.onProgress = d => {
@@ -86,12 +90,18 @@ export async function download(options: DownloadOptions): Promise<DownloadResult
         };
       }
 
-      options.onProgress({
+      const r = options.onProgress({
         size: contentLength,
         downloaded: downloadedLen + cachedLen,
         percent: contentLength ? Number((100 * (downloadedLen + cachedLen)) / contentLength) : -1,
         speed: (1000 * downloadedLen) / (Date.now() - startTime),
+        errmsg,
       });
+
+      if (r === false) {
+        isCanceled = true;
+        if (!result.errmsg) result.errmsg = '用户取消下载';
+      }
     }
   };
 
@@ -110,6 +120,7 @@ export async function download(options: DownloadOptions): Promise<DownloadResult
     const segments = Math.ceil(contentLength / segmentSize);
     const tasks: (() => Promise<typeof result>)[] = [];
     const tmpDir = resolve(tmpdir(), `fe-utils-tmp`);
+    const segmentMd5 = md5(options.url + segmentSize);
 
     for (let i = 0; i < segments; i++) {
       const start = segmentSize * i;
@@ -123,18 +134,19 @@ export async function download(options: DownloadOptions): Promise<DownloadResult
             range: `bytes=${start}-${end}`,
           },
         },
-        filepath: resolve(tmpDir, `${basename(filepath)}.${i}`),
-        onProgress: () => void 0,
+        filepath: resolve(tmpDir, `${segmentMd5}-${i}`),
+        onProgress: false,
       };
 
-      tasks.push(() =>
-        download(option).then(d => {
+      tasks.push(() => {
+        if (isCanceled) return Promise.resolve(result);
+        return download(option).then(d => {
           if (d.isExist) cachedLen += end - start + 1;
           else downloadedLen += end - start + 1;
           onProgress();
           return d;
-        })
-      );
+        });
+      });
     }
 
     const r = await concurrency(tasks, Number(options.paralelism) || cpus().length);
@@ -146,7 +158,7 @@ export async function download(options: DownloadOptions): Promise<DownloadResult
         const readStream = fs.createReadStream(fp);
         readStream.pipe(writeStream, { end: false });
         readStream.on('end', () => {
-          fs.rm(fp, err => rj(err));
+          fs.rm(fp, err => err && console.error('[download]删除临时文件失败', err));
           rs(true);
         });
         readStream.on('error', error => rj(error));
@@ -157,15 +169,18 @@ export async function download(options: DownloadOptions): Promise<DownloadResult
     const { res } = await request.req(options.url, options.params, options.requestOptions);
     const chunks: Buffer[] = [];
     contentLength = Number(res.headers['content-length']) || 0;
-    await new Promise<void>((rs, reject) => {
+    await new Promise<void>(rs => {
       res.on('data', (buf: Buffer) => {
         downloadedLen += buf.byteLength;
         chunks.push(buf);
         onProgress();
       });
-      res.on('end', rs).on('error', reject);
+      res.on('end', rs).on('error', error => {
+        console.error('[download]下载失败', error);
+        result.errmsg = error.message;
+      });
     });
-    fs.writeFileSync(filepath, Buffer.concat(chunks));
+    if (chunks.length && !result.errmsg) fs.writeFileSync(filepath, Buffer.concat(chunks));
     result.size = downloadedLen;
   }
 

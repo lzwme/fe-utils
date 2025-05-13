@@ -9,7 +9,7 @@ module.exports = {
     '^src/(.*).js$': '$1.ts',
   },
   transform: {
-    '^.+.tsx?$': ['ts-jest', { isolatedModules: true }],
+    '^.+.tsx?$': ['ts-jest'],
   },
   // transform: {
   //   '^.+\\.(t|j)sx?$': [
