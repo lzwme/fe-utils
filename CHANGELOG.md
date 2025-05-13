@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/lzwme/fe-utils/compare/v1.8.3...v1.9.0) (2025-05-13)
+
+
+### Features
+
+* **request:** 新增 getRandomUA 函数 ([ad39859](https://github.com/lzwme/fe-utils/commit/ad398591545d30de812759088fd9f33efe3ada98))
+
+
+### Bug Fixes
+
+* **Request:** 修复 cookie 参数不生效问题；增加 setConfig 方法 ([b890bff](https://github.com/lzwme/fe-utils/commit/b890bffc37e0b4f7caecd6b1293a06a98e604525))
+
 ### [1.8.3](https://github.com/lzwme/fe-utils/compare/v1.8.2...v1.8.3) (2025-04-22)
 
 ### [1.8.2](https://github.com/lzwme/fe-utils/compare/v1.8.1...v1.8.2) (2025-01-23)
