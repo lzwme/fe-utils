@@ -1,8 +1,8 @@
 /*
  * @Author: lzw
  * @Date: 2021-04-23 10:44:32
- * @LastEditors: lzw
- * @LastEditTime: 2022-11-25 11:57:18
+ * @LastEditors: renxia
+ * @LastEditTime: 2025-05-26 10:13:50
  * @Description: gh u 相关的命令。主要为常用的快捷工具方法
  */
 
@@ -47,11 +47,13 @@ export interface GitLogItem {
 /**
  * 获取近 N 条日志的详细信息
  * @param num 指定获取日志的数量
+ * @param cwd 工作目录
+ * @param filepath 指定获取日志的文件路径，可选
  */
-export function getGitLog(num = 1, cwd?: string) {
+export function getGitLog(num = 1, cwd?: string, filepath?: string) {
   num = Math.max(1, +num || 1);
   const prettyFormat = ['H', 'h', 'T', 't', 'p', 'P', 'cd', 'ad', 'an', 'ae', 'ce', 's', 'ar', 'cr'];
-  const cmd = `git log -${num} --pretty="tformat:%${prettyFormat.join(' _-_ %')}" --date=iso`;
+  const cmd = `git log -${num} --pretty="tformat:%${prettyFormat.join(' _-_ %')}" --date=iso ${filepath ? `-- ${filepath}` : ''}`.trim();
   const logResult = execSync(cmd, 'pipe', cwd);
   if (logResult.stderr) console.error('[getGitLog][error]', logResult.stderr);
 
@@ -160,13 +162,13 @@ export function gitIsTagDirty(cwd = process.cwd()) {
 }
 
 /** 【git】获取最近一次的修改日期 */
-export function gitDate(cwd = process.cwd()) {
-  return new Date(getGitLog(1, cwd)[0].ad!);
+export function gitDate(cwd = process.cwd(), filepath?: string) {
+  return new Date(getGitLog(1, cwd, filepath)[0].ad!);
 }
 
 /** 【git】获取最近一次的修改提交信息 */
-export function gitMessage(cwd = process.cwd()) {
-  return getGitLog(1, cwd)[0]?.s;
+export function gitMessage(cwd = process.cwd(), filepath?: string) {
+  return getGitLog(1, cwd, filepath)[0]?.s;
 }
 
 /** 【git】获取历史提交总次数 */
