@@ -2,7 +2,7 @@
  * @Author: renxia
  * @Date: 2024-01-15 11:26:52
  * @LastEditors: renxia
- * @LastEditTime: 2025-05-12 14:26:25
+ * @LastEditTime: 2025-07-08 10:05:14
  * @Description:
  */
 import type { OutgoingHttpHeaders } from 'node:http';
@@ -116,7 +116,7 @@ export class ReqFetch extends ReqBase {
   constructor(cookie?: string | (Omit<ReqConfig, 'reqOptions'> & { reqOptions?: ReqOptions }), headers?: OutgoingHttpHeaders) {
     super(cookie, headers);
   }
-  req(url: string | URL, parameters?: AnyObject, options: ReqOptions = {}) {
+  async req(url: string | URL, parameters?: AnyObject, options: ReqOptions = {}, autoRedirect = true): Promise<Response> {
     url = this.formatUrl(url);
     if (options.method === 'GET' && parameters) url = urlFormat(url.toString(), parameters);
     options = { ...this.config.reqOptions, ...options, headers: this.getHeaders(url, options.headers) };
@@ -127,7 +127,15 @@ export class ReqFetch extends ReqBase {
         : new URLSearchParams(parameters as Record<string, string>).toString();
     }
 
-    return fetch(url, options as never);
+    const r = await fetch(url, options as never);
+
+    if (r.status >= 300 && r.status < 400 && autoRedirect && r.headers.get('location')) {
+      let rurl = r.headers.get('location')!;
+      if (!rurl.startsWith('http')) rurl = (r.headers.get('host') || url.host) + rurl;
+      return this.req(rurl, parameters, options, true);
+    }
+
+    return r;
   }
   async request<T = AnyObject>(method: string, url: string | URL, parameters?: AnyObject, options?: ReqOptions) {
     const response = await this.req(url, parameters, { ...options, method });
