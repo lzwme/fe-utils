@@ -39,6 +39,9 @@ export function safeJsonParse<T extends AnyObject>(input: string, useJSON5 = fal
 }
 
 export function safeStringify(obj: any, space?: string | number, useJSON5 = false): string {
+  if (obj instanceof Error) return `Error: ${obj.message}\n${obj.stack}`;
+  if (obj instanceof RegExp) return obj.toString();
+
   const seen = new Set<any>();
   return (useJSON5 ? JSON5 : JSON).stringify(
     obj,

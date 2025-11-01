@@ -49,6 +49,45 @@ describe('objects/assign', () => {
     expect(safeStringify(a).includes('[Circular]')).toBeTruthy();
   });
 
+  it('safeStringify handles Error and RegExp', () => {
+    const err = new Error('boom');
+    const reg = /test/gi;
+
+    expect(safeStringify(err)).toContain('Error: boom');
+    expect(safeStringify(reg)).toBe(reg.toString());
+  });
+
+  it('safeStringify handles duplicate references (non-circular) marking second as [Circular]', () => {
+    const x = { n: 1 };
+    const obj = { a: x, b: x };
+    const normal = JSON.stringify(obj);
+    const s = safeStringify(obj);
+
+    // safeStringify will mark the second reference as [Circular]
+    expect(s.includes('[Circular]')).toBeTruthy();
+    // JSON.stringify does not insert [Circular] for duplicate refs
+    expect(normal.includes('[Circular]')).toBeFalsy();
+  });
+
+  it('safeStringify respects space parameter and primitives', () => {
+    const a = { a: 1 };
+    expect(safeStringify(a, 2)).toBe(JSON.stringify(a, null, 2));
+    expect(safeStringify('abc')).toBe(JSON.stringify('abc'));
+    expect(safeStringify(null)).toBe(JSON.stringify(null));
+  });
+
+  it('safeStringify handles Date same as JSON.stringify', () => {
+    const d = new Date('2020-01-01T00:00:00Z');
+    expect(safeStringify(d)).toBe(JSON.stringify(d));
+  });
+
+  it('safeStringify handles nested circular references', () => {
+    const a: AnyObject = { n: 1 };
+    a.self = a;
+    a.child = { parent: a };
+    expect(safeStringify(a)).toContain('[Circular]');
+  });
+
   it('deepClone', () => {
     const a = { a: 1, b: { c: 2, d: 3 } };
 
