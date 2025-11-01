@@ -1,4 +1,4 @@
-import { type StdioOptions, execSync as cpExecSync, exec, ExecOptions } from 'node:child_process';
+import { type StdioOptions, execSync as cpExecSync, exec, ExecOptions, ExecSyncOptions } from 'node:child_process';
 import { color } from 'console-log-colors';
 import { getLogger } from './get-logger';
 
@@ -11,7 +11,7 @@ export function execPromisfy(cmd: string, debug = process.env.DEBUG != null, opt
 
     const proc = exec(cmd, { maxBuffer: 100 * 1024 * 1024, ...options }, (error, stdout, stderr) => {
       if (debug && error) getLogger().error(`\n[exec]命令执行失败：${cmd}\n`, color.redBright(error.message), '\n', error);
-      resolve({ error: error as never, stdout: stdout.trim(), stderr });
+      resolve({ error: error as never, stdout: String(stdout).trim(), stderr: stderr ? String(stderr).trim() : stderr });
     });
 
     if (proc.stderr) proc.stderr.pipe(process.stderr);
@@ -19,7 +19,7 @@ export function execPromisfy(cmd: string, debug = process.env.DEBUG != null, opt
   });
 }
 
-export function execSync(cmd: string, stdio?: StdioOptions, cwd = process.cwd(), debug = false, options: ExecOptions = {}) {
+export function execSync(cmd: string, stdio?: StdioOptions, cwd = process.cwd(), debug = false, options: ExecSyncOptions = {}) {
   if (debug) getLogger().log(color.cyanBright('exec cmd:'), color.cyan(cwd));
   const result = { stdout: '', stderr: '', error: null as unknown as Error };
 
