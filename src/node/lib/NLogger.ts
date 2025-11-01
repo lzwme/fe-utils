@@ -1,8 +1,8 @@
 /*
  * @Author: lzw
  * @Date: 2022-04-08 10:30:02
- * @LastEditors: lzw
- * @LastEditTime: 2022-11-16 10:47:44
+ * @LastEditors: renxia
+ * @LastEditTime: 2025-11-01 22:44:11
  * @Description:
  */
 /* eslint no-console: 0 */
@@ -17,6 +17,7 @@ const fsStreamCache: { [logPath: string]: WriteStream } = {};
 
 /** 用于 Node.js 中的 logger 模块 */
 export class NLogger extends Logger {
+  private logDate = '';
   public static map: { [tag: string]: NLogger } = {};
 
   constructor(tag: string, options: LoggerOptions = {}) {
@@ -33,6 +34,7 @@ export class NLogger extends Logger {
     } else {
       const curTime = new Date().toISOString().slice(0, 10).replace(/\D/g, '');
       logPath = resolve(logDir, `${this.tag.replace(/[^\dA-Za-z]/g, '')}_${curTime}.log`);
+      this.logDate = curTime;
     }
 
     if (logPath === this.logPath) return;
@@ -87,6 +89,11 @@ export class NLogger extends Logger {
    */
   protected override writeToFile(msg: string) {
     if (!this.logPath) return;
+    // 检测日志文件路径是否需要更新
+    if (this.logDate && this.logDate !== new Date().toISOString().slice(0, 10).replace(/\D/g, '')) {
+      this.setLogDir(this.logDir);
+    }
+
     let logFsStream = fsStreamCache[this.logPath];
     if (!logFsStream || logFsStream.destroyed) {
       if (!fs.existsSync(this.logDir)) fs.mkdirSync(this.logDir, { recursive: true });
