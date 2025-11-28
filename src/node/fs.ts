@@ -32,6 +32,22 @@ export async function rmrfAsync(filepath: string): Promise<void> {
   }
 }
 
+/** 清理指定目录下的空目录 */
+export function clearEmptyDir(dir: string) {
+  if (!dir || !fs.existsSync(dir)) return;
+
+  const stat = fs.statSync(dir);
+  if (!stat.isDirectory()) return;
+
+  const files = fs.readdirSync(dir);
+  if (files.length === 0) {
+    fs.rmSync(dir, { recursive: true });
+    return;
+  }
+
+  files.forEach(file => clearEmptyDir(resolve(dir, file)));
+}
+
 /**
  * 创建一个深度的目录
  */
