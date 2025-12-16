@@ -3,16 +3,20 @@ type DisposeReason = 'set' | 'delete' | 'evict' | 'expired';
 export interface LRUCacheOptions<K = string, V = unknown> {
   /** The maximum number of items that remain in the cache. default 500 */
   max?: number;
-  /** how long to live in ms. default 0 */
+  /** how long to live in ms. default 0 forever */
   ttl?: number;
+  /** Whether to update the age of the cache to Date.now() when get() is called. default true */
   updateAgeOnGet?: boolean;
   /** Function that is called on items when they are dropped from the cache */
   dispose?(val: LRUCacheItem<V>, key: K, reason: DisposeReason): void;
 }
 
-interface LRUCacheItem<V> {
+export interface LRUCacheItem<V> {
+  /** the time when the item was added to the cache */
   t: number;
+  /** how long to live in ms. default 0 */
   ttl: number;
+  /** the value */
   v: V;
 }
 
@@ -20,6 +24,9 @@ export class LRUCache<K = string, V = unknown> {
   protected options: Required<LRUCacheOptions<K, V>>;
   protected cache = new Map<K, LRUCacheItem<V>>();
   constructor(options: LRUCacheOptions<K, V>) {
+    this.options = this.updateOptions(options);
+  }
+  updateOptions(options: LRUCacheOptions<K, V>) {
     options = {
       ttl: 0,
       dispose: () => void 0,
@@ -29,6 +36,8 @@ export class LRUCache<K = string, V = unknown> {
     options.max = Math.max(options.max || 500, 2);
     if (options.ttl) options.ttl = Math.max(+options.ttl || 0, 100);
     this.options = options as never;
+    this.purgeStale();
+    return options as Required<LRUCacheOptions<K, V>>;
   }
   /** Add a value to the cache */
   set<T extends V = V>(key: K, value: T, opts?: { ttl?: number }) {
@@ -58,11 +67,15 @@ export class LRUCache<K = string, V = unknown> {
       return;
     }
 
-    if (options.updateAgeOnGet || (this.options.updateAgeOnGet && options.updateAgeOnGet !== false)) value.t = Date.now();
+    if ((options.updateAgeOnGet ?? this.options.updateAgeOnGet) !== false) value.t = Date.now();
     cache.delete(key);
     cache.set(key, value);
 
     return value.v as T;
+  }
+  /** Returns true if the cache has a key */
+  has(key: K) {
+    return this.cache.has(key);
   }
   /** Deletes a key out of the cache */
   delete(key: K, reason: DisposeReason = 'delete') {
@@ -78,27 +91,30 @@ export class LRUCache<K = string, V = unknown> {
       this.delete(key);
     }
   }
+  /** Dump all cache as an array of [key, value] pairs */
   dump() {
     return [...this.cache];
   }
+  /** Reset and load an array of [key, value] pairs into the cache */
   load(entries: string | [K, LRUCacheItem<V>][]) {
     if (typeof entries == 'string') entries = JSON.parse(entries) as never;
     this.cache = new Map(entries);
   }
   /** Delete any stale entries. */
   purgeStale() {
-    let hasDeleted = false;
+    let count = 0;
     for (const [key, value] of this.cache) {
       if (value.ttl && Date.now() - value.t > value.ttl) {
-        hasDeleted = true;
+        count++;
         this.delete(key, 'expired');
       }
     }
-    return hasDeleted;
+    return count;
   }
   info() {
     return {
       capacity: this.options.max,
+      ttl: this.options.ttl,
       /** The total number of items held in the cache at the current moment */
       size: this.cache.size,
     };
