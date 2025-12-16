@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.10.0](https://github.com/lzwme/fe-utils/compare/v1.9.2...v1.10.0) (2025-12-16)
+
+
+### Features
+
+* **fs:** 新增 clearEmptyDir 方法 ([93f5fe7](https://github.com/lzwme/fe-utils/commit/93f5fe794944bc81581e859686ac4772c7552c85))
+* LiteStorage 支持多实例管理和原子写入，增强错误处理； 新增 execFilePromisfy 方法以支持文件执行；添加 tryKillProcess 方法的单元测试 ([9498f1c](https://github.com/lzwme/fe-utils/commit/9498f1ce9c54acb556e338a4f765d01be3ba0836))
+* **LRUCache:** 新增 has、updateOptions 方法 ([611aea6](https://github.com/lzwme/fe-utils/commit/611aea605ce204d2f46165d9647c62e8c1a4ecc9))
+
 ### [1.9.2](https://github.com/lzwme/fe-utils/compare/v1.9.1...v1.9.2) (2025-11-01)
 
 ### [1.9.1](https://github.com/lzwme/fe-utils/compare/v1.9.0...v1.9.1) (2025-11-01)
