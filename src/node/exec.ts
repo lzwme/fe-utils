@@ -1,4 +1,4 @@
-import { type StdioOptions, execSync as cpExecSync, exec, ExecOptions, ExecSyncOptions } from 'node:child_process';
+import { spawn, type StdioOptions, execSync as cpExecSync, exec, ExecOptions, ExecSyncOptions } from 'node:child_process';
 import { color } from 'console-log-colors';
 import { getLogger } from './get-logger';
 
@@ -16,6 +16,25 @@ export function execPromisfy(cmd: string, debug = process.env.DEBUG != null, opt
 
     if (proc.stderr) proc.stderr.pipe(process.stderr);
     if (debug && proc.stdout) proc.stdout.pipe(process.stdout);
+  });
+}
+
+export function execFilePromisfy(command: string, args: string[], debug = process.env.DEBUG != null, options: ExecOptions = {}) {
+  return new Promise<{ error: Error | null; stdout: string; stderr: string; code: number | null }>(resolve => {
+    if (debug) getLogger().log('exec file:', command, args.join(' '));
+    const proc = spawn(command, args, { stdio: ['ignore', 'pipe', 'pipe'], ...options });
+    let stdout = '';
+    let stderr = '';
+    proc.stdout?.on('data', d => (stdout += String(d)));
+    proc.stderr?.on('data', d => (stderr += String(d)));
+    proc.once('error', error => {
+      if (debug) getLogger().error('[execFile] error', error);
+      resolve({ error: error as Error, stdout: stdout.trim(), stderr: stderr.trim(), code: null });
+    });
+    proc.once('close', code => {
+      if (debug && code !== 0) getLogger().error('[execFile] exit', code, stderr.trim());
+      resolve({ error: code === 0 ? null : new Error(`exit ${code}`), stdout: stdout.trim(), stderr: stderr.trim(), code });
+    });
   });
 }
 

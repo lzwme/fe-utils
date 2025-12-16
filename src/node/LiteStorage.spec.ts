@@ -1,4 +1,4 @@
-import { existsSync, unlinkSync } from 'node:fs';
+import { existsSync, unlinkSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { LiteStorage } from './LiteStorage';
 import { AnyObject } from '../types';
@@ -51,5 +51,49 @@ describe('node/LiteStorage', () => {
 
     await stor.clear(true);
     expect(existsSync(filepath)).toBe(false);
+  });
+
+  it('getInstance returns same instance for same filepath', async () => {
+    const f = resolve('./cache/test-instance.json');
+    if (existsSync(f)) unlinkSync(f);
+
+    const s1 = LiteStorage.getInstance<AnyObject>({ filepath: f });
+    const s2 = LiteStorage.getInstance<AnyObject>({ filepath: f });
+
+    expect(s1).toBe(s2);
+
+    await s1.clear(true);
+    expect(existsSync(f)).toBe(false);
+  });
+
+  it('different filepaths produce different instances', async () => {
+    const f1 = resolve('./cache/test-instance-1.json');
+    const f2 = resolve('./cache/test-instance-2.json');
+    if (existsSync(f1)) unlinkSync(f1);
+    if (existsSync(f2)) unlinkSync(f2);
+
+    const s1 = LiteStorage.getInstance<AnyObject>({ filepath: f1 });
+    const s2 = LiteStorage.getInstance<AnyObject>({ filepath: f2 });
+
+    expect(s1).not.toBe(s2);
+
+    await s1.clear(true);
+    await s2.clear(true);
+  });
+
+  it('atomic write writes valid JSON file', async () => {
+    const f = resolve('./cache/test-atomic.json');
+    if (existsSync(f)) unlinkSync(f);
+
+    const stor = LiteStorage.getInstance<AnyObject>({ filepath: f });
+    await stor.ready();
+
+    await stor.set({ atomic: true });
+
+    expect(existsSync(f)).toBe(true);
+    const content = readFileSync(f, 'utf8');
+    expect(() => JSON.parse(content)).not.toThrow();
+
+    await stor.clear(true);
   });
 });

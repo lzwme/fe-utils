@@ -1,6 +1,7 @@
 import { homedir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { fs } from './fs-system.js';
+import { getLogger } from './get-logger.js';
 import { assign, safeJsonParse, safeStringify, tryLoadJSON5 } from '../common/objects.js';
 import { Barrier } from '../common/async.js';
 
@@ -44,10 +45,21 @@ export interface LSOptions<T extends object = Record<string, unknown>> {
  * ```
  */
 export class LiteStorage<T extends object = Record<string, unknown>> {
-  private static instance: LiteStorage;
+  private static instances: Map<string, LiteStorage> = new Map();
+
+  private static computeKey(options?: LSOptions) {
+    const baseDir = resolve(fs.existsSync('./node_modules') ? './node_modules/.cache' : homedir(), '.liteStorage');
+    let filepath = options?.filepath ?? 'ls.json';
+    if (!/\.(json5?|toml)$/i.test(filepath)) filepath = resolve(baseDir, filepath, 'ls.json');
+    return resolve(baseDir, filepath);
+  }
+
   static getInstance<T extends object>(options?: LSOptions) {
-    if (!LiteStorage.instance) LiteStorage.instance = new LiteStorage(options);
-    return LiteStorage.instance as LiteStorage<T>;
+    const key = this.computeKey(options);
+    if (!LiteStorage.instances.has(key)) {
+      LiteStorage.instances.set(key, new LiteStorage(options));
+    }
+    return LiteStorage.instances.get(key) as LiteStorage<T>;
   }
   private get cachePath() {
     return this.options.filepath;
@@ -57,8 +69,7 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
   private isJson5 = false;
   private isChanged = false;
 
-  // @ts-ignore
-  private cache: LSCache<T>;
+  private cache!: LSCache<T>;
   private options: Required<LSOptions>;
   private baseDir = resolve(fs.existsSync('./node_modules') ? './node_modules/.cache' : homedir(), '.liteStorage');
   constructor(options?: LSOptions) {
@@ -109,7 +120,7 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
       if (reload && !this.options.singleMode) await this.reload();
       await this.toCache();
     } catch (e) {
-      console.log(e);
+      getLogger().error('[LiteStorage][save][error]', e);
     }
 
     this.barrier.open();
@@ -128,7 +139,20 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
       } else {
         content = safeStringify(this.cache, 4, this.isJson5);
       }
-      fs.writeFileSync(this.cachePath, content, 'utf8');
+      // atomic write: write to tmp file then rename
+      const tmpPath = `${this.cachePath}.tmp-${process.pid}-${Date.now()}`;
+      fs.writeFileSync(tmpPath, content, 'utf8');
+      try {
+        fs.renameSync(tmpPath, this.cachePath);
+      } catch (e) {
+        // cleanup tmp on error
+        try {
+          if (fs.existsSync(tmpPath)) fs.rmSync(tmpPath, { force: true });
+        } catch {
+          /* ignore */
+        }
+        throw e;
+      }
       this.isChanged = false;
       return this;
     };
@@ -144,18 +168,35 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
   public async reload() {
     if (fs.existsSync(this.cachePath)) {
       const content = fs.readFileSync(this.cachePath, 'utf8');
-      let localCache: LSCache<T>;
-      if (this.isToml) {
-        const TOML = await import('@iarna/toml');
-        localCache = JSON.parse(JSON.stringify(TOML.default.parse(content)));
-      } else {
-        if (this.isJson5) await tryLoadJSON5();
-        localCache = safeJsonParse<never>(content, this.isJson5) as LSCache<T>;
+      let localCache: LSCache<T> | undefined;
+      try {
+        if (this.isToml) {
+          const TOML = await import('@iarna/toml');
+          localCache = JSON.parse(JSON.stringify(TOML.default.parse(content)));
+        } else {
+          if (this.isJson5) await tryLoadJSON5();
+          localCache = safeJsonParse<never>(content, this.isJson5) as LSCache<T>;
+        }
+      } catch (e) {
+        getLogger().error('[LiteStorage][reload][parseError]', e);
+        try {
+          const corruptPath = `${this.cachePath}.corrupt-${Date.now()}`;
+          fs.renameSync(this.cachePath, corruptPath);
+        } catch {
+          /* ignore */
+        }
+        return this;
       }
 
-      if (localCache.version === this.options.version) {
+      if (localCache && localCache.version === this.options.version) {
         assign(this.cache, assign(localCache, this.cache));
-      } else fs.renameSync(this.cachePath, this.cachePath + `-${localCache.version}.bak`);
+      } else if (localCache) {
+        try {
+          fs.renameSync(this.cachePath, this.cachePath + `-${localCache.version}.bak`);
+        } catch (e) {
+          getLogger().error('[LiteStorage][reload][renameBakError]', e);
+        }
+      }
     }
     return this;
   }

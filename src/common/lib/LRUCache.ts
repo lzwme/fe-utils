@@ -113,8 +113,7 @@ export class LRUCache<K = string, V = unknown> {
   }
   info() {
     return {
-      capacity: this.options.max,
-      ttl: this.options.ttl,
+      ...this.options,
       /** The total number of items held in the cache at the current moment */
       size: this.cache.size,
     };
@@ -124,5 +123,8 @@ export class LRUCache<K = string, V = unknown> {
   }
   values() {
     return [...this.cache.values()].map(d => d.v);
+  }
+  get size() {
+    return this.cache.size;
   }
 }

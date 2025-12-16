@@ -17,7 +17,7 @@ export function rmrf(filepath: string) {
     for (const filename of fileList) rmrf(resolve(filepath, filename));
   }
 
-  if (fs.existsSync(filepath)) fs.rmdirSync(filepath, { recursive: true });
+  if (fs.existsSync(filepath)) fs.rmSync(filepath, { recursive: true, force: true });
 }
 
 /** 【异步】删除指定的文件或目录 */

@@ -3,7 +3,7 @@
 
 import { ChildProcess, exec } from 'node:child_process';
 import { color } from 'console-log-colors';
-import { execPromisfy, execSync } from './exec';
+import { execPromisfy, execSync, execFilePromisfy } from './exec';
 import { getLogger } from './get-logger';
 
 export interface ProcessItem {
@@ -244,18 +244,46 @@ export async function tryKillProcess(params: { proc?: ChildProcess; name?: strin
     }
 
     if (params.name) {
-      logger.log(`kill by program name: ${color.green(params.name)}`);
+      const name = params.name;
+      logger.log(`kill by program name: ${color.green(name)}`);
+
+      // validate name: allow alnum, ., -, _, optional .exe suffix
+      if (!/^[A-Za-z0-9_.-]+(?:\.exe)?$/.test(name)) {
+        logger.warn(`[tryKillProcess] rejected unsafe name: ${name}`);
+        return;
+      }
 
       if (process.platform === 'win32') {
         const taskList = execSync('tasklist').stdout;
-        if (taskList.includes(params.name)) await execPromisfy(`taskkill /F /T /IM ${params.name}`, true);
+        if (taskList.includes(name)) await execFilePromisfy('taskkill', ['/F', '/T', '/IM', name], true);
       } else {
-        const pidList = execSync(`ps -ef | pgrep -f "${params.name.replace('.exe', '')}"`)
-          .stdout.split('\n')
-          .map(d => String(d).trim())
-          .filter(Boolean);
+        const simpleName = name.replace(/\.exe$/i, '');
+        // prefer pgrep -f if available
+        const pgrep = await execFilePromisfy('pgrep', ['-f', simpleName], true);
+        let pidList: string[] = [];
+        if (!pgrep.error && pgrep.stdout) {
+          pidList = pgrep.stdout
+            .split('\n')
+            .map(d => String(d).trim())
+            .filter(Boolean);
+        } else {
+          // fallback: get ps -ef and filter safely in JS
+          const psOut = execPromisfy('ps -ef', true);
+          const stdout = (await psOut).stdout;
+          pidList = stdout
+            .split('\n')
+            .map(l => l.trim())
+            .filter(Boolean)
+            .filter(l => l.includes(simpleName))
+            .map(l => {
+              const m = /^\s*(\d+)\s+/.exec(l);
+              return m ? m[1] : '';
+            })
+            .filter(Boolean);
+        }
+
         if (pidList.length > 0) {
-          const killTaskList = pidList.map(pid => execPromisfy(`kill -9 ${pid}`, true));
+          const killTaskList = pidList.map(pid => execFilePromisfy('kill', ['-9', pid], true));
           await Promise.all(killTaskList);
         }
       }
