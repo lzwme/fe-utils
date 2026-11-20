@@ -159,17 +159,19 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
 
     if (!this.options.singleMode) return tc();
 
-    return new Promise(rs => {
+    return new Promise((rs, rj) => {
       if (this.cacheTimer) clearTimeout(this.cacheTimer);
-      this.cacheTimer = setTimeout(async () => tc().then(rs), 100);
+      this.cacheTimer = setTimeout(() => {
+        tc().then(rs, rj);
+      }, 100);
     });
   }
   /** 从文件中重载数据至内存。在多进程、多线程模式下，需读取最新数据时，可手动调用 */
   public async reload() {
     if (fs.existsSync(this.cachePath)) {
-      const content = fs.readFileSync(this.cachePath, 'utf8');
       let localCache: LSCache<T> | undefined;
       try {
+        const content = fs.readFileSync(this.cachePath, 'utf8');
         if (this.isToml) {
           const TOML = await import('@iarna/toml');
           localCache = JSON.parse(JSON.stringify(TOML.default.parse(content)));
@@ -189,7 +191,8 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
       }
 
       if (localCache && localCache.version === this.options.version) {
-        assign(this.cache, assign(localCache, this.cache));
+        // 以磁盘数据为准，避免内存中的旧值覆盖其他进程写入的新值
+        assign(this.cache, localCache);
       } else if (localCache) {
         try {
           fs.renameSync(this.cachePath, this.cachePath + `-${localCache.version}.bak`);
@@ -249,14 +252,12 @@ export class LiteStorage<T extends object = Record<string, unknown>> {
   }
   /** 移除一项数据 */
   public async removeItem(key: keyof T) {
-    const info = this.cache.data[this.options.uuid];
-    if (key in info) {
-      if (!this.options.singleMode) await this.reload();
+    if (!this.options.singleMode) await this.reload();
 
-      if (key in info) {
-        delete info[key];
-        return this.toCache();
-      }
+    const info = this.cache.data[this.options.uuid];
+    if (info && key in info) {
+      delete info[key];
+      return this.toCache();
     }
     return this;
   }
