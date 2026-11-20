@@ -191,9 +191,7 @@ export function listProcesses(rootPid: number, formatName?: (cmd: string) => str
 
       return exec('which ps', {}, (err, stdout, stderr) => {
         if (err || stderr) {
-          if (process.platform !== 'linux') {
-            reject(err || new Error(stderr.toString()));
-          }
+          reject(err || new Error(stderr.toString()));
         } else {
           const ps = stdout.toString().trim();
           const args = '-ax -o pid=,ppid=,pcpu=,pmem=,command=';

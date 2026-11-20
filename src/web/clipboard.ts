@@ -39,7 +39,7 @@ export function writeToClipboard(msg: unknown) {
 export function copyImage(file: File, title = 'download') {
   const blob = new Blob([title], { type: 'text/plain' });
   const clipboardItem = new ClipboardItem({
-    'text/rt': blob,
+    'text/plain': blob,
     'image/png': file,
   });
   return navigator.clipboard.write([clipboardItem]);

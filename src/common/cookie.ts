@@ -62,7 +62,7 @@ export function setCookie(
 ): boolean {
   if (!globalThis.document) return false;
   const { expires = 365, path = '/', domain = '', secure = false, sameSite = 'strict' } = options;
-  const expiresValue = expires instanceof Date ? expires.toUTCString() : `${expires}`;
+  const expiresValue = expires instanceof Date ? expires.toUTCString() : new Date(Date.now() + Number(expires) * 86_400_000).toUTCString();
   const cookieStr = `${name}=${value}; path=${path}; domain=${domain}; expires=${expiresValue}; ${
     secure ? 'secure; ' : ''
   }httponly; samesite=${sameSite}`;

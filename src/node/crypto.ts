@@ -4,6 +4,7 @@ import {
   createCipheriv,
   createDecipheriv,
   createHash,
+  randomInt,
   scryptSync,
   getHashes,
 } from 'node:crypto';
@@ -12,15 +13,12 @@ import { fs } from './fs-system';
 
 /** 生成指定长度的字符串 */
 export function genRandomAesKey(len = 16) {
-  // return crypto.randomBytes(len).toString('utf-8');
-  const result: string[] = [];
-  for (let i = 0; i < len; i++) {
-    let code = Math.round(Math.random() * 126);
-    if (code < 33) code += 32;
-    result.push(String.fromCodePoint(code));
-  }
+  // 使用加密安全的随机数生成密钥，避免 Math.random 的可预测性与分布偏差
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < len; i++) result += chars[randomInt(0, chars.length)];
 
-  return result.join('');
+  return result;
 }
 
 interface HashFn {

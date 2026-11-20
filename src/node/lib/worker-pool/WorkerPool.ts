@@ -45,8 +45,8 @@ export class WorkerPool<T = unknown, R = unknown> extends EventEmitter {
   ) {
     super();
 
-    if (!numThreads || numThreads < 1) numThreads = cpus().length;
-    for (let i = 0; i < numThreads; i++) this.addNewWorker(processorFile);
+    if (!this.numThreads || this.numThreads < 1) this.numThreads = cpus().length;
+    for (let i = 0; i < this.numThreads; i++) this.addNewWorker(processorFile);
 
     // 每当发出 kWorkerFreedEvent 时，调度队列中待处理的下一个任务
     this.on(kWorkerFreedEvent, () => {
@@ -80,12 +80,15 @@ export class WorkerPool<T = unknown, R = unknown> extends EventEmitter {
       // 如果发生未捕获的异常：调用传递给 `runTask` 并出现错误的回调。
       const r = this.workerTaskInfo.get(worker);
       if (r) {
-        r.callback(err, null, r.task, r.startTime);
+        r.callback(err as Error, null, r.task, r.startTime);
         this.workerTaskInfo.delete(worker);
       } else this.emit('error', err);
 
-      // 从列表中删除 Worker 并启动一个新的 Worker 来替换当前的 Worker
-      this.workers.splice(this.workers.indexOf(worker), 1);
+      // 从空闲列表与工作列表中删除该 Worker，并启动一个新的 Worker 来替换当前的 Worker
+      const freeIndex = this.freeWorkers.indexOf(worker);
+      if (freeIndex > -1) this.freeWorkers.splice(freeIndex, 1);
+      const index = this.workers.indexOf(worker);
+      if (index > -1) this.workers.splice(index, 1);
       this.addNewWorker();
     });
 

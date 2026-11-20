@@ -408,7 +408,7 @@ export async function retry<T>(
     }
   }
 
-  throw lastError!;
+  throw lastError || new Error(`[retry] task failed after ${retries} retries`);
 }
 /**
  * 并发执行多任务
