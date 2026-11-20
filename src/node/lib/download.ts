@@ -150,6 +150,14 @@ export async function download(options: DownloadOptions): Promise<DownloadResult
     }
 
     const r = await concurrency(tasks, Number(options.paralelism) || cpus().length);
+    if (isCanceled) return result;
+
+    const failItem = r.find(d => d.error);
+    if (failItem) {
+      result.errmsg = `分段下载失败: ${failItem.error instanceof Error ? failItem.error.message : 'unknown error'}`;
+      return result;
+    }
+
     const tmpFiles = r.map(d => d.result.filepath);
     const writeStream = fs.createWriteStream(filepath);
 
@@ -171,16 +179,22 @@ export async function download(options: DownloadOptions): Promise<DownloadResult
     contentLength = Number(res.headers['content-length']) || 0;
     await new Promise<void>(rs => {
       res.on('data', (buf: Buffer) => {
+        if (isCanceled) return;
         downloadedLen += buf.byteLength;
         chunks.push(buf);
         onProgress();
+        if (isCanceled) res.destroy();
       });
-      res.on('end', rs).on('error', error => {
+      // 正常结束、取消或出错都应结束 Promise，避免下载流程永久挂起
+      res.on('end', () => rs());
+      res.on('close', () => rs());
+      res.on('error', error => {
         console.error('[download]下载失败', error);
         result.errmsg = error.message;
+        rs();
       });
     });
-    if (chunks.length && !result.errmsg) fs.writeFileSync(filepath, Buffer.concat(chunks));
+    if (chunks.length && !result.errmsg && !isCanceled) fs.writeFileSync(filepath, Buffer.concat(chunks));
     result.size = downloadedLen;
   }
 
