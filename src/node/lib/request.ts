@@ -17,7 +17,8 @@ export class Request extends ReqBase {
   }
   req(url: string | URL, parameters?: AnyObject, options: RequestOptions = {}, autoRedirect = true) {
     url = this.formatUrl(url);
-    if (options.method === 'GET' && parameters) url = urlFormat(url.toString(), parameters);
+    const method = String(options.method || 'GET').toUpperCase();
+    if (method === 'GET' && parameters) url = urlFormat(url.toString(), parameters);
 
     let postBody = '';
     const { protocol, port } = url;
@@ -31,7 +32,7 @@ export class Request extends ReqBase {
       headers,
     };
 
-    if (parameters) {
+    if (parameters && method !== 'GET' && method !== 'HEAD') {
       postBody = String(headers!['content-type']).includes('application/json')
         ? JSON.stringify(parameters)
         : new URLSearchParams(parameters as Record<string, string>).toString();

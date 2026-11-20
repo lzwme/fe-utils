@@ -63,7 +63,8 @@ export class ReqBase {
   protected formatUrl(url: string | URL) {
     if (typeof url === 'string') {
       if (!url.startsWith('http')) {
-        if (!this.config.baseURL?.endsWith('/')) this.config.baseURL += '/';
+        if (!this.config.baseURL) throw new Error(`[ReqBase] invalid url: ${url}, please set baseURL first`);
+        if (!this.config.baseURL.endsWith('/')) this.config.baseURL += '/';
         url = this.config.baseURL + (url.startsWith('/') ? url.slice(1) : url);
       }
       url = new URL(url);
@@ -118,10 +119,12 @@ export class ReqFetch extends ReqBase {
   }
   async req(url: string | URL, parameters?: AnyObject, options: ReqOptions = {}, autoRedirect = true): Promise<Response> {
     url = this.formatUrl(url);
-    if (options.method === 'GET' && parameters) url = urlFormat(url.toString(), parameters);
-    options = { ...this.config.reqOptions, ...options, headers: this.getHeaders(url, options.headers) };
+    const method = String(options.method || 'GET').toUpperCase();
+    if (method === 'GET' && parameters) url = urlFormat(url.toString(), parameters);
+    options = { ...this.config.reqOptions, ...options, method, headers: this.getHeaders(url, options.headers) };
 
-    if (parameters) {
+    // GET/HEAD 请求不允许携带 body，否则 fetch 会抛出 TypeError
+    if (parameters && method !== 'GET' && method !== 'HEAD') {
       options.body = String(options.headers!['content-type']).includes('application/json')
         ? JSON.stringify(parameters)
         : new URLSearchParams(parameters as Record<string, string>).toString();
@@ -130,8 +133,8 @@ export class ReqFetch extends ReqBase {
     const r = await fetch(url, options as never);
 
     if (r.status >= 300 && r.status < 400 && autoRedirect && r.headers.get('location')) {
-      let rurl = r.headers.get('location')!;
-      if (!rurl.startsWith('http')) rurl = (r.headers.get('host') || url.host) + rurl;
+      // 相对 location 需基于当前 url 解析为绝对地址
+      const rurl = new URL(r.headers.get('location')!, url).toString();
       return this.req(rurl, parameters, options, true);
     }
 
