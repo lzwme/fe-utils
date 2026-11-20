@@ -110,8 +110,6 @@ export function formatTimeCost(startTime: number, suffix = ['days', 'hours', 'mi
   const milliseconds = s % 1000;
   const result = arriveTimerFormat(Math.floor(s / 1000));
 
-  result.slice(0, 4).push(milliseconds);
-
   return [...result.slice(0, 4), milliseconds]
     .map((v, index) => (v && suffix[index] != null ? `${v}${suffix[index]}` : null))
     .filter(Boolean)
@@ -241,14 +239,22 @@ export function formatIntToTime(time: number | string | Date, withMillisecond = 
   return retVal;
 }
 
+/** 输出带本地时区偏移的 ISO 8601 字符串，如 2020-01-01T12:00:00.000+08:00 */
 export function toLocalISOString(date: Date): string {
+  const pad = (value: number, len = 2) => String(value).padStart(len, '0');
+  // getTimezoneOffset 返回「本地时间相对 UTC 的分钟差」的相反数
+  const offset = -date.getTimezoneOffset();
+  const sign = offset >= 0 ? '+' : '-';
+  const absOffset = Math.abs(offset);
+
   return [
     date.getFullYear() + '-',
-    String(date.getMonth() + 1).padStart(2, '0') + '-',
-    String(date.getDate()).padStart(2, '0') + 'T',
-    String(date.getHours()).padStart(2, '0') + ':',
-    String(date.getMinutes()).padStart(2, '0') + ':',
-    String(date.getSeconds()).padStart(2, '0') + '.',
-    (date.getMilliseconds() / 1000).toFixed(3).slice(2, 5) + 'Z',
+    pad(date.getMonth() + 1) + '-',
+    pad(date.getDate()) + 'T',
+    pad(date.getHours()) + ':',
+    pad(date.getMinutes()) + ':',
+    pad(date.getSeconds()) + '.',
+    pad(date.getMilliseconds(), 3),
+    sign + pad(Math.floor(absOffset / 60)) + ':' + pad(absOffset % 60),
   ].join('');
 }

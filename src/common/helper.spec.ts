@@ -26,6 +26,12 @@ describe('helper.ts', () => {
     // tofixed
     expect(formatByteSize(1536, 2, false)).toBe('1.5KB');
     expect(formatByteSize(1536, 2, true)).toBe('1.50KB');
+
+    // 精确边界值应进位到上一单位
+    expect(formatByteSize(1024)).toBe('1KB');
+    expect(formatByteSize(1024 * 1024)).toBe('1MB');
+    // 极大值不应越界到 undefined 单位
+    expect(formatByteSize(Number.MAX_SAFE_INTEGER)).not.toContain('undefined');
   });
 
   it('formatQty', () => {

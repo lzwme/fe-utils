@@ -189,7 +189,8 @@ export function gitDir(cwd = process.cwd()) {
  * @param cwd 工作目录。默认为当前目录
  */
 export function gitGetTopDir(cwd = process.cwd()) {
-  return resolve(execSync(`git rev-parse --show-toplevel`, 'pipe', cwd).stdout, cwd);
+  // git 失败时 stdout 为空，此时回退到调用方传入的 cwd（而非 process.cwd()）
+  return resolve(execSync(`git rev-parse --show-toplevel`, 'pipe', cwd).stdout.trim() || cwd);
 }
 
 /** 【git】获取最新的 git tag */

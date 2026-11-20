@@ -297,6 +297,26 @@ describe('async.ts#retry', () => {
 
     expect(task).toHaveBeenCalledTimes(retries);
   });
+
+  it('throws a descriptive error when only the validator rejects every attempt', async () => {
+    const task = jest.fn().mockResolvedValue(1);
+    const error = await retry(task, 1, 2, () => false).catch(e => e as Error);
+
+    expect(error).toBeInstanceOf(Error);
+    expect(error.message).toContain('[retry]');
+    expect(task).toHaveBeenCalledTimes(2);
+  });
+
+  it('waits between attempts when the validator rejects', async () => {
+    const start = Date.now();
+    await retry(
+      () => 1,
+      30,
+      2,
+      () => false
+    ).catch(() => void 0);
+    expect(Date.now() - start).toBeGreaterThanOrEqual(25);
+  });
 });
 
 describe('async.ts#concurrency', () => {
@@ -441,6 +461,27 @@ describe('async.ts#Limiter', () => {
     } catch (error_) {
       expect(error_).toBe(error);
     }
+  });
+
+  it('does not stall when a factory throws synchronously', async () => {
+    const error = new Error('sync throw');
+    const l = new Limiter<number>(1);
+    const results: number[] = [];
+
+    const p1 = l
+      .queue(() => {
+        throw error;
+      })
+      .catch(e => {
+        expect(e).toBe(error);
+        return -1;
+      });
+    const p2 = l.queue(() => Promise.resolve(2)).then(v => results.push(v));
+
+    expect(await Promise.race([Promise.all([p1, p2]).then(() => 'done'), new Promise(r => setTimeout(() => r('timeout'), 200))])).toBe(
+      'done'
+    );
+    expect(results).toEqual([2]);
   });
 
   // -eslint-disable-next-line jest/no-done-callback

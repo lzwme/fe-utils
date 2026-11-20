@@ -403,9 +403,9 @@ export async function retry<T>(
       if (!validator || validator(result, i)) return result;
     } catch (error) {
       lastError = error as Error;
-
-      await sleep(delay);
     }
+    // 校验失败与执行异常都需要等待，避免 validator 场景变成无间隔的紧凑重试
+    if (i < retries - 1) await sleep(delay);
   }
 
   throw lastError || new Error(`[retry] task failed after ${retries} retries`);
@@ -494,16 +494,30 @@ export class Limiter<T> {
   private consume(): void {
     while (this.outstandingPromises.length > 0 && this.runningPromises < this.maxDegreeOfParalellism) {
       const iLimitedTask = this.outstandingPromises.shift();
+      if (!iLimitedTask) break;
       this.runningPromises++;
 
-      if (iLimitedTask) {
-        const promise = iLimitedTask.factory();
-        promise.then(iLimitedTask.c, iLimitedTask.e);
-        promise.then(
-          () => this.consumed(),
-          () => this.consumed()
-        );
+      let promise: Promise<T>;
+      try {
+        // Promise.resolve 兼容工厂返回非 Promise 值的情况
+        promise = Promise.resolve(iLimitedTask.factory());
+      } catch (error) {
+        // 同步抛错也必须归还占用，否则 runningPromises 永远无法归零，后续任务全部卡死。
+        // 直接在本轮循环内归还，不能调用 consumed()：consumed() 会再次进入 consume()，
+        // 大量同步抛错的工厂会让 consume -> consumed -> consume 无限递归直至栈溢出
+        iLimitedTask.e(error);
+        this._size--;
+        this.runningPromises--;
+        if (this.outstandingPromises.length > 0) continue;
+        for (const d of this.onFinishCallbackFns) d();
+        continue;
       }
+
+      promise.then(iLimitedTask.c, iLimitedTask.e);
+      promise.then(
+        () => this.consumed(),
+        () => this.consumed()
+      );
     }
   }
 

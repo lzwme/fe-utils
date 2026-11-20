@@ -112,4 +112,20 @@ describe('utils-date', () => {
 
     expect(utilsDate.formatIntToTime(80_151_559, false)).toEqual('08:01:51');
   });
+
+  it('toLocalISOString includes a local UTC offset instead of a misleading Z', () => {
+    const d = new Date('2020-01-01T04:00:00.000Z');
+    const result = utilsDate.toLocalISOString(d);
+    const offsetMinutes = -d.getTimezoneOffset();
+    const sign = offsetMinutes >= 0 ? '+' : '-';
+    const abs = Math.abs(offsetMinutes);
+
+    expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{2}:\d{2}$/);
+    expect(result).toContain(`${sign}${String(Math.floor(abs / 60)).padStart(2, '0')}:${String(abs % 60).padStart(2, '0')}`);
+    expect(new Date(result).getTime()).toBe(d.getTime());
+  });
+
+  it('formatTimeCost still formats time without the removed dead-code line', () => {
+    expect(utilsDate.formatTimeCost(Date.now() - 1500)).toContain('s');
+  });
 });

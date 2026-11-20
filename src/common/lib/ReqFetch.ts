@@ -88,6 +88,11 @@ export class ReqBase {
       ...toLowcaseKeyObject(headers),
     };
 
+    // undefined/null 视为未设置：既不覆盖默认值，也不能传给 http.request（会抛 ERR_HTTP_INVALID_HEADER_VALUE）
+    for (const key of Object.keys(headers)) {
+      if (headers[key] == null) delete headers[key];
+    }
+
     if (!this.isBrowser && urlObject) {
       if (!headers.host) headers.host = urlObject.host;
       if (!headers.origin) headers.origin = urlObject.origin || `${urlObject.protocol}://${urlObject.hostname}`;
@@ -134,8 +139,19 @@ export class ReqFetch extends ReqBase {
 
     if (r.status >= 300 && r.status < 400 && autoRedirect && r.headers.get('location')) {
       // 相对 location 需基于当前 url 解析为绝对地址
-      const rurl = new URL(r.headers.get('location')!, url).toString();
-      return this.req(rurl, parameters, options, true);
+      const rurl = new URL(r.headers.get('location')!, url);
+      const headers: OutgoingHttpHeaders = { ...(options.headers as OutgoingHttpHeaders) };
+      // 仅当主机确实变化时才丢弃 host/origin，保留同主机重定向下用户显式设置的值
+      if (headers.host && headers.host !== rurl.host) delete headers.host;
+      if (headers.origin && headers.origin !== rurl.origin) delete headers.origin;
+      // 跨主机重定向不能沿用上一次的凭据，避免 cookie/authorization 泄露给第三方主机
+      if (rurl.host !== url.host) {
+        headers.cookie = undefined;
+        headers.authorization = undefined;
+      }
+      // Location 已是完整 URL，GET/HEAD 不再重复拼接 parameters
+      const method = String(options.method || 'GET').toUpperCase();
+      return this.req(rurl, method === 'GET' || method === 'HEAD' ? undefined : parameters, { ...options, headers }, true);
     }
 
     return r;

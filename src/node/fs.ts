@@ -150,9 +150,11 @@ export function findFiles(srcDir?: string, validate?: (filepath: string, stat: S
 
   const stat = fs.statSync(srcDir);
 
-  if (validate && !validate(srcDir, stat)) return files;
-
-  if (stat.isFile()) return [resolve(srcDir)];
+  // validate 只用于筛选文件；若对目录也执行，只匹配文件的校验函数会把整个子树裁掉
+  if (stat.isFile()) {
+    if (validate && !validate(srcDir, stat)) return files;
+    return [resolve(srcDir)];
+  }
 
   if (stat.isDirectory()) {
     for (const filename of fs.readdirSync(srcDir)) {

@@ -9,6 +9,30 @@ import { Request } from './request';
 import { NLogger } from './NLogger';
 import { md5 } from '../crypto';
 
+/** 解析 content-disposition 中的文件名，优先 filename*（RFC 5987），再回退 filename= */
+function parseContentDispositionFilename(disposition?: string | string[]): string | undefined {
+  const value = Array.isArray(disposition) ? disposition[0] : disposition;
+  if (!value) return undefined;
+
+  let raw: string | undefined;
+  const star = /filename\*\s*=\s*(?:UTF-8''|utf-8'')?([^;]*)/i.exec(value);
+  if (star?.[1]) {
+    raw = star[1];
+  } else {
+    const plain = /filename\s*=\s*([^;]*)/i.exec(value);
+    raw = plain?.[1];
+  }
+
+  if (!raw) return undefined;
+
+  const name = raw.trim().replace(/^['"]|['"]$/g, '');
+  try {
+    return decodeURIComponent(name);
+  } catch {
+    return name;
+  }
+}
+
 export interface DownloadOptions {
   url: string;
   /** 文件保存路径 */
@@ -64,9 +88,7 @@ export async function download(options: DownloadOptions): Promise<DownloadResult
   const { req, res } = await request.req(options.url, options.params, { ...options.requestOptions, method: 'HEAD' });
   res.destroy();
   if (!options.filepath) {
-    options.filepath = res.headers['content-disposition']
-      ? decodeURIComponent(res.headers['content-disposition'].split('filename=')[1].trim().split(';')[0].replace(/['"]/g, ''))
-      : basename(req.path.split('?')[0]);
+    options.filepath = parseContentDispositionFilename(res.headers['content-disposition']) || basename(req.path.split('?')[0]);
   }
 
   const filepath = resolve(options.filepath);
@@ -152,49 +174,68 @@ export async function download(options: DownloadOptions): Promise<DownloadResult
     const r = await concurrency(tasks, Number(options.paralelism) || cpus().length);
     if (isCanceled) return result;
 
-    const failItem = r.find(d => d.error);
+    // 分段失败可能表现为 reject（d.error）或正常结束但 result.errmsg 非空（如连接提前关闭），两者都要视为失败
+    const failItem = r.find(d => d.error || d.result?.errmsg);
     if (failItem) {
-      result.errmsg = `分段下载失败: ${failItem.error instanceof Error ? failItem.error.message : 'unknown error'}`;
+      const message = failItem.error instanceof Error ? failItem.error.message : failItem.result?.errmsg;
+      result.errmsg = `分段下载失败: ${message || 'unknown error'}`;
+      if (fs.existsSync(filepath)) fs.rmSync(filepath, { force: true });
       return result;
     }
 
     const tmpFiles = r.map(d => d.result.filepath);
     const writeStream = fs.createWriteStream(filepath);
 
-    for (const fp of tmpFiles) {
-      await new Promise((rs, rj) => {
-        const readStream = fs.createReadStream(fp);
-        readStream.pipe(writeStream, { end: false });
-        readStream.on('end', () => {
-          fs.rm(fp, err => err && console.error('[download]删除临时文件失败', err));
-          rs(true);
+    try {
+      for (const fp of tmpFiles) {
+        await new Promise((rs, rj) => {
+          const readStream = fs.createReadStream(fp);
+          readStream.pipe(writeStream, { end: false });
+          readStream.on('end', () => {
+            fs.rm(fp, err => err && console.error('[download]删除临时文件失败', err));
+            rs(true);
+          });
+          readStream.on('error', error => rj(error));
         });
-        readStream.on('error', error => rj(error));
-      });
+      }
+      writeStream.end();
+    } catch (error) {
+      writeStream.destroy();
+      if (fs.existsSync(filepath)) fs.rmSync(filepath, { force: true });
+      throw error;
     }
-    writeStream.end();
   } else {
     const { res } = await request.req(options.url, options.params, options.requestOptions);
     const chunks: Buffer[] = [];
     contentLength = Number(res.headers['content-length']) || 0;
     await new Promise<void>(rs => {
+      let completed = false;
       res.on('data', (buf: Buffer) => {
         if (isCanceled) return;
         downloadedLen += buf.byteLength;
         chunks.push(buf);
         onProgress();
-        if (isCanceled) res.destroy();
+        if (isCanceled) {
+          res.destroy();
+          rs();
+        }
       });
-      // 正常结束、取消或出错都应结束 Promise，避免下载流程永久挂起
-      res.on('end', () => rs());
-      res.on('close', () => rs());
+      res.on('end', () => {
+        completed = true;
+        rs();
+      });
       res.on('error', error => {
         console.error('[download]下载失败', error);
         result.errmsg = error.message;
         rs();
       });
+      // close 在正常结束时也会触发；只有在「未正常结束」时才标记为不完整，避免写出截断文件
+      res.on('close', () => {
+        if (!completed && !result.errmsg && !isCanceled) result.errmsg = '连接提前关闭，下载不完整';
+        rs();
+      });
     });
-    if (chunks.length && !result.errmsg && !isCanceled) fs.writeFileSync(filepath, Buffer.concat(chunks));
+    if (!result.errmsg && !isCanceled) fs.writeFileSync(filepath, Buffer.concat(chunks));
     result.size = downloadedLen;
   }
 

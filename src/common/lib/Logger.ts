@@ -70,7 +70,7 @@ export class Logger {
     return LogLevel[this.level] as LogLevelType;
   }
 
-  public silent: GeneralFn = this._log.bind(this, 'error');
+  public silent: GeneralFn = this._log.bind(this, 'silent');
   public error: GeneralFn = this._log.bind(this, 'error');
   public warn: GeneralFn = this._log.bind(this, 'warn');
   public info: GeneralFn = this._log.bind(this, 'info');
@@ -128,29 +128,31 @@ export class Logger {
   private _log(type: LogLevelType, ...args: unknown[]) {
     const lvl = LogLevel[type];
 
-    if (lvl <= this.level) {
-      this.times++;
-      const now = this.getSeverTime(true);
-      const curTime = dateFormat(this.options.timeFormat!, now);
-      const msg = args.map(s => (typeof s === 'string' ? s : safeStringify(s))).join(' ');
+    // silent 是「仅写文件」级别：不受日志级别门槛限制（否则 levelType='error' 时连文件都不会写），
+    // 但始终不输出到控制台
+    if (type !== 'silent' && lvl > this.level) return;
 
-      if (this.writeToFile) this.writeToFile(`[${curTime}]${this.tag}[${type}] ${msg}\n`);
-      if (this.options.silent || type === 'silent') return;
+    this.times++;
+    const now = this.getSeverTime(true);
+    const curTime = dateFormat(this.options.timeFormat!, now);
+    const msg = args.map(s => (typeof s === 'string' ? s : safeStringify(s))).join(' ');
 
-      if (console[type]) {
-        let header = `[${curTime}]${this.tag}`;
-        if (this.options.color) {
-          header = this.options.color.greenBright(header);
-        }
+    if (this.writeToFile) this.writeToFile(`[${curTime}]${this.tag}[${type}] ${msg}\n`);
+    if (this.options.silent || type === 'silent') return;
 
-        if (lvl === LogLevel.debug) header += `[${this.times}]`;
-        if (LogLevelHeadTip[type]) {
-          header = LogLevelHeadTip[type][0] + header;
-        }
-
-        if (!this.options.debug && type !== 'debug') console[type](header, msg);
-        else console[type](header, ...args);
+    if (console[type]) {
+      let header = `[${curTime}]${this.tag}`;
+      if (this.options.color) {
+        header = this.options.color.greenBright(header);
       }
+
+      if (lvl === LogLevel.debug) header += `[${this.times}]`;
+      if (LogLevelHeadTip[type]) {
+        header = LogLevelHeadTip[type][0] + header;
+      }
+
+      if (!this.options.debug && type !== 'debug') console[type](header, msg);
+      else console[type](header, ...args);
     }
   }
   public updateOptions(options: LoggerOptions) {

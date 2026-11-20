@@ -42,16 +42,17 @@ export function safeStringify(obj: any, space?: string | number, useJSON5 = fals
   if (obj instanceof Error) return `Error: ${obj.message}\n${obj.stack}`;
   if (obj instanceof RegExp) return obj.toString();
 
-  const seen = new Set<any>();
+  // 只把「当前调用栈上的祖先」视为循环引用；共享引用（同一对象出现在不同分支）应正常序列化
+  const ancestors: unknown[] = [];
   return (useJSON5 ? JSON5 : JSON).stringify(
     obj,
-    (_key, value) => {
-      if (isObject(value) || Array.isArray(value)) {
-        if (seen.has(value)) {
-          return '[Circular]';
-        } else {
-          seen.add(value);
+    function (_key, value) {
+      if (typeof value === 'object' && value !== null) {
+        while (ancestors.length > 0 && ancestors[ancestors.length - 1] !== this) {
+          ancestors.pop();
         }
+        if (ancestors.includes(value)) return '[Circular]';
+        ancestors.push(value);
       }
       return value;
     },
@@ -66,14 +67,32 @@ export function getObjectKeysUnsafe<T extends object>(value: T): (keyof T)[] {
   return Object.keys(value) as (keyof T)[];
 }
 
-export function deepClone<T extends object>(obj: T): T {
-  if (!obj || typeof obj !== 'object' || obj instanceof RegExp) return obj;
+export function deepClone<T>(obj: T, seen = new WeakMap<object, unknown>()): T {
+  if (!obj || typeof obj !== 'object') return obj;
+
+  const cached = seen.get(obj);
+  if (cached) return cached as T;
+
+  if (obj instanceof Date) return new Date(obj.getTime()) as T;
+  if (obj instanceof RegExp) return new RegExp(obj.source, obj.flags) as T;
+  if (obj instanceof Map) {
+    const result = new Map();
+    seen.set(obj, result);
+    for (const [key, value] of obj) result.set(deepClone(key, seen), deepClone(value, seen));
+    return result as T;
+  }
+  if (obj instanceof Set) {
+    const result = new Set();
+    seen.set(obj, result);
+    for (const value of obj) result.add(deepClone(value, seen));
+    return result as T;
+  }
 
   const result: any = Array.isArray(obj) ? [] : {};
-  // eslint-disable-next-line unicorn/no-array-for-each
-  getObjectKeysUnsafe(obj).forEach(key => {
-    result[key] = (<any>obj)[key] && typeof (<any>obj)[key] === 'object' ? deepClone((<any>obj)[key]) : (<any>obj)[key];
-  });
+  seen.set(obj, result);
+  for (const key of Object.keys(obj)) {
+    result[key] = deepClone((obj as Record<string, unknown>)[key], seen);
+  }
   return result;
 }
 
@@ -197,15 +216,17 @@ export function ensureArray<T>(input: readonly T[] | T | undefined | null): read
 
 /** 将 object 所有 key 转换为小写 */
 export function toLowcaseKeyObject<T extends Record<string, unknown>>(info: T = {} as T) {
+  // 在副本上改写，避免污染调用方传入的对象
+  const ret = { ...info };
   for (const key of Object.keys(info)) {
     const lowCaseKey = key.toLocaleLowerCase();
     if (key !== lowCaseKey) {
       // @ts-expect-error
-      info[lowCaseKey] = info[key];
-      delete info[key];
+      ret[lowCaseKey] = info[key];
+      delete ret[key];
     }
   }
-  return info;
+  return ret as T;
 }
 
 /** 过滤指定的key或空值，返回新的对象 */

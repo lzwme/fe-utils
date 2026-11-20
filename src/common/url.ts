@@ -50,13 +50,26 @@ export function toQueryString(params: Record<string, unknown>) {
 }
 
 export function getUrlParams(query = location.search) {
-  const ret: Record<string, string> = {};
+  // 使用 null 原型对象：避免 __proto__ 等键被原型 setter 吞掉或改写返回值的原型
+  const ret: Record<string, string> = Object.create(null);
   if (query) {
     if (query.includes('?')) query = query.slice(query.indexOf('?') + 1);
     const parts = query.split('&');
     for (const line of parts) {
-      const kv = line.split('=').map(d => decodeURIComponent(d));
-      ret[kv[0]] = kv[1] || '';
+      if (!line) continue;
+      // 值中可能包含 '='（如 base64），只能按第一个 '=' 拆分
+      const eqIndex = line.indexOf('=');
+      const rawKey = eqIndex === -1 ? line : line.slice(0, eqIndex);
+      const rawValue = eqIndex === -1 ? '' : line.slice(eqIndex + 1);
+      let key = rawKey;
+      let value = rawValue;
+      try {
+        key = decodeURIComponent(rawKey);
+        value = decodeURIComponent(rawValue);
+      } catch {
+        // 非法转义时保留原始内容，避免整次解析抛错
+      }
+      ret[key] = value;
     }
   }
   return ret;

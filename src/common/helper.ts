@@ -12,7 +12,7 @@ export function formatByteSize(byteSize: number | string, decimal = 2, toFixed =
   const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
   let idx = 0;
 
-  while (idx < units.length && formated > base) {
+  while (idx < units.length - 1 && formated >= base) {
     formated /= base;
     idx++;
   }

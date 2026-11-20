@@ -6,6 +6,8 @@ import { urlFormat } from '../../common/url';
 import { ReqBase, type ReqConfig } from '../../common/lib/ReqFetch';
 import type { AnyObject } from '../../types';
 
+const MAX_REDIRECT_COUNT = 10;
+
 export class Request extends ReqBase {
   static instance: Request;
   static getInstance() {
@@ -15,10 +17,11 @@ export class Request extends ReqBase {
   constructor(cookie?: string | (Omit<ReqConfig, 'reqOptions'> & { reqOptions?: RequestOptions }), headers?: OutgoingHttpHeaders) {
     super(cookie, headers);
   }
-  req(url: string | URL, parameters?: AnyObject, options: RequestOptions = {}, autoRedirect = true) {
+  req(url: string | URL, parameters?: AnyObject, options: RequestOptions = {}, autoRedirect = true, _redirectCount = 0) {
     url = this.formatUrl(url);
     const method = String(options.method || 'GET').toUpperCase();
-    if (method === 'GET' && parameters) url = urlFormat(url.toString(), parameters);
+    // GET/HEAD 的参数需要拼进 URL，否则下载 HEAD 探测会丢失 query，导致探测到错误的资源
+    if ((method === 'GET' || method === 'HEAD') && parameters) url = urlFormat(url.toString(), parameters);
 
     let postBody = '';
     const { protocol, port } = url;
@@ -28,7 +31,7 @@ export class Request extends ReqBase {
       ...options,
       hostname: url.host.split(':')[0],
       port,
-      path: url.href.split(url.host)[1],
+      path: url.pathname + url.search,
       headers,
     };
 
@@ -45,9 +48,38 @@ export class Request extends ReqBase {
       const req: http.ClientRequest = h.request(options, res => {
         globalThis.clearTimeout(timer);
         if (autoRedirect && String(res.statusCode).startsWith('30') && res.headers['location']) {
-          let rurl = res.headers['location'];
-          if (!rurl.startsWith('http')) rurl = (res.headers['host'] || url.host) + rurl;
-          this.req(rurl, parameters, options, true).then(resolve);
+          // 消费掉重定向响应体，释放连接
+          res.resume();
+
+          if (_redirectCount >= MAX_REDIRECT_COUNT) {
+            req.destroy();
+            reject(new Error(`重定向次数过多（超过 ${MAX_REDIRECT_COUNT} 次）`));
+            return;
+          }
+
+          let rurl: URL;
+          try {
+            // 相对 Location 必须基于当前 URL 解析，响应头中的 host 并不可靠
+            rurl = new URL(res.headers['location'], url);
+          } catch (error) {
+            req.destroy();
+            reject(error);
+            return;
+          }
+
+          const headers: OutgoingHttpHeaders = { ...(options.headers as OutgoingHttpHeaders) };
+          // 仅当主机确实变化时才丢弃 host/origin，保留同主机重定向下用户显式设置的值
+          if (headers.host && headers.host !== rurl.host) delete headers.host;
+          if (headers.origin && headers.origin !== rurl.origin) delete headers.origin;
+          // 跨主机重定向不能沿用上一次的凭据，避免 cookie/authorization 泄露给第三方主机
+          if (rurl.host !== url.host) {
+            headers.cookie = undefined;
+            headers.authorization = undefined;
+          }
+
+          // Location 已是完整 URL，GET/HEAD 不再重复拼接 parameters
+          const nextParams = method === 'GET' || method === 'HEAD' ? undefined : parameters;
+          this.req(rurl, nextParams, { ...options, headers }, true, _redirectCount + 1).then(resolve, reject);
         } else resolve({ req, res });
       });
 
@@ -91,9 +123,15 @@ export class Request extends ReqBase {
         };
 
         if (encoding === 'gzip') {
-          zlib.gunzip(buffer, (_error, decoded) => resolveData(decoded.toString()));
+          zlib.gunzip(buffer, (_error, decoded) => {
+            if (_error) return reject(_error);
+            resolveData(decoded.toString());
+          });
         } else if (encoding === 'deflate') {
-          zlib.inflate(buffer, (_error, decoded) => resolveData(decoded.toString()));
+          zlib.inflate(buffer, (_error, decoded) => {
+            if (_error) return reject(_error);
+            resolveData(decoded.toString());
+          });
         } else {
           resolveData(buffer.toString());
         }

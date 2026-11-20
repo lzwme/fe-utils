@@ -57,16 +57,15 @@ describe('objects/assign', () => {
     expect(safeStringify(reg)).toBe(reg.toString());
   });
 
-  it('safeStringify handles duplicate references (non-circular) marking second as [Circular]', () => {
+  it('safeStringify keeps duplicate references (non-circular) intact', () => {
     const x = { n: 1 };
     const obj = { a: x, b: x };
     const normal = JSON.stringify(obj);
     const s = safeStringify(obj);
 
-    // safeStringify will mark the second reference as [Circular]
-    expect(s.includes('[Circular]')).toBeTruthy();
-    // JSON.stringify does not insert [Circular] for duplicate refs
-    expect(normal.includes('[Circular]')).toBeFalsy();
+    // 共享引用不是循环引用，两个分支都应正常序列化
+    expect(s).toBe(normal);
+    expect(s.includes('[Circular]')).toBeFalsy();
   });
 
   it('safeStringify respects space parameter and primitives', () => {
@@ -102,6 +101,29 @@ describe('objects/assign', () => {
     expect(deepClone(regex1)).toEqual(regex1);
 
     expect(deepClone([a]).length === 1).toBeTruthy();
+  });
+
+  it('deepClone handles Date, Map, Set and circular references', () => {
+    const date = new Date('2020-01-01T00:00:00Z');
+    const clonedDate = deepClone(date);
+    expect(clonedDate).not.toBe(date);
+    expect(clonedDate.getTime()).toBe(date.getTime());
+
+    const map = new Map([['k', { n: 1 }]]);
+    const clonedMap = deepClone(map);
+    expect(clonedMap).not.toBe(map);
+    expect(clonedMap.get('k')).toEqual({ n: 1 });
+    expect(clonedMap.get('k')).not.toBe(map.get('k'));
+
+    const set = new Set([1, 2]);
+    const clonedSet = deepClone(set);
+    expect(clonedSet).not.toBe(set);
+    expect([...clonedSet]).toEqual([1, 2]);
+
+    const circular: AnyObject = { n: 1 };
+    circular.self = circular;
+    const cloned = deepClone(circular);
+    expect(cloned.self).toBe(cloned);
   });
 
   it('mixin', () => {
