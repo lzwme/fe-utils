@@ -6,11 +6,9 @@ export let fs = nfs;
 try {
   if (typeof process === 'object' && process.versions?.electron) {
     if (typeof require === 'undefined') {
-      // @ts-ignore
-      // eslint-disable-next-line unicorn/prefer-top-level-await
+      // @ts-expect-error
       import('original-fs').then(d => (fs = d));
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const ofs = require('original-fs');
       if ('read' in ofs) fs = ofs;
     }

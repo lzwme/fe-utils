@@ -7,10 +7,10 @@
  */
 import type { OutgoingHttpHeaders } from 'node:http';
 import type { RequestOptions } from 'node:https';
-import { urlFormat } from '../url';
-import { assign, toLowcaseKeyObject } from '../objects';
 import type { AnyObject } from '../../types';
 import { cookieParse } from '../cookie';
+import { assign, toLowcaseKeyObject } from '../objects';
+import { urlFormat } from '../url';
 
 interface ReqOptions extends Omit<RequestInit, 'headers'> {
   headers?: OutgoingHttpHeaders;

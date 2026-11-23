@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, unicorn/prefer-top-level-await */
 import type { AnyObject } from '../types';
-import { isObject, isSet, isMap, isArray } from './is';
+import { isArray, isMap, isObject, isSet } from './is';
 
 let JSON5: typeof globalThis.JSON;
 
@@ -8,7 +7,7 @@ export async function tryLoadJSON5(useCache = false) {
   if (!JSON5 || !useCache) {
     JSON5 = globalThis.JSON;
     try {
-      // @ts-ignore
+      // @ts-expect-error
       if (globalThis.JSON5) JSON5 = globalThis.JSON5;
       else {
         if (typeof require === 'function') JSON5 = require('json5');
@@ -166,8 +165,6 @@ export function simpleAssign<T extends Record<string, any>, U>(
   seen.add(b);
 
   for (const [key, value] of Object.entries(b as Record<string, unknown>)) {
-    // eslint bug
-    // eslint-disable-next-line unicorn/no-array-callback-reference, unicorn/no-array-method-this-argument
     if (typeof options.filter === 'function' && !options.filter(value, key)) continue;
 
     if (null == value || typeof value !== 'object' || value instanceof RegExp) {

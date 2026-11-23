@@ -1,7 +1,7 @@
-import { getGitLog, isGitRepo, getHeadBranch, getHeadCommitId, getHeadDiffFileList, getUserEmail, gitSetChmod, gitGetTopDir } from './git';
 import cp from 'node:child_process';
 import fs from 'node:fs';
 import { resolve } from 'node:path';
+import { getGitLog, getHeadBranch, getHeadCommitId, getHeadDiffFileList, getUserEmail, gitGetTopDir, gitSetChmod, isGitRepo } from './git';
 
 const gitLogLine = [
   `a5840084eae998ee4a33ad091d004b9f856c1140`,

@@ -1,9 +1,9 @@
+import http, { type IncomingHttpHeaders, type IncomingMessage, type OutgoingHttpHeaders } from 'node:http';
+import https, { type RequestOptions } from 'node:https';
 import { URL } from 'node:url';
 import zlib from 'node:zlib';
-import http, { type IncomingMessage, type IncomingHttpHeaders, type OutgoingHttpHeaders } from 'node:http';
-import https, { type RequestOptions } from 'node:https';
-import { urlFormat } from '../../common/url';
 import { ReqBase, type ReqConfig } from '../../common/lib/ReqFetch';
+import { urlFormat } from '../../common/url';
 import type { AnyObject } from '../../types';
 
 const MAX_REDIRECT_COUNT = 10;

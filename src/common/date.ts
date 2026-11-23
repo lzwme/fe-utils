@@ -58,7 +58,7 @@ export function dateFormat(fmt: string, date: Date | string | number = new Date(
   }
   for (const k in o) {
     if (new RegExp(`(${k})`).test(fmt)) {
-      // @ts-ignore
+      // @ts-expect-error
       fmt = fmt.replace(RegExp.$1, RegExp.$1.length === 1 ? o[k] : ('00' + o[k]).slice(('' + o[k]).length));
     }
   }
@@ -95,7 +95,7 @@ export function arriveTimerFormat(second: number | string, dayDesc = 'day ') {
     t.push(String(min).padStart(2, '0'), String(sec).padStart(2, '0'));
   }
 
-  // @ts-ignore
+  // @ts-expect-error
   return [day, hour, min, sec, t.join(':')] as const;
 }
 

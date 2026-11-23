@@ -7,9 +7,6 @@ module.exports = {
   tscheck: {
     src: ['src'],
   },
-  eslint: {
-    src: ['src'],
-  },
   jest: {
     src: ['src'],
   },

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 // 主要定义一些 types 工具方法或类型
 
 /** 获取 T 的 value 值类型 */
@@ -16,7 +15,6 @@ export type GeneralFn<T = void> = (...p: unknown[]) => T;
 /**
  * @deprecated This type should be avoided as far as possible
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyObject = Record<string, any>;
 
 export type ComputeRange<N extends number, Result extends Array<unknown> = []> = Result['length'] extends N

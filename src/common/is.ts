@@ -29,7 +29,7 @@ export function isEmptyObject(obj: unknown): boolean {
   if (!isObject(obj)) return false;
 
   for (const key in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, key)) return false;
+    if (Object.hasOwn(obj, key)) return false;
   }
 
   return true;
@@ -39,7 +39,6 @@ export function isNumber(obj: unknown): obj is number {
   return typeof obj === 'number' && !Number.isNaN(obj);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isArray(array: any): array is any[] {
   return Array.isArray(array);
 }
@@ -48,7 +47,6 @@ export function isUndefinedOrNull(value: unknown) {
   return null == value;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function isFunction(obj: unknown): obj is Function {
   return typeof obj === 'function';
 }

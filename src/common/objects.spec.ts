@@ -1,17 +1,17 @@
-import { AnyObject } from '../types';
+import type { AnyObject } from '../types';
 import {
   assign,
-  mergeArrayLike,
-  simpleAssign,
   assignExceptNil,
-  mixin,
   deepClone,
-  safeStringify,
   ensureArray,
-  safeJsonParse,
-  tryLoadJSON5,
-  toLowcaseKeyObject,
+  mergeArrayLike,
+  mixin,
   objectFilterByKeys,
+  safeJsonParse,
+  safeStringify,
+  simpleAssign,
+  toLowcaseKeyObject,
+  tryLoadJSON5,
 } from './objects';
 
 describe('objects/assign', () => {
@@ -178,7 +178,6 @@ describe('objects/assign', () => {
   });
 
   it('assign', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const a: Record<string, any> = { b: 1 };
     const b = { a: { b: 1 }, b: 2, c: [1, 2] };
 
@@ -187,9 +186,9 @@ describe('objects/assign', () => {
     expect(assign(a, [], b).b).toEqual(2);
     expect(Array.isArray(assign(a, b)['c'])).toBeTruthy();
 
-    // @ts-ignore
+    // @ts-expect-error
     expect(assign(void 0, b) === void 0).toBeTruthy();
-    // @ts-ignore
+    // @ts-expect-error
     expect(assign(a, void 0)).toEqual(a);
 
     // 第一个参数是数组，则原样返回

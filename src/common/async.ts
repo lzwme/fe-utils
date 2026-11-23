@@ -7,9 +7,7 @@
  * @see src\vs\base\common\async.ts
  */
 
-export interface ITask<T> {
-  (): T;
-}
+export type ITask<T> = () => T;
 
 export interface IDisposable {
   dispose(): void;
@@ -257,7 +255,6 @@ export class Delayer<T> implements IDisposable {
       });
     }
 
-    // eslint-disable-next-line unicorn/consistent-function-scoping
     const fn = () => {
       this.deferred = null;
       this.doResolve?.(null);

@@ -7,8 +7,8 @@
  */
 
 import { resolve } from 'node:path';
-import { fs } from './fs-system';
 import { execSync } from './exec';
+import { fs } from './fs-system';
 
 /** getGitLog 返回项的格式 */
 export interface GitLogItem {
@@ -60,7 +60,6 @@ export function getGitLog(num = 1, cwd?: string, filepath?: string) {
   const list = logResult.stdout ? logResult.stdout.split('\n') : [];
   const result: GitLogItem[] = list.map(line => {
     const valList = line.split(' _-_ ');
-    // eslint-disable-next-line unicorn/no-array-reduce
     return prettyFormat.reduce((r: GitLogItem, key: string, idx: number) => {
       r[key as never] = valList[idx] as never;
       return r;
@@ -122,13 +121,13 @@ export function gitSetChmod(filepath: string, type: 'add' | 'del' = 'add') {
 
 /** 判断给定的目录是否为一个 git 仓库 */
 export function isGitRepo(rootDir = process.cwd(), useCache = true): boolean {
-  // @ts-ignore
+  // @ts-expect-error
   if (isGitRepo[rootDir] == null || !useCache) {
-    // @ts-ignore
+    // @ts-expect-error
     isGitRepo[rootDir] =
       fs.existsSync(resolve(rootDir, '.git/config')) || execSync('git branch --show-current', 'pipe', rootDir).error == null;
   }
-  // @ts-ignore
+  // @ts-expect-error
   return isGitRepo[rootDir];
 }
 

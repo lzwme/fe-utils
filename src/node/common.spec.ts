@@ -1,5 +1,6 @@
 // import test from 'ava';
 import * as comm from './common';
+
 jest.mock('node:readline', () => ({
   createInterface() {
     return {

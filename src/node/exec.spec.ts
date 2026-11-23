@@ -1,9 +1,7 @@
-/* eslint-disable unicorn/no-await-expression-member */
-import { execSync, execPromisfy } from './exec';
+import { execPromisfy, execSync } from './exec';
 
 describe('utils/exec', () => {
   beforeAll(() => {
-    // eslint-disable-next-line no-console
     console.error = console.warn = console.log = () => null;
   });
 

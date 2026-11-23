@@ -1,6 +1,4 @@
-/* -eslint-disable jest/no-conditional-expect */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { raceTimeout, sleep, Barrier, getPromiseState, Limiter, ITask, concurrency, retry, wait, Throttler, Sequencer } from './async';
+import { Barrier, concurrency, getPromiseState, type ITask, Limiter, raceTimeout, retry, Sequencer, sleep, Throttler, wait } from './async';
 
 describe('async.ts#raceTimeout', () => {
   it('resolves with promise value before timeout', async () => {
@@ -279,7 +277,6 @@ describe('async.ts#retry', () => {
       .mockImplementationOnce(() => Promise.resolve(2));
     const delay = 100;
     const retries = 2;
-    // eslint-disable-next-line unicorn/consistent-function-scoping
     const validator = (result: number, _index: number) => result >= 2;
 
     const result = await retry(task, delay, retries, validator);
@@ -484,7 +481,6 @@ describe('async.ts#Limiter', () => {
     expect(results).toEqual([2]);
   });
 
-  // -eslint-disable-next-line jest/no-done-callback
   it('should handle multiple errors correctly', done => {
     const errors: Error[] = [];
     for (let i = 0; i < 3; i++) {

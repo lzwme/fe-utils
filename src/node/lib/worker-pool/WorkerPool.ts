@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events';
-import { Worker } from 'node:worker_threads';
-import { cpus } from 'node:os';
 import { existsSync } from 'node:fs';
+import { cpus } from 'node:os';
+import { Worker } from 'node:worker_threads';
 
 interface WorkerMsgBody<T> {
   type: string;

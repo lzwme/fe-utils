@@ -67,7 +67,6 @@ export function setCookie(
     secure ? 'secure; ' : ''
   }httponly; samesite=${sameSite}`;
 
-  // eslint-disable-next-line unicorn/no-document-cookie
   document.cookie = cookieStr;
   return document.cookie.includes(name);
 }

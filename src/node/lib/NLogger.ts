@@ -5,13 +5,13 @@
  * @LastEditTime: 2025-11-01 22:44:11
  * @Description:
  */
-/* eslint no-console: 0 */
-import { dirname, resolve } from 'node:path';
+
 import type { WriteStream } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 import { clearScreenDown, cursorTo } from 'node:readline';
 import { color } from 'console-log-colors';
-import { fs } from '../fs-system';
 import { Logger, type LoggerOptions } from '../../common/lib/Logger';
+import { fs } from '../fs-system';
 
 const fsStreamCache: { [logPath: string]: WriteStream } = {};
 
@@ -100,7 +100,6 @@ export class NLogger extends Logger {
       logFsStream = fs.createWriteStream(this.logPath, { encoding: 'utf8', flags: 'a' });
       fsStreamCache[this.logPath] = logFsStream;
     }
-    // eslint-disable-next-line no-control-regex
     logFsStream.write(msg.replace(/\u001B\[\d+m/g, ''), 'utf8');
   }
   public logInline(msg: string, start = 0) {

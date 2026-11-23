@@ -1,13 +1,13 @@
+import type { OutgoingHttpHeaders } from 'node:http';
+import type { RequestOptions } from 'node:https';
+import { cpus, tmpdir } from 'node:os';
 import { basename, dirname, resolve } from 'node:path';
-import { tmpdir, cpus } from 'node:os';
-import { RequestOptions } from 'node:https';
-import { type OutgoingHttpHeaders } from 'node:http';
-import type { AnyObject } from '../../types';
 import { concurrency } from '../../common/async';
-import { fs } from '../fs-system';
-import { Request } from './request';
-import { NLogger } from './NLogger';
+import type { AnyObject } from '../../types';
 import { md5 } from '../crypto';
+import { fs } from '../fs-system';
+import { NLogger } from './NLogger';
+import { Request } from './request';
 
 /** 解析 content-disposition 中的文件名，优先 filename*（RFC 5987），再回退 filename= */
 function parseContentDispositionFilename(disposition?: string | string[]): string | undefined {

@@ -1,6 +1,6 @@
 import { color } from 'console-log-colors';
-import { getLogger } from './get-logger';
 import { formatTimeCost } from '../common/date';
+import { getLogger } from './get-logger';
 
 /** 等待并获取用户输入内容 */
 export async function readSyncByRl(tips = '> ') {

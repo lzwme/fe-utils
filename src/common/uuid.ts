@@ -24,12 +24,11 @@ let _fillRandomValues: (bucket: Uint8Array) => Uint8Array;
 
 declare const crypto: undefined | { getRandomValues(data: Uint8Array): Uint8Array; randomUUID?(): string };
 
-// eslint-disable-next-line unicorn/prefer-ternary
 if (typeof crypto === 'object' && typeof crypto.getRandomValues === 'function') {
   // browser
   _fillRandomValues = crypto.getRandomValues.bind(crypto);
 } else {
-  _fillRandomValues = function (bucket: Uint8Array): Uint8Array {
+  _fillRandomValues = (bucket: Uint8Array): Uint8Array => {
     for (let i = 0; i < bucket.length; i++) {
       bucket[i] = Math.floor(Math.random() * 256);
     }
@@ -45,9 +44,7 @@ export function generateUuid(): string {
   _fillRandomValues(_data);
 
   // set version bits
-  // eslint-disable-next-line unicorn/number-literal-case
   _data[6] = (_data[6] & 0x0f) | 0x40;
-  // eslint-disable-next-line unicorn/number-literal-case
   _data[8] = (_data[8] & 0x3f) | 0x80;
 
   // print as string

@@ -1,5 +1,5 @@
-import { fs } from './fs-system';
 import { LRUCache } from '../common/lib/LRUCache';
+import { fs } from './fs-system';
 
 /**
  * 清除指定模块的 require 缓存（内存清理或实现热更新）

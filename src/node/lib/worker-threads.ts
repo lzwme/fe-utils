@@ -9,8 +9,9 @@
  * - eslint-plugins 也使用了 worker_threads，会有一些异常现象
  */
 
-import { Worker, isMainThread, workerData } from 'node:worker_threads'; // parentPort
+import { isMainThread, Worker, workerData } from 'node:worker_threads'; // parentPort
 import { getLogger } from '../get-logger';
+
 interface CreateThreadOptions {
   debug?: boolean;
   type: string;
@@ -52,7 +53,6 @@ export function createWorkerThreads<T>(options: CreateThreadOptions, onMessage?:
 
 if (!isMainThread) {
   const config: CreateThreadOptions = workerData;
-  // eslint-disable-next-line no-console
   if (config.debug) console.log('workerData:', config);
   // const done = (data: unknown) => {
   //   if (config.debug) console.log('emit msg from worker thread:', { type: config.type, data, end: true });
@@ -62,7 +62,6 @@ if (!isMainThread) {
   // };
   // const resetConfig = { checkOnInit: false, exitOnError: false, mode: 'current' };
 
-  // eslint-disable-next-line unicorn/prefer-top-level-await
   if (config.workerFile) import(config.workerFile).then(f => (f.default || f)(config)).catch(console.error);
 
   // heartbeat and more...

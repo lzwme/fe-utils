@@ -7,7 +7,7 @@
  * @see https://github.com/rollup/plugins/blob/master/packages/pluginutils/src/createFilter.ts
  */
 
-import { resolve, posix, isAbsolute, extname } from 'node:path';
+import { extname, isAbsolute, posix, resolve } from 'node:path';
 import { ensureArray } from '../common/objects';
 import { normalizePath } from './path';
 

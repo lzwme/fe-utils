@@ -1,10 +1,9 @@
-import { existsSync, unlinkSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, unlinkSync } from 'node:fs';
 import { resolve } from 'node:path';
+import type { AnyObject } from '../types';
 import { LiteStorage } from './LiteStorage';
-import { AnyObject } from '../types';
 
 describe('node/LiteStorage', () => {
-  // eslint-disable-next-line no-console
   // console.log = jest.fn();
   console.error = jest.fn();
 

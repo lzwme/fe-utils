@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/require-await */
-
 import { execFilePromisfy, execSync } from './exec';
 import { tryKillProcess } from './ps';
 

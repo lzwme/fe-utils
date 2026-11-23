@@ -1,5 +1,5 @@
-import { createFilePathFilter } from './createFilePathFilter';
 import { isMatch } from 'micromatch';
+import { createFilePathFilter } from './createFilePathFilter';
 
 describe('createFilePathFilter', () => {
   it('options empty', () => {

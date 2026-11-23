@@ -1,6 +1,6 @@
 import { resolve } from 'node:path';
+import { copyDir, findFiles, mkdirp, outputFile, outputFileSync, readJsonFile, readJsonFileSync, rmEmptyDir, rmrf } from './fs';
 import { fs } from './fs-system';
-import { rmrf, mkdirp, outputFile, outputFileSync, readJsonFile, readJsonFileSync, copyDir, rmEmptyDir, findFiles } from './fs';
 
 describe('fs utils', () => {
   const testDir = resolve(__dirname, '.test-fs');

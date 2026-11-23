@@ -4,9 +4,9 @@ import {
   createCipheriv,
   createDecipheriv,
   createHash,
+  getHashes,
   randomInt,
   scryptSync,
-  getHashes,
 } from 'node:crypto';
 import { basename, resolve } from 'node:path';
 import { fs } from './fs-system';
@@ -50,7 +50,6 @@ export const hash: HashFn = (algorithm: string, str: string | Buffer, isFile = f
     }
     return createHash(algorithm).update(str).digest(outputEncoding);
   } catch (error) {
-    /* eslint-disable no-console */
     console.log(`[hash][${algorithm}][error]`, (error as Error).message);
     return '';
   }

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 import * as IS from './is';
 
 describe('is.ts', () => {
@@ -63,7 +62,6 @@ describe('is.ts', () => {
   });
 
   it('isFunction', () => {
-    // eslint-disable-next-line unicorn/consistent-function-scoping
     const noop = () => {};
     const y = [function a() {}, noop];
     const n = [null, void 0, '1', '0', 'a', '', true, false, 0, {}, []];

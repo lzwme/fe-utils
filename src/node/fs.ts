@@ -1,5 +1,5 @@
 import type { Stats, WriteFileOptions } from 'node:fs';
-import { resolve, sep, dirname } from 'node:path';
+import { dirname, resolve, sep } from 'node:path';
 import { fs } from './fs-system';
 
 /** 【同步】删除指定的文件或目录 */

@@ -1,8 +1,8 @@
+import fs from 'node:fs';
 import http, { type IncomingMessage, type ServerResponse } from 'node:http';
+import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
-import fs from 'node:fs';
-import type { AddressInfo } from 'node:net';
 import { download } from './download';
 
 describe('node/lib/download', () => {

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /*
  * @Author: lzw
  * @Date: 2021-12-24 13:01:39
@@ -140,7 +139,6 @@ export function wxWorkNotify(params: string | WxWorkReqParams, webhookUrl: strin
   }
 
   return new Request().post<WxWorkResult>(webhookUrl, params, { 'content-type': 'application/json' }).then(d => {
-    // eslint-disable-next-line no-console
     if (debug) console.log(`[wxWorkNotify][${d.data.errcode}]`, JSON.stringify(d.data));
     return d.data;
   });

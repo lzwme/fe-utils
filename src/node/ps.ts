@@ -1,9 +1,6 @@
-/* eslint-disable unicorn/no-array-for-each */
-/* eslint-disable unicorn/no-for-loop */
-
-import { ChildProcess, exec } from 'node:child_process';
+import { type ChildProcess, exec } from 'node:child_process';
 import { color } from 'console-log-colors';
-import { execPromisfy, execSync, execFilePromisfy } from './exec';
+import { execFilePromisfy, execPromisfy, execSync } from './exec';
 import { getLogger } from './get-logger';
 
 export interface ProcessItem {
@@ -23,7 +20,6 @@ export function listProcesses(rootPid: number, formatName?: (cmd: string) => str
     let rootItem: ProcessItem | undefined;
     const map = new Map<number, ProcessItem>();
 
-    // eslint-disable-next-line unicorn/consistent-function-scoping
     function findName(cmd: string): string {
       if (typeof formatName === 'function') {
         const cname = formatName(cmd);
@@ -219,8 +215,8 @@ function parsePsOutput(stdout: string, addToTree: (pid: number, ppid: number, cm
     const matches = PID_CMD.exec(line.trim());
     if (matches && matches.length === 6) {
       addToTree(
-        Number.parseInt(matches[1]),
-        Number.parseInt(matches[2]),
+        Number.parseInt(matches[1], 10),
+        Number.parseInt(matches[2], 10),
         matches[5],
         Number.parseFloat(matches[3]),
         Number.parseFloat(matches[4])

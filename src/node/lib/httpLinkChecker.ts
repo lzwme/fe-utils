@@ -1,4 +1,4 @@
-import { RequestOptions } from 'https';
+import type { RequestOptions } from 'https';
 import { assign } from '../../common/objects';
 import { Request } from './request';
 

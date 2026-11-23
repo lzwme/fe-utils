@@ -5,11 +5,10 @@
  * @LastEditTime: 2025-04-22 17:21:25
  * @Description:
  */
-/* eslint no-console: 0 */
 
-import { type GeneralFn } from '../../types';
-import { safeStringify } from '../objects';
+import type { GeneralFn } from '../../types';
 import { dateFormat } from '../date';
+import { safeStringify } from '../objects';
 
 /** 日志级别 */
 export enum LogLevel {
@@ -34,7 +33,6 @@ export interface LoggerOptions {
   /** 日志级别 */
   levelType?: LogLevelType;
   /** 通过外部注入 color 能力 */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   color?: Record<string, any>;
   /** 日志时间格式。默认为：yyyy-MM-dd hh:mm:ss.S */
   timeFormat?: string;
@@ -160,7 +158,7 @@ export class Logger {
       for (const value of Object.values(LogLevelHeadTip)) {
         const [tag, colorType] = value;
         if (options.color[colorType]) {
-          // @ts-ignore
+          // @ts-expect-error
           value[0] = options.color[colorType](tag);
           headTipColored = true;
         }
@@ -175,7 +173,7 @@ export class Logger {
           if (null == options.logDir) continue;
           this.setLogDir(options.logDir);
         }
-        // @ts-ignore
+        // @ts-expect-error
         this.options[key] = options[key];
       }
     }

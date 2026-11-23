@@ -1,9 +1,9 @@
 import { homedir } from 'node:os';
 import { dirname, resolve } from 'node:path';
+import { Barrier } from '../common/async.js';
+import { assign, safeJsonParse, safeStringify, tryLoadJSON5 } from '../common/objects.js';
 import { fs } from './fs-system.js';
 import { getLogger } from './get-logger.js';
-import { assign, safeJsonParse, safeStringify, tryLoadJSON5 } from '../common/objects.js';
-import { Barrier } from '../common/async.js';
 
 export interface LSCache<T> {
   version: string;

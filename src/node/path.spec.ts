@@ -1,7 +1,6 @@
 import { fixToshortPath, normalizePath } from './path';
 
 describe('node/path', () => {
-  // eslint-disable-next-line no-console
   console.log = jest.fn();
   console.error = jest.fn();
 

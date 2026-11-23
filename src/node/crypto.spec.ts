@@ -6,7 +6,7 @@ describe('common/crypto', () => {
   it('md5', () => {
     expect(md5('abc')).toEqual(md5Abc);
     expect(md5(__filename, true).length).toEqual(32);
-    // @ts-ignore
+    // @ts-expect-error
     expect(md5(void 0)).toEqual('');
     expect(md5('abc', true).length).toEqual(0);
 
