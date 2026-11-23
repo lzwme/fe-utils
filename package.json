@@ -27,6 +27,7 @@
     "build:esm": "tsc -p tsconfig.module.json",
     "fix": "biome check --write .",
     "lint": "biome check .",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "run-s test:*",
     "test:lint": "biome check .",
     "test:unit": "npm run cov",
