@@ -1,22 +1,22 @@
 // import test from 'ava';
 import * as comm from './common';
 
-jest.mock('node:readline', () => ({
+vi.mock('node:readline', () => ({
   createInterface() {
     return {
       question(tip: string, callback: (answer: string) => void) {
         callback(tip);
       },
-      close: jest.fn,
+      close: vi.fn,
     };
   },
 }));
 
 describe('utils/common', () => {
-  afterAll(() => jest.restoreAllMocks());
+  afterAll(() => vi.restoreAllMocks());
 
-  console.log = jest.fn();
-  console.error = jest.fn();
+  console.log = vi.fn();
+  console.error = vi.fn();
 
   it('readSyncByRl', async () => {
     expect(await comm.readSyncByRl()).toBe('>');
@@ -29,7 +29,7 @@ describe('utils/common', () => {
   });
 
   it('calcTimeCost.label', async () => {
-    const spyLog = jest.spyOn(console, 'log').mockImplementation(() => null);
+    const spyLog = vi.spyOn(console, 'log').mockImplementation(() => null);
 
     const r = await comm.calcTimeCost(() => Promise.resolve(1), 'label');
     expect(typeof r === 'number').toBeTruthy();

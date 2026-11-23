@@ -7,7 +7,4 @@ module.exports = {
   tscheck: {
     src: ['src'],
   },
-  jest: {
-    src: ['src'],
-  },
 };

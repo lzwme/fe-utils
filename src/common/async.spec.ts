@@ -1,3 +1,4 @@
+import type { MockedFunction } from 'vitest';
 import { Barrier, concurrency, getPromiseState, type ITask, Limiter, raceTimeout, retry, Sequencer, sleep, Throttler, wait } from './async';
 
 describe('async.ts#raceTimeout', () => {
@@ -42,9 +43,9 @@ describe('async.ts#raceTimeout', () => {
 describe('async.ts#Throttler', () => {
   it('should execute tasks one after another', async () => {
     const throttler = new Throttler();
-    const task1 = jest.fn(() => Promise.resolve(1));
-    const task2 = jest.fn(() => Promise.resolve(2));
-    const task3 = jest.fn(() => Promise.resolve(3));
+    const task1 = vi.fn(() => Promise.resolve(1));
+    const task2 = vi.fn(() => Promise.resolve(2));
+    const task3 = vi.fn(() => Promise.resolve(3));
 
     const result1 = await throttler.queue(task1);
     const result2 = await throttler.queue(task2);
@@ -60,9 +61,9 @@ describe('async.ts#Throttler', () => {
 
   it('should queue tasks when active task is running', async () => {
     const throttler = new Throttler();
-    const task1 = jest.fn(() => new Promise(resolve => setTimeout(resolve, 100, 1)));
-    const task2 = jest.fn(() => Promise.resolve(2));
-    const task3 = jest.fn(() => Promise.resolve(3));
+    const task1 = vi.fn(() => new Promise(resolve => setTimeout(resolve, 100, 1)));
+    const task2 = vi.fn(() => Promise.resolve(2));
+    const task3 = vi.fn(() => Promise.resolve(3));
 
     const result1 = await throttler.queue(task1);
     const result2 = await throttler.queue(task2);
@@ -78,9 +79,9 @@ describe('async.ts#Throttler', () => {
 
   it('should cancel queued tasks when new task is queued', async () => {
     const throttler = new Throttler();
-    const task1 = jest.fn(() => new Promise(resolve => setTimeout(resolve, 100, 1)));
-    const task2 = jest.fn(() => Promise.reject(new Error('Cancelled')));
-    const task3 = jest.fn(() => Promise.resolve(3));
+    const task1 = vi.fn(() => new Promise(resolve => setTimeout(resolve, 100, 1)));
+    const task2 = vi.fn(() => Promise.reject(new Error('Cancelled')));
+    const task3 = vi.fn(() => Promise.resolve(3));
 
     const result1 = await throttler.queue(task1);
     const result2Promise = throttler.queue(task2);
@@ -247,7 +248,7 @@ describe('async.ts#wait', () => {
 });
 describe('async.ts#retry', () => {
   it('retries the task until it succeeds', async () => {
-    const task = jest
+    const task = vi
       .fn()
       .mockImplementationOnce(() => Promise.reject(new Error('first fail')))
       .mockImplementationOnce(() => Promise.resolve('success'));
@@ -261,7 +262,7 @@ describe('async.ts#retry', () => {
   });
 
   it('throws an error if all retries fail', async () => {
-    const task = jest.fn().mockImplementation(() => Promise.reject(new Error('always fail')));
+    const task = vi.fn().mockImplementation(() => Promise.reject(new Error('always fail')));
     const delay = 100;
     const retries = 2;
 
@@ -271,7 +272,7 @@ describe('async.ts#retry', () => {
   });
 
   it('can use a validator to determine success', async () => {
-    const task = jest
+    const task = vi
       .fn()
       .mockImplementationOnce(() => Promise.resolve(1))
       .mockImplementationOnce(() => Promise.resolve(2));
@@ -286,7 +287,7 @@ describe('async.ts#retry', () => {
   });
 
   it('throws an error if validator is not provided and task fails', async () => {
-    const task = jest.fn().mockImplementation(() => Promise.reject(new Error('always fail')));
+    const task = vi.fn().mockImplementation(() => Promise.reject(new Error('always fail')));
     const delay = 100;
     const retries = 2;
 
@@ -296,7 +297,7 @@ describe('async.ts#retry', () => {
   });
 
   it('throws a descriptive error when only the validator rejects every attempt', async () => {
-    const task = jest.fn().mockResolvedValue(1);
+    const task = vi.fn().mockResolvedValue(1);
     const error = await retry(task, 1, 2, () => false).catch(e => e as Error);
 
     expect(error).toBeInstanceOf(Error);
@@ -397,12 +398,11 @@ describe('async.ts#concurrency', () => {
 
 describe('async.ts#Limiter', () => {
   let limiter: Limiter<any>;
-  let taskFactory: jest.MockedFunction<ITask<any>>;
+  let taskFactory: MockedFunction<ITask<any>>;
 
   beforeEach(() => {
     limiter = new Limiter(2);
-    // @ts-expect-error
-    taskFactory = jest.fn<ITask<any>, any[]>().mockImplementation(() => jest.fn());
+    taskFactory = vi.fn<ITask<any>>().mockImplementation(() => vi.fn());
   });
 
   it('should queue tasks and execute them with limited parallelism', async () => {
@@ -424,7 +424,7 @@ describe('async.ts#Limiter', () => {
   });
 
   it('should invoke onFinished callbacks when all tasks are completed', async () => {
-    const onFinishedCallback = jest.fn();
+    const onFinishedCallback = vi.fn();
     limiter.onFinished(onFinishedCallback);
 
     for (let i = 0; i < 3; i++) {
@@ -436,7 +436,7 @@ describe('async.ts#Limiter', () => {
   });
 
   it('should dispose onFinished callbacks', () => {
-    const onFinishedCallback = jest.fn();
+    const onFinishedCallback = vi.fn();
     limiter.onFinished(onFinishedCallback);
 
     limiter.dispose();
@@ -481,7 +481,7 @@ describe('async.ts#Limiter', () => {
     expect(results).toEqual([2]);
   });
 
-  it('should handle multiple errors correctly', done => {
+  it('should handle multiple errors correctly', async () => {
     const errors: Error[] = [];
     for (let i = 0; i < 3; i++) {
       const error = new Error(`Task ${i} failed`);
@@ -489,17 +489,16 @@ describe('async.ts#Limiter', () => {
       errors.push(error);
     }
 
-    Promise.all([limiter.queue(taskFactory), limiter.queue(taskFactory), limiter.queue(taskFactory)]).catch(error => {
-      if (Array.isArray(error)) {
-        for (const err of error) {
-          expect(errors).toContain(err);
-        }
-      } else {
-        expect(errors).toContain(error);
-        // done.fail('Expected an array of errors');
+    const caught = await Promise.all([limiter.queue(taskFactory), limiter.queue(taskFactory), limiter.queue(taskFactory)]).catch(
+      error => error
+    );
+    if (Array.isArray(caught)) {
+      for (const err of caught) {
+        expect(errors).toContain(err);
       }
-      done();
-    });
+    } else {
+      expect(errors).toContain(caught);
+    }
   });
 });
 

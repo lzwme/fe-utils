@@ -1,13 +1,14 @@
+import type { MockedFunction } from 'vitest';
 import { execFilePromisfy, execSync } from './exec';
 import { tryKillProcess } from './ps';
 
-jest.mock('./exec');
+vi.mock('./exec');
 
 describe('node/ps tryKillProcess', () => {
-  afterEach(() => jest.resetAllMocks());
+  afterEach(() => vi.resetAllMocks());
 
   it('rejects unsafe name', async () => {
-    const ef = execFilePromisfy as jest.MockedFunction<typeof execFilePromisfy>;
+    const ef = execFilePromisfy as MockedFunction<typeof execFilePromisfy>;
 
     await tryKillProcess({ name: 'bad;rm -rf /' });
 
@@ -16,7 +17,7 @@ describe('node/ps tryKillProcess', () => {
 
   it('uses pgrep and kill on unix', async () => {
     if (process.platform === 'win32') return; // skip on windows
-    const ef = execFilePromisfy as jest.MockedFunction<any>;
+    const ef = execFilePromisfy as MockedFunction<any>;
     ef.mockImplementation(async (cmd: string) => {
       if (cmd === 'pgrep') return { error: null, stdout: '123\n', stderr: '', code: 0 };
       return { error: null, stdout: '', stderr: '', code: 0 };
@@ -33,9 +34,9 @@ describe('node/ps tryKillProcess', () => {
 
   it('uses taskkill on windows', async () => {
     if (process.platform !== 'win32') return; // skip on non-windows
-    const es = execSync as jest.MockedFunction<any>;
+    const es = execSync as MockedFunction<any>;
     es.mockReturnValue({ stdout: 'notepad.exe' });
-    const ef = execFilePromisfy as jest.MockedFunction<any>;
+    const ef = execFilePromisfy as MockedFunction<any>;
     ef.mockResolvedValue({ error: null, stdout: '', stderr: '', code: 0 });
 
     await tryKillProcess({ name: 'notepad.exe' });

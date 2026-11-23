@@ -4,8 +4,8 @@ import type { AnyObject } from '../types';
 import { LiteStorage } from './LiteStorage';
 
 describe('node/LiteStorage', () => {
-  // console.log = jest.fn();
-  console.error = jest.fn();
+  // console.log = vi.fn();
+  console.error = vi.fn();
 
   const filepath = resolve('./cache/test.json');
 

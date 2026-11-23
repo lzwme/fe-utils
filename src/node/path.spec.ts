@@ -1,8 +1,8 @@
 import { fixToshortPath, normalizePath } from './path';
 
 describe('node/path', () => {
-  console.log = jest.fn();
-  console.error = jest.fn();
+  console.log = vi.fn();
+  console.error = vi.fn();
 
   it('fixToshortPath', () => {
     expect(fixToshortPath()).toBe('');

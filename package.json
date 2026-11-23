@@ -30,12 +30,12 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "run-s test:*",
     "test:lint": "biome check .",
-    "test:unit": "npm run cov",
-    "watch": "run-s clean build:cjs && run-p \"build:cjs -- -w\" \"test:unit -- --watch\"",
+    "test:unit": "vitest run",
+    "watch": "run-s clean build:cjs && run-p \"build:cjs -- -w\" \"watch:test\"",
     "watch:build": "tsc -p tsconfig.cjs.json -w",
-    "watch:test": "jest --watch",
-    "cov": "jest --coverage --silent",
-    "cov:html": "jest --coverage --silent --reporter=html",
+    "watch:test": "vitest",
+    "cov": "vitest run --coverage",
+    "cov:html": "vitest run --coverage --coverage.reporter=html",
     "doc": "run-s doc:html",
     "doc:html": "typedoc src/ src/common src/web src/node --exclude **/*.spec.ts --out docs --tsconfig tsconfig.module.json",
     "doc:json": "typedoc src/ src/common src/web src/node --exclude **/*.spec.ts --json docs/typedoc.json --tsconfig tsconfig.module.json",
@@ -49,7 +49,7 @@
   },
   "publishConfig": {
     "access": "public",
-    "registry": "https://registry.npmjs.com"
+    "registry": "https://registry.npmjs.org"
   },
   "files": [
     "esm",
@@ -62,24 +62,20 @@
   "devDependencies": {
     "@biomejs/biome": "^2.6.8",
     "@iarna/toml": "^2.2.5",
-    "@jest/core": "^30",
-    "@jest/types": "^30",
     "@lzwme/fed-lint-helper": "^2.6.6",
-    "@types/jest": "^30.0.0",
     "@types/micromatch": "^4.0.10",
     "@types/node": "^26.6.6",
+    "@vitest/coverage-v8": "^5.1.1",
     "compressing": "^2.1.5",
     "husky": "^9.1.7",
-    "jest": "^30.5.2",
     "json5": "^2.2.3",
     "micromatch": "^4.0.8",
     "npm-run-all": "^4.1.5",
     "standard-version": "^9.5.0",
-    "ts-jest": "^29.4.15",
-    "ts-jest-resolver": "^2.0.1",
     "ts-node": "^10.9.2",
     "typedoc": "^0.28.20",
     "typescript": "^7.0.2",
+    "vitest": "^5.1.1",
     "windows-process-tree": "^0.4.0"
   },
   "peerDependencies": {
