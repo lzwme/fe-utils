@@ -74,7 +74,7 @@
     "standard-version": "^9.5.0",
     "ts-node": "^10.9.2",
     "typedoc": "^0.28.20",
-    "typescript": "^7.0.2",
+    "typescript": "^6.0.3",
     "vitest": "^5.1.1",
     "windows-process-tree": "^0.4.0"
   },
